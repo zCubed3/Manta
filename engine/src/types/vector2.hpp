@@ -11,10 +11,7 @@ namespace Silica {
         float x = 0.0F;
         float y = 0.0F;
 
-        Vector2(float x, float y) {
-            this->x = x;
-            this->y = y;
-        }
+        Vector2(float x, float y);
 
         [[nodiscard]]
         std::string ToString() const {

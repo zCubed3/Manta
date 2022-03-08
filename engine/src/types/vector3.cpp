@@ -5,6 +5,12 @@
 #include <math.h>
 
 namespace Silica {
+    Vector3::Vector3(float x, float y, float z) {
+        this->x = x;
+        this->y = y;
+        this->z = z;
+    }
+
     //https://en.wikipedia.org/wiki/Fast_inverse_square_root#Accuracy
     // TODO: Faster length?
     float Vector3::Length() const {
