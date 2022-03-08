@@ -3,6 +3,8 @@ set(SOURCES
 
     "src/types/vector2.cpp"
     "src/types/vector3.cpp"
+    "src/types/vector4.cpp"
+    "src/types/matrix4x4.cpp"
 
     "src/rendering/mesh.cpp"
     "src/rendering/material.cpp"
@@ -10,7 +12,7 @@ set(SOURCES
 )
 
 set(INCLUDE_DIRS
-    "${ENGINE_DIR}/include"
+    "${ENGINE_DIR}/src"
     "${DEPENDS_DIR}/openvr/headers"
 )
 

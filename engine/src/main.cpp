@@ -10,6 +10,8 @@
 // Types
 #include "types/vector2.hpp"
 #include "types/vector3.hpp"
+#include "types/vector4.hpp"
+#include "types/matrix4x4.hpp"
 
 #include "rendering/mesh.hpp"
 #include "rendering/shader.hpp"

@@ -7,8 +7,7 @@
 #include "../lua_common.hpp"
 
 namespace Silica {
-    class Vector3 {
-    public:
+    struct Vector3 {
         float x = 0.0F;
         float y = 0.0F;
         float z = 0.0F;

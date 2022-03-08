@@ -36,6 +36,7 @@ namespace Silica {
 
     protected:
         int version = 330;
+        int sorting_order = 2000; // Does nothing right now, maybe in the future!
         bool analyzed = false;
     };
 }
