@@ -7,282 +7,15 @@
 // Opengl
 #include <GL/glew.h>
 
-extern "C" { // This is to fix the C-ness of lua
-    #include <lua.h>
-    #include <lualib.h>
-    #include <lauxlib.h>
-}
+// Types
+#include "types/vector2.hpp"
 
 // TODO: Proof of concept implementation first
 // TODO: Then clean up
 
-const char* HELLO_LUA_PATH = "lua/scripts/hello.lua";
-const char* CONFIG_LUA_PATH = "lua/config/engine.lua";
+#include "lua_common.hpp"
 
-class Vector2 {
-public:
-    float x = 0.0F;
-    float y = 0.0F;
-
-    Vector2(float x, float y) {
-        this->x = x;
-        this->y = y;
-    }
-
-    [[nodiscard]]
-    std::string to_string() const {
-        std::stringstream str;
-
-        str << "{ " << x << ", " << y << " }";
-
-        return str.str();
-    }
-
-    [[nodiscard]]
-    std::string to_pretty_string() const {
-        std::stringstream str;
-
-        str << x << ", " << y;
-
-        return str.str();
-    }
-
-    //
-    // Addition
-    //
-    friend Vector2 operator+(const Vector2& lhs, const Vector2& rhs) {
-        return {lhs.x + rhs.x, lhs.y + rhs.y};
-    }
-
-    friend Vector2 operator+(const Vector2& lhs, const float& rhs) {
-        return {lhs.x + rhs, lhs.y + rhs};
-    }
-
-    //
-    // Subtraction
-    //
-    friend Vector2 operator-(const Vector2& lhs, const Vector2& rhs) {
-        return {lhs.x - rhs.x, lhs.y - rhs.y};
-    }
-
-    friend Vector2 operator-(const Vector2& lhs, const float& rhs) {
-        return {lhs.x - rhs, lhs.y - rhs};
-    }
-
-    //
-    // Multiplication
-    //
-    friend Vector2 operator*(const Vector2& lhs, const Vector2& rhs) {
-        return {lhs.x * rhs.x, lhs.y * rhs.y};
-    }
-
-    friend Vector2 operator*(const Vector2& lhs, const float& rhs) {
-        return {lhs.x * rhs, lhs.y * rhs};
-    }
-
-    //
-    // Division
-    //
-    friend Vector2 operator/(const Vector2& lhs, const Vector2& rhs) {
-        return {lhs.x / rhs.x, lhs.y / rhs.y};
-    }
-
-    friend Vector2 operator/(const Vector2& lhs, const float& rhs) {
-        return {lhs.x / rhs, lhs.y / rhs};
-    }
-
-    //
-    // Lua bindings
-    //
-protected:
-    static Vector2* lua_construct_vector2(lua_State *L) {
-        auto vector2 = reinterpret_cast<Vector2*>(lua_newuserdata(L, sizeof(Vector2)));
-        luaL_getmetatable(L, "Vector2");
-        lua_setmetatable(L, -2);
-        return vector2;
-    }
-
-    static int lua_new_vector2(lua_State *L) {
-        float x = luaL_checknumber(L, 1);
-        float y = luaL_checknumber(L, 2);
-
-        auto vector2 = lua_construct_vector2(L);
-
-        vector2->x = x;
-        vector2->y = y;
-
-        return 1;
-    }
-
-    static int lua_get_vector2(lua_State *L) {
-        auto v2 = reinterpret_cast<Vector2*>(lua_touserdata(L, 1));
-        std::string member = lua_tostring( L, 2 );
-
-        if (member == "x") {
-            lua_pushnumber(L, v2->x);
-        } else if (member == "y") {
-            lua_pushnumber(L, v2->y);
-        } else {
-#ifdef DEBUG
-            std::cout << "LUA: Get '" << member << "' was called!" << std::endl;
-#endif
-            return 0;
-        }
-
-        return 1;
-    }
-
-    static int lua_set_vector2(lua_State *L) {
-        auto v2 = reinterpret_cast<Vector2*>(lua_touserdata(L, 1));
-        std::string member = lua_tostring( L, 2 );
-        float value = luaL_checknumber(L, 3);
-
-        if (member == "x") {
-            v2->x = value;
-        } else if (member == "y") {
-            v2->y = value;
-        } else {
-#ifdef DEBUG
-            std::cout << "LUA: Set '" << member << "' was called!" << std::endl;
-#endif
-            return 0;
-        }
-
-        return 1;
-    }
-
-    static int lua_tostring_vector2(lua_State *L) {
-        auto v2 = reinterpret_cast<Vector2*>(lua_touserdata(L, 1));
-        lua_pushstring(L, v2->to_string().c_str());
-
-        return 1;
-    }
-
-    static int lua_add_vector2(lua_State *L) {
-        auto v2 = reinterpret_cast<Vector2*>(lua_touserdata(L, 1));
-
-        if (lua_isnumber(L, 2)) {
-            float rhs = luaL_checknumber(L, 2);
-            auto res = lua_construct_vector2(L);
-
-            *res = *v2 + rhs;
-        } else if (lua_istable(L, 2)) {
-            auto rhs = reinterpret_cast<Vector2*>(lua_touserdata(L, 2));
-
-            if (rhs == nullptr)
-                throw std::runtime_error("lua_add_vector2() rhs table was nullptr!");
-
-            auto res = lua_construct_vector2(L);
-
-            *res = *v2 + *rhs;
-        } else {
-            return 0;
-        }
-
-        return 1;
-    }
-
-    static int lua_sub_vector2(lua_State *L) {
-        auto v2 = reinterpret_cast<Vector2*>(lua_touserdata(L, 1));
-
-        if (lua_isnumber(L, 2)) {
-            float rhs = luaL_checknumber(L, 2);
-            auto res = lua_construct_vector2(L);
-
-            *res = *v2 - rhs;
-        } else if (lua_istable(L, 2)) {
-            auto rhs = reinterpret_cast<Vector2*>(lua_touserdata(L, 2));
-
-            if (rhs == nullptr)
-                throw std::runtime_error("lua_add_vector2() rhs table was nullptr!");
-
-            auto res = lua_construct_vector2(L);
-
-            *res = *v2 - *rhs;
-        } else {
-            return 0;
-        }
-
-        return 1;
-    }
-
-    static int lua_mul_vector2(lua_State *L) {
-        auto v2 = reinterpret_cast<Vector2*>(lua_touserdata(L, 1));
-
-        if (lua_isnumber(L, 2)) {
-            float rhs = luaL_checknumber(L, 2);
-            auto res = lua_construct_vector2(L);
-
-            *res = *v2 * rhs;
-        } else if (lua_istable(L, 2)) {
-            auto rhs = reinterpret_cast<Vector2*>(lua_touserdata(L, 2));
-
-            if (rhs == nullptr)
-                throw std::runtime_error("lua_add_vector2() rhs table was nullptr!");
-
-            auto res = lua_construct_vector2(L);
-
-            *res = *v2 * *rhs;
-        } else {
-            return 0;
-        }
-
-        return 1;
-    }
-
-    static int lua_div_vector2(lua_State *L) {
-        auto v2 = reinterpret_cast<Vector2*>(lua_touserdata(L, 1));
-
-        if (lua_isnumber(L, 2)) {
-            float rhs = luaL_checknumber(L, 2);
-            auto res = lua_construct_vector2(L);
-
-            *res = *v2 / rhs;
-        } else if (lua_istable(L, 2)) {
-            auto rhs = reinterpret_cast<Vector2*>(lua_touserdata(L, 2));
-
-            if (rhs == nullptr)
-                throw std::runtime_error("lua_add_vector2() rhs table was nullptr!");
-
-            auto res = lua_construct_vector2(L);
-
-            *res = *v2 / *rhs;
-        } else {
-            return 0;
-        }
-
-        return 1;
-    }
-
-    constexpr static const struct luaL_Reg lua_vector2_methods[] = {
-            { "__index", lua_get_vector2 },
-            { "__newindex", lua_set_vector2 },
-            { "__tostring", lua_tostring_vector2 },
-            { "__add", lua_add_vector2 },
-            { "__sub", lua_sub_vector2 },
-            { "__mul", lua_mul_vector2 },
-            { "__div", lua_div_vector2 },
-            { nullptr, nullptr }
-    };
-
-    constexpr static const struct luaL_Reg lua_vector2_functions[] = {
-            { "new", lua_new_vector2 },
-            { nullptr, nullptr }
-    };
-
-    // Lua register function
-public:
-    static int lua_open_vector2(lua_State *L) {
-        luaL_newmetatable(L, "Vector2");
-        lua_pushvalue(L, -1);
-        lua_setfield(L, -2, "__index");
-        luaL_setfuncs(L, lua_vector2_methods, 0);
-
-        luaL_newlib(L, lua_vector2_functions);
-
-        return 1;
-    }
-};
+using namespace Silica;
 
 // A base behavior that has 2 variants, LuaBehavior and NativeBehavior
 // LuaBehavior is self-explanatory
@@ -368,10 +101,10 @@ bool lua_invoke_script(lua_State* lua_vm, int argc = 0, int retc = 0) {
     lua_pushcfunction(lua_vm, lua_error_handle);
     lua_insert(lua_vm, top_pos);
 
-    int run_state = lua_pcall(lua_vm, argc, retc, 0);
+    int run_state = lua_pcall(lua_vm, argc, retc, top_pos);
 
     if (run_state != LUA_OK) {
-        printf("LUA ERROR \n%s\n", lua_tostring(lua_vm, -1));
+        printf("LUA ERROR:\n%s\n", lua_tostring(lua_vm, -1));
     }
 
     return run_state == LUA_OK;
@@ -399,7 +132,7 @@ lua_State* lua_init(bool as_debug) {
         lua_setglobal(lua, "SILICA_LUA_DEBUG");
     }
 
-    if (lua_load_script(lua, HELLO_LUA_PATH)) {
+    if (lua_load_script(lua, LUA_HELLO_PATH)) {
         lua_invoke_script(lua);
     }
 
@@ -417,7 +150,7 @@ public:
 
         // TODO: Safety
 
-        if (!lua_load_script(L, CONFIG_LUA_PATH))
+        if (!lua_load_script(L, LUA_ENGINE_CFG_PATH))
             throw std::runtime_error("Failed loading engine config script!");
 
         lua_pcall(L, 0, 0, 0);
