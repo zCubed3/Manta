@@ -1,0 +1,64 @@
+-- Basic hello function
+local function hello_lua()
+    print("LUA: Hello from Lua!")
+    print(string.format("LUA: Version is %s", _VERSION))
+
+    if SILICA_LUA_DEBUG ~= nil then
+        print("LUA: Debug isn't nil, prepare for verbosity!")
+
+        print("LUA DEBUG: Listing locations we are going to search for lua scripts in...")
+        for str in string.gmatch(package.path, '([^;]+)') do
+            print("  PATH: " .. str)
+        end
+
+        print("LUA DEBUG: Loaded modules...")
+        for key, value in pairs(package.loaded) do
+            print("  MOD: " .. key)
+        end
+
+        print("LUA DEBUG: Checking that silica types have loaded correctly...")
+
+        print("LUA DEBUG: Checking vector2")
+        local v2 = vector2.new(1.0, 0.0)
+
+        print("LUA DEBUG: Testing __index!")
+
+        print("X = " .. v2.x) -- Should print 1
+        print("Y = " .. v2.y) -- Should print 0
+
+        print("LUA DEBUG: Testing __newindex!")
+
+        v2.x = 0.0
+        print("X = " .. v2.x) -- Should print 0
+
+        v2.y = 1.0
+        print("Y = " .. v2.y) -- Should print 1
+
+        print("LUA DEBUG: Testing __tostring!")
+        print(v2) -- Should print { 0, 1 }
+
+        -- After all this we should return to { 0, 1 }
+        print("LUA DEBUG: Testing artihmetic, we should return to { 0, 1 } at the end!")
+
+        v2 = v2 + 1.0 -- Should become { 1, 2 }
+        print(v2)
+
+        v2 = v2 - 1.0 -- Should become { 0, 1 }
+        print(v2)
+
+        v2 = v2 * 2.0 -- Should become { 0, 2 }
+        print(v2)
+
+        v2 = v2 / 2.0 -- Should become { 0, 1 }
+        print(v2)
+    end
+end
+
+local state, err = pcall(function()
+    hello_lua()
+end)
+
+if state == false then
+    print("LUA: hello_lua() failed!")
+    print("LUA ERROR:\n" .. err)
+end
