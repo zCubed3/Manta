@@ -108,7 +108,7 @@ namespace Silica {
 
     int Vector2::lua_tostring_vector2(lua_State *L) {
         auto v2 = reinterpret_cast<Vector2 *>(lua_touserdata(L, 1));
-        lua_pushstring(L, v2->to_string().c_str());
+        lua_pushstring(L, v2->ToString().c_str());
 
         return 1;
     }

@@ -20,7 +20,7 @@ namespace Silica {
         }
     }
 
-    Matrix4x4 Matrix4x4::identity() {
+    Matrix4x4 Matrix4x4::Identity() {
         return {
             { 1, 0, 0, 0 },
             { 0, 1, 0, 0 },

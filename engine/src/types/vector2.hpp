@@ -17,7 +17,7 @@ namespace Silica {
         }
 
         [[nodiscard]]
-        std::string to_string() const {
+        std::string ToString() const {
             std::stringstream str;
 
             str << "{ " << x << ", " << y << " }";
@@ -26,7 +26,7 @@ namespace Silica {
         }
 
         [[nodiscard]]
-        std::string to_pretty_string() const {
+        std::string ToPrettyString() const {
             std::stringstream str;
 
             str << x << ", " << y;

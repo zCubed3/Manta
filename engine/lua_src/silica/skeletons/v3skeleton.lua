@@ -3,20 +3,18 @@
 -- Any behavior here is purely for type hinting!
 
 vector3 = {
+    new = function(x, y, z) return setmetatable({}, vector3.Vector3) end,
+
     Vector3 = {
         x = 0.0,
         y = 0.0,
         z = 0.0,
-        __index = Vector3
+
+        __index = Vector3,
+    
+        length = function(rhs) return 0.0 end,
+        dot = function(rhs) return 0.0 end,
+        normalize = function() return {} end,
+        cross = function(rhs) return {} end,
     }
 }
-
-function vector3.new(x, y, z)
-    return setmetatable({}, vector2.Vector2)
-end
-
-function dummy()
-    return setmetatable({}, vector2.Vector2)
-end
-
-vector3.Vector3.__add = dummy();

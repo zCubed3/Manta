@@ -2,7 +2,31 @@
 
 #include <iostream>
 
+#include <math.h>
+
 namespace Silica {
+    //https://en.wikipedia.org/wiki/Fast_inverse_square_root#Accuracy
+    // TODO: Faster length?
+    float Vector3::Length() const {
+        return sqrtf(Dot(*this)); // This is because dot(this, this) is the same as calculating raw length!
+    }
+
+    float Vector3::Dot(const Vector3& rhs) const {
+        return (x * rhs.x) + (y * rhs.y) + (z * rhs.z);
+    }
+
+    Vector3 Vector3::Normalize() const {
+        return *this / Length();
+    }
+
+    Vector3 Vector3::Cross(const Vector3& rhs) const {
+        return {
+            y * rhs.z - z * rhs.y,
+            z * rhs.x - x * rhs.z,
+            x * rhs.y - y * rhs.x
+        };
+    }
+
     //
     // Addition
     //
@@ -71,6 +95,12 @@ namespace Silica {
         return 1;
     }
 
+    int Vector3::lua_gc_vector3(lua_State *L) {
+        auto v3 = reinterpret_cast<Vector3 *>(lua_touserdata(L, 1));
+        free(v3);
+        return 1;
+    }
+
     int Vector3::lua_get_vector3(lua_State *L) {
         auto v3 = reinterpret_cast<Vector3 *>(lua_touserdata(L, 1));
         std::string member = lua_tostring(L, 2);
@@ -81,7 +111,23 @@ namespace Silica {
             lua_pushnumber(L, v3->y);
         } else if (member == "z") {
             lua_pushnumber(L, v3->z);
-        } else {
+        }
+        //
+        // Methods
+        //
+        else if (member == "length") {
+            lua_pushcfunction(L, lua_length_vector3);
+        } else if (member == "dot") {
+            lua_pushcfunction(L, lua_dot_vector3);
+        } else if (member == "normalize") {
+            lua_pushcfunction(L, lua_normalize_vector3);
+        } else if (member == "cross") {
+            lua_pushcfunction(L, lua_cross_vector3);
+        }
+        //
+        // Fallback
+        //
+        else {
 #ifdef DEBUG
             std::cout << "LUA: Get '" << member << "' was called!" << std::endl;
 #endif
@@ -215,8 +261,51 @@ namespace Silica {
         return 1;
     }
 
+    int Vector3::lua_length_vector3(lua_State *L) {
+        auto v3 = reinterpret_cast<Vector3 *>(lua_touserdata(L, 1));
+        lua_pushnumber(L, v3->Length());
+
+        return 1;
+    }
+
+    int Vector3::lua_dot_vector3(lua_State *L) {
+        auto v3 = reinterpret_cast<Vector3 *>(lua_touserdata(L, 1));
+        auto rhs = reinterpret_cast<Vector3 *>(lua_touserdata(L, 2));
+
+        if (rhs == nullptr)
+            return 0;
+
+        lua_pushnumber(L, v3->Dot(*rhs));
+
+        return 1;
+    }
+
+    int Vector3::lua_normalize_vector3(lua_State *L) {
+        auto v3 = reinterpret_cast<Vector3 *>(lua_touserdata(L, 1));
+        auto res = lua_construct_vector3(L);
+
+        *res = v3->Normalize();
+
+        return 1;
+    }
+
+    int Vector3::lua_cross_vector3(lua_State *L) {
+        auto v3 = reinterpret_cast<Vector3 *>(lua_touserdata(L, 1));
+        auto rhs = reinterpret_cast<Vector3 *>(lua_touserdata(L, 2));
+
+        if (rhs == nullptr)
+            return 0;
+
+        auto res = lua_construct_vector3(L);
+
+        *res = v3->Cross(*rhs);
+
+        return 1;
+    }
+
     const struct luaL_Reg Vector3::lua_vector3_methods[] = {
             {"__index",    Vector3::lua_get_vector3},
+            {"__gc",       Vector3::lua_gc_vector3},
             {"__newindex", Vector3::lua_set_vector3},
             {"__tostring", Vector3::lua_tostring_vector3},
             {"__add",      Vector3::lua_add_vector3},

@@ -9,7 +9,7 @@ namespace Silica {
 
         Vector4 operator[] (const int &idx) const;
 
-        static Matrix4x4 identity();
+        static Matrix4x4 Identity();
     };
 }
 

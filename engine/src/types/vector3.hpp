@@ -37,6 +37,15 @@ namespace Silica {
         }
 
         //
+        // Vector math
+        //
+        [[nodiscard]] float Length() const;
+        [[nodiscard]] float Dot(const Vector3& rhs) const;
+
+        [[nodiscard]] Vector3 Normalize() const;
+        [[nodiscard]] Vector3 Cross(const Vector3& rhs) const;
+
+        //
         // Addition
         //
         Vector3 operator+(const Vector3 &rhs) const;
@@ -67,13 +76,22 @@ namespace Silica {
         static Vector3 *lua_construct_vector3(lua_State *L);
 
         static int lua_new_vector3(lua_State *L);
+        static int lua_gc_vector3(lua_State *L);
+
         static int lua_get_vector3(lua_State *L);
         static int lua_set_vector3(lua_State *L);
+
         static int lua_tostring_vector3(lua_State *L);
+
         static int lua_add_vector3(lua_State *L);
         static int lua_sub_vector3(lua_State *L);
         static int lua_mul_vector3(lua_State *L);
         static int lua_div_vector3(lua_State *L);
+
+        static int lua_length_vector3(lua_State *L);
+        static int lua_dot_vector3(lua_State *L);
+        static int lua_normalize_vector3(lua_State *L);
+        static int lua_cross_vector3(lua_State *L);
 
         static const struct luaL_Reg lua_vector3_methods[];
         static const struct luaL_Reg lua_vector3_functions[];

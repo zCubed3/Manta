@@ -1,5 +1,5 @@
 -- Basic hello function
-local function hello_lua()
+local state, err = pcall(function()
     print("LUA: Hello from Lua!")
     print(string.format("LUA: Version is %s", _VERSION))
 
@@ -89,11 +89,33 @@ local function hello_lua()
 
         v3 = v3 / 2.0 -- Should become { 0, 1, 2 }
         print(v3)
-    end
-end
 
-local state, err = pcall(function()
-    hello_lua()
+        print("LUA DEBUG: Testing dot product!")
+        -- We set it to 0, 1, 0 for testing
+        v3 = vector3.new(0.0, 1.0, 0.0)
+
+        local v3r = vector3.new(0.0, 1.0, 0.0);
+        print("DOT = " .. v3:dot(v3r)); -- Should be 1.0
+
+        v3r = vector3.new(0.0, 0.0, 0.0);
+        print("DOT = " .. v3:dot(v3r)); -- Should be 0.0
+
+        v3r = vector3.new(0.0, -1.0, 0.0);
+        print("DOT = " .. v3:dot(v3r)); -- Should be -1.0
+
+        print("LUA DEBUG: Testing cross product!")
+        v3r = vector3.new(1.0, 0.0, 0.0)
+        print(tostring(v3) .. " X " .. tostring(v3r) .. " = ".. tostring(v3:cross(v3r)))
+
+        print("LUA DEBUG: Testing length and normalization!")
+        
+        v3 = vector3.new(0.0, 2.0, 0.0)
+        print("LEN = " .. v3:length())
+
+        print("PRE NORM = " .. tostring(v3))
+        v3 = v3:normalize()
+        print("POST NORM = " .. tostring(v3));
+    end
 end)
 
 if state == false then
