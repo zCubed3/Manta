@@ -11,6 +11,10 @@
 #include "types/vector2.hpp"
 #include "types/vector3.hpp"
 
+#include "rendering/mesh.hpp"
+#include "rendering/shader.hpp"
+#include "rendering/material.hpp"
+
 // TODO: Proof of concept implementation first
 // TODO: Then clean up
 
@@ -203,6 +207,8 @@ int main(int argc, char** argv) {
 
     SDL_Event sdl_event;
     bool keep_running = true;
+
+    Shader* shader = Shader::LoadFile("shaders/unlit.glsl");
 
     while (keep_running) {
         // Event polling

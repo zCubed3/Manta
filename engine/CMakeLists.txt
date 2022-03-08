@@ -3,6 +3,10 @@ set(SOURCES
 
     "src/types/vector2.cpp"
     "src/types/vector3.cpp"
+
+    "src/rendering/mesh.cpp"
+    "src/rendering/material.cpp"
+    "src/rendering/shader.cpp"
 )
 
 set(INCLUDE_DIRS
@@ -34,9 +38,15 @@ set_target_properties(Silica PROPERTIES
 
 # https://stackoverflow.com/questions/34799916/copy-file-from-source-directory-to-binary-directory-using-cmake
 add_custom_target(copy-lua ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${ENGINE_DIR}/lua_src
-    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/lua
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${ENGINE_DIR}/lua_src
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/lua
+)
+
+add_custom_target(copy-glsl ALL
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${ENGINE_DIR}/shaders
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/shaders
 )
 
 add_dependencies(Silica copy-lua)
