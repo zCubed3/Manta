@@ -9,6 +9,7 @@
 
 // Types
 #include "types/vector2.hpp"
+#include "types/vector3.hpp"
 
 // TODO: Proof of concept implementation first
 // TODO: Then clean up
@@ -125,6 +126,7 @@ lua_State* lua_init(bool as_debug) {
 
     // Register silica primitive types
     luaL_requiref(lua, "vector2", Vector2::lua_open_vector2, 1);
+    luaL_requiref(lua, "vector3", Vector3::lua_open_vector3, 1);
 
     // Enables debug mode
     if (as_debug) {

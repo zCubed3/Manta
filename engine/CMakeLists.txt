@@ -2,6 +2,7 @@ set(SOURCES
     "src/main.cpp"
 
     "src/types/vector2.cpp"
+    "src/types/vector3.cpp"
 )
 
 set(INCLUDE_DIRS

@@ -51,6 +51,44 @@ local function hello_lua()
 
         v2 = v2 / 2.0 -- Should become { 0, 1 }
         print(v2)
+
+        print("LUA DEBUG: Checking vector3")
+        local v3 = vector3.new(2.0, 1.0, 0.0)
+
+        print("LUA DEBUG: Testing __index!")
+
+        print("X = " .. v3.x) -- Should print 2
+        print("Y = " .. v3.y) -- Should print 1
+        print("Z = " .. v3.z) -- Should print 0
+
+        print("LUA DEBUG: Testing __newindex!")
+
+        v3.x = 0.0
+        print("X = " .. v3.x) -- Should print 0
+
+        v3.y = 1.0
+        print("Y = " .. v3.y) -- Should print 1
+
+        v3.z = 2.0
+        print("Z = " .. v3.z) -- Should print 2
+
+        print("LUA DEBUG: Testing __tostring!")
+        print(v3) -- Should print { 0, 1 }
+
+        -- After all this we should return to { 0, 1, 2 }
+        print("LUA DEBUG: Testing artihmetic, we should return to { 0, 1, 2 } at the end!")
+
+        v3 = v3 + 1.0 -- Should become { 1, 2, 3 }
+        print(v3)
+
+        v3 = v3 - 1.0 -- Should become { 0, 1, 2 }
+        print(v3)
+
+        v3 = v3 * 2.0 -- Should become { 0, 2, 4 }
+        print(v3)
+
+        v3 = v3 / 2.0 -- Should become { 0, 1, 2 }
+        print(v3)
     end
 end
 
