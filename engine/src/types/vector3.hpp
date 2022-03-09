@@ -14,23 +14,14 @@ namespace Silica {
 
         Vector3(float x = 0, float y = 0, float z = 0);
 
+        //
+        // To string
+        //
         [[nodiscard]]
-        std::string to_string() const {
-            std::stringstream str;
-
-            str << "{ " << x << ", " << y << ", " << z << " }";
-
-            return str.str();
-        }
+        std::string ToString() const;
 
         [[nodiscard]]
-        std::string to_pretty_string() const {
-            std::stringstream str;
-
-            str << x << ", " << y << ", " << z;
-
-            return str.str();
-        }
+        std::string ToPrettyString() const;
 
         //
         // Vector math

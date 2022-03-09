@@ -9,6 +9,24 @@ namespace Silica {
         this->y = y;
     }
 
+    [[nodiscard]]
+    std::string Vector2::ToString() const {
+        std::stringstream str;
+
+        str << "{ " << x << ", " << y << " }";
+
+        return str.str();
+    }
+
+    [[nodiscard]]
+    std::string Vector2::ToPrettyString() const {
+        std::stringstream str;
+
+        str << x << ", " << y;
+
+        return str.str();
+    }
+
     //
     // Addition
     //

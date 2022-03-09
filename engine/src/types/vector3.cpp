@@ -12,6 +12,24 @@ namespace Silica {
         this->z = z;
     }
 
+    [[nodiscard]]
+    std::string Vector3::ToString() const {
+        std::stringstream str;
+
+        str << "{ " << x << ", " << y << ", " << z << " }";
+
+        return str.str();
+    }
+
+    [[nodiscard]]
+    std::string Vector3::ToPrettyString() const {
+        std::stringstream str;
+
+        str << x << ", " << y << ", " << z;
+
+        return str.str();
+    }
+
     //https://en.wikipedia.org/wiki/Fast_inverse_square_root#Accuracy
     // TODO: Faster length?
     float Vector3::Length() const {
@@ -167,7 +185,7 @@ namespace Silica {
 
     int Vector3::lua_tostring_vector3(lua_State *L) {
         auto v3 = reinterpret_cast<Vector3 *>(lua_touserdata(L, 1));
-        lua_pushstring(L, v3->to_string().c_str());
+        lua_pushstring(L, v3->ToString().c_str());
 
         return 1;
     }

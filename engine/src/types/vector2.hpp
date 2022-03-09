@@ -14,22 +14,10 @@ namespace Silica {
         Vector2(float x, float y);
 
         [[nodiscard]]
-        std::string ToString() const {
-            std::stringstream str;
-
-            str << "{ " << x << ", " << y << " }";
-
-            return str.str();
-        }
+        std::string ToString() const;
 
         [[nodiscard]]
-        std::string ToPrettyString() const {
-            std::stringstream str;
-
-            str << x << ", " << y;
-
-            return str.str();
-        }
+        std::string ToPrettyString() const;
 
         //
         // Addition
