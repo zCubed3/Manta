@@ -7,8 +7,8 @@ set(SOURCES
     "src/types/matrix4x4.cpp"
 
     "src/rendering/mesh.cpp"
-    "src/rendering/material.cpp"
     "src/rendering/shader.cpp"
+    "src/rendering/camera.cpp"
 )
 
 set(INCLUDE_DIRS

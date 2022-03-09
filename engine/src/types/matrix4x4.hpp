@@ -23,6 +23,7 @@ namespace Silica {
 
         static Matrix4x4 MakeTRS(const Vector3& translation, const Vector3& euler, const Vector3& scale);
 
+        static Matrix4x4 MakePerspective(float fov_y, float aspect, float near_cull, float far_cull);
 
         Vector4 operator[] (const int &idx) const;
         Matrix4x4 operator* (const Matrix4x4& rhs) const;

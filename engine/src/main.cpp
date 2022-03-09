@@ -15,7 +15,6 @@
 
 #include "rendering/mesh.hpp"
 #include "rendering/shader.hpp"
-#include "rendering/material.hpp"
 
 // TODO: Proof of concept implementation first
 // TODO: Then clean up
@@ -217,6 +216,23 @@ int main(int argc, char** argv) {
     Shader::CreateEngineShaders();
     Shader* shader = Shader::LoadFile("shaders/unlit.glsl");
 
+    Mesh* mesh = new Mesh();
+    Mesh::Vertex vertex { Vector3(), Vector3(), Vector2() };
+
+    mesh->vertices.emplace_back(vertex);
+
+    vertex.position = Vector3(0, 1, 0);
+    mesh->vertices.emplace_back(vertex);
+
+    vertex.position = Vector3(1, 0, 0);
+    mesh->vertices.emplace_back(vertex);
+
+    mesh->indices.emplace_back(0);
+    mesh->indices.emplace_back(1);
+    mesh->indices.emplace_back(2);
+
+    mesh->CreateBuffers();
+
     while (keep_running) {
         // Event polling
         while (SDL_PollEvent(&sdl_event) != 0) {
@@ -226,6 +242,9 @@ int main(int argc, char** argv) {
 
         glClearColor(config->clear_r, config->clear_g, config->clear_b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        mesh->DrawNow(Matrix4x4::Identity(), Shader::error_shader);
+
         SDL_GL_SwapWindow(sdl_window);
     }
 

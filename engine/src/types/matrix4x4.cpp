@@ -71,6 +71,21 @@ namespace Silica {
         return mat;
     }
 
+    Matrix4x4 Matrix4x4::MakePerspective(float fov_y, float aspect, float near_cull, float far_cull) {
+        float rad = (fov_y / 2.0f) * DEG_TO_RAD;
+
+        float y_scale = 1.0f / tanf(rad);
+        float x_scale = y_scale / aspect;
+        float comp = near_cull - far_cull;
+
+        return {
+            Vector4(x_scale, 0, 0, 0),
+            Vector4(0, y_scale, 0, 0),
+            Vector4(0, 0, (far_cull + near_cull) / comp, -1.0),
+            Vector4(0, 0, 2 * far_cull * near_cull / comp, 0)
+        };
+    }
+
     Vector4 Matrix4x4::operator[] (const int &idx) const {
         switch (idx) {
             case 0:
@@ -111,10 +126,10 @@ namespace Silica {
     //
     Matrix4x4 Matrix4x4::Identity() {
         return {
-            { 1, 0, 0, 0 },
-            { 0, 1, 0, 0 },
-            { 0 ,0, 1, 0 },
-            { 0, 0, 0, 1 }
+            Vector4(1, 0, 0, 0),
+            Vector4(0, 1, 0, 0),
+            Vector4(0, 0, 1, 0),
+            Vector4(0, 0, 0, 1)
         };
     }
 }

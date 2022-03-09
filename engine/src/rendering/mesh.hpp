@@ -8,9 +8,9 @@
 #include <vector>
 
 namespace Silica {
-    class Material;
-
+    class Shader;
     class Mesh {
+    public:
         // We have 1 vertex type in the engine for now, later more will come with different data configs allowed inside them!
         struct Vertex {
             Vector3 position;
@@ -21,8 +21,15 @@ namespace Silica {
         std::vector<uint32_t> indices;
         std::vector<Vertex> vertices;
 
+        void CreateBuffers();
+        void UpdateBuffers();
+
         // Meshes can draw themselves, though it is preferred to use renderers!
-        void DrawNow(const Matrix4x4& transform, Material* material);
+        void DrawNow(const Matrix4x4& transform, Shader* shader);
+
+    protected:
+        uint32_t vao;
+        uint32_t vbo, ibo;
     };
 }
 

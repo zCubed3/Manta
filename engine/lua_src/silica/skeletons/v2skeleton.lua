@@ -3,12 +3,12 @@
 -- Any behavior here is purely for type hinting!
 
 vector2 = {
-    new = function(x, y) return {} end
+    new = function(x, y) return {} end,
 
     Vector2 = {
-        __index = Vector2,
-
         x = 0.0,
-        y = 0.0
+        y = 0.0,
+
+        __index = Vector2
     }
 }

@@ -2,18 +2,12 @@
 
 #include <fstream>
 #include <sstream>
-
-#include "material.hpp"
+#include <iostream>
 
 // TODO: Make this more generic for other APIs?
 #include <GL/glew.h>
 
 namespace Silica {
-    ShaderProgram::ShaderProgram(uint32_t program, std::string keywords) {
-        handle = program;
-        this->keywords = keywords;
-    }
-
     Shader* Shader::LoadCode(std::string code) {
         auto shader = new Shader();
 
@@ -71,7 +65,7 @@ namespace Silica {
             for (char c : version_line)
                 if (c != '\n')
                     break;
-                    //TODO: CORRECT IT IF WE FIND ONE!
+            //TODO: CORRECT IT IF WE FIND ONE!
 
             int version_no = 0;
             sscanf(version_line.c_str(), "#version %i", &version_no);
@@ -93,13 +87,34 @@ namespace Silica {
         return keyword_buf.str();
     }
 
+    bool did_compile_shader(uint32_t shader) {
+        int status;
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+
+        if (status != GL_TRUE) {
+            int logLen = 0;
+            glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLen);
+
+            char *log = new char[logLen];
+
+            glGetShaderInfoLog(shader, logLen, nullptr, log);
+            printf("Shader failed to compile with error:\n%s\n", log);
+
+            delete[] log;
+        }
+
+        return status;
+    }
+
     uint32_t compile_source(const std::string& source_str, int version, bool isVertex) {
         uint32_t shader = glCreateShader(isVertex ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
 
-        auto version_str = std::string("#version ") + std::to_string(version);
-        auto type_str = std::string("#define ") + (isVertex ? "VERT" : "FRAG") + "\n#define" + (isVertex ? "VERTEX" : "FRAGMENT") + "\n";
+        auto version_str = std::string("#version") + " " + std::to_string(version) + "\n";
+        auto type_str = std::string("#define") + " " + (isVertex ? "VERT" : "FRAG") + "\n#define " + (isVertex ? "VERTEX" : "FRAGMENT") + "\n";
 
         const char *sources[3] = { version_str.c_str(), type_str.c_str(), source_str.c_str() };
+
+        //std::cout << version_str << type_str << source_str << std::endl;
 
         glShaderSource(shader, 3, sources, nullptr);
         glCompileShader(shader);
@@ -123,60 +138,36 @@ namespace Silica {
 
     // Compiles a variant with the following keywords then appends it to the list of variants
     // For performance reasons variant lookup doesn't use nested vectors!
-    ShaderProgram* Shader::Compile(const std::vector<std::string>& keywords) {
-        if (source.empty())
-            throw std::runtime_error("Can't compile a shader with no source!");
-
-        auto combo = combine_keywords(keywords);
-
+    bool Shader::Compile() {
         if (!analyzed)
             ProcessSource();
 
         // TODO: Geometry shaders?
         auto vert = compile_source(source, version, true);
+        did_compile_shader(vert);
+
         auto frag = compile_source(source, version, false);
+        did_compile_shader(frag);
 
         auto prog = link_program(vert, frag);
 
         glDeleteShader(vert);
         glDeleteShader(frag);
 
-        auto res = new ShaderProgram(prog, combo);
-        compiled_variants.emplace(combo, res);
-
-        return res;
+        handle = prog;
+        return true;
     }
 
-    // This does one of two things, it either compiles the variant on the spot and returns it or it returns a cached representation
-    ShaderProgram* Shader::GetVariant(const std::vector<std::string>& keywords) {
-        auto combo = combine_keywords(keywords);
-
-        auto variant = compiled_variants.find(combo);
-
-        // Did we stumble across an invalidated slot? If so we try to fill it
-        bool invalidated = false;
-        if (variant != compiled_variants.end()) {
-            invalidated = variant->second == nullptr;
-            compiled_variants.erase(variant);
-        }
-
-        // The variant wasn't found, let's try to compile it!
-        // If a variant fails to compile we fill its spot with a redirection to the engine's error shader
-        if (variant == compiled_variants.end() || invalidated) {
-            ShaderProgram* result = Compile(keywords);
-
-            compiled_variants.emplace(combo, result);
-            return result;
-        }
-
-
-        return variant->second;
+    void Shader::Use() {
+        glUseProgram(handle);
     }
 
     void Shader::CreateEngineShaders() {
-        auto err_shader = LoadCode(R"(#version 330 core
+        error_shader = LoadCode(R"(#version 330 core
         #ifdef VERT
             layout(location = 0) in vec3 _vertex;
+
+            uniform mat4 SILICA_MVP;
 
             void main() {
                 gl_Position = SILICA_MVP * vec4(_vertex, 1.0);
@@ -192,9 +183,7 @@ namespace Silica {
         #endif
         )");
 
-        err_shader->Compile();
-
-        Material::error_material = new Material(err_shader);
+        error_shader->Compile();
     }
 
     Shader* Shader::error_shader = nullptr;
