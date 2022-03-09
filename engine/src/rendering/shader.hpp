@@ -8,7 +8,10 @@
 namespace Silica {
     class ShaderProgram {
         uint32_t handle; // Does VK or DX use something else?
-        std::string keywords;
+        std::string keywords = "";
+
+    public:
+        ShaderProgram(uint32_t program, std::string keywords);
     };
 
     class Shader {
@@ -33,6 +36,10 @@ namespace Silica {
         // Rarely should you ever compile on demand, use GetVariant for safety!
         ShaderProgram* Compile(const std::vector<std::string>& keywords = {});
         ShaderProgram* GetVariant(const std::vector<std::string>& keywords);
+
+        static void CreateEngineShaders();
+
+        static Shader* error_shader;
 
     protected:
         int version = 330;

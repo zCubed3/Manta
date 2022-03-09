@@ -6,7 +6,14 @@ namespace Silica {
 
     class Material {
     public:
+        explicit Material(Shader* shader);
+
+        void Use();
+
         Shader* shader;
+        // TODO: Variants
+
+        static Material* error_material;
     };
 }
 

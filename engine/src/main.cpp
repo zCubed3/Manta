@@ -207,9 +207,14 @@ int main(int argc, char** argv) {
     sdl_context = SDL_GL_CreateContext(sdl_window);
     SDL_GL_SetSwapInterval(1);
 
+    if (glewInit() != 0) {
+        throw std::runtime_error("GLEW failed to initialize!");
+    }
+
     SDL_Event sdl_event;
     bool keep_running = true;
 
+    Shader::CreateEngineShaders();
     Shader* shader = Shader::LoadFile("shaders/unlit.glsl");
 
     while (keep_running) {
