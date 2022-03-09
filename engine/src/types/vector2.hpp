@@ -61,6 +61,11 @@ namespace Silica {
     protected:
         static Vector2 *lua_construct_vector2(lua_State *L);
 
+        typedef Vector2(Vector2::*scalar_operator_t)(const float&) const;
+        typedef Vector2(Vector2::*vector_operator_t)(const Vector2&) const;
+
+        static int lua_operate_vector2(lua_State *L, scalar_operator_t scalar_op, vector_operator_t vector_op);
+
         static int lua_new_vector2(lua_State *L);
         static int lua_get_vector2(lua_State *L);
         static int lua_set_vector2(lua_State *L);

@@ -1,6 +1,7 @@
 #include "vector3.hpp"
 
 #include <iostream>
+#include <functional>
 
 #include <math.h>
 
@@ -171,14 +172,14 @@ namespace Silica {
         return 1;
     }
 
-    int Vector3::lua_add_vector3(lua_State *L) {
+    int Vector3::lua_operate_vector3(lua_State *L, scalar_operator_t scalar_op, vector_operator_t vector_op) {
         auto v3 = reinterpret_cast<Vector3 *>(lua_touserdata(L, 1));
 
         if (lua_isnumber(L, 2)) {
             float rhs = luaL_checknumber(L, 2);
             auto res = lua_construct_vector3(L);
 
-            *res = *v3 + rhs;
+            *res = std::invoke(scalar_op, v3, rhs);
         } else if (lua_istable(L, 2)) {
             auto rhs = reinterpret_cast<Vector3 *>(lua_touserdata(L, 2));
 
@@ -187,84 +188,28 @@ namespace Silica {
 
             auto res = lua_construct_vector3(L);
 
-            *res = *v3 + *rhs;
+            *res = std::invoke(vector_op, v3, *rhs);
         } else {
             return 0;
         }
 
         return 1;
+    }
+
+    int Vector3::lua_add_vector3(lua_State *L) {
+        return lua_operate_vector3(L, &Vector3::operator+, &Vector3::operator+);
     }
 
     int Vector3::lua_sub_vector3(lua_State *L) {
-        auto v3 = reinterpret_cast<Vector3 *>(lua_touserdata(L, 1));
-
-        if (lua_isnumber(L, 2)) {
-            float rhs = luaL_checknumber(L, 2);
-            auto res = lua_construct_vector3(L);
-
-            *res = *v3 - rhs;
-        } else if (lua_istable(L, 2)) {
-            auto rhs = reinterpret_cast<Vector3 *>(lua_touserdata(L, 2));
-
-            if (rhs == nullptr)
-                throw std::runtime_error("lua_add_vector3() rhs table was nullptr!");
-
-            auto res = lua_construct_vector3(L);
-
-            *res = *v3 - *rhs;
-        } else {
-            return 0;
-        }
-
-        return 1;
+        return lua_operate_vector3(L, &Vector3::operator-, &Vector3::operator-);
     }
 
     int Vector3::lua_mul_vector3(lua_State *L) {
-        auto v3 = reinterpret_cast<Vector3 *>(lua_touserdata(L, 1));
-
-        if (lua_isnumber(L, 2)) {
-            float rhs = luaL_checknumber(L, 2);
-            auto res = lua_construct_vector3(L);
-
-            *res = *v3 * rhs;
-        } else if (lua_istable(L, 2)) {
-            auto rhs = reinterpret_cast<Vector3 *>(lua_touserdata(L, 2));
-
-            if (rhs == nullptr)
-                throw std::runtime_error("lua_add_vector3() rhs table was nullptr!");
-
-            auto res = lua_construct_vector3(L);
-
-            *res = *v3 * *rhs;
-        } else {
-            return 0;
-        }
-
-        return 1;
+        return lua_operate_vector3(L, &Vector3::operator*, &Vector3::operator+);
     }
 
     int Vector3::lua_div_vector3(lua_State *L) {
-        auto v3 = reinterpret_cast<Vector3 *>(lua_touserdata(L, 1));
-
-        if (lua_isnumber(L, 2)) {
-            float rhs = luaL_checknumber(L, 2);
-            auto res = lua_construct_vector3(L);
-
-            *res = *v3 / rhs;
-        } else if (lua_istable(L, 2)) {
-            auto rhs = reinterpret_cast<Vector3 *>(lua_touserdata(L, 2));
-
-            if (rhs == nullptr)
-                throw std::runtime_error("lua_add_vector3() rhs table was nullptr!");
-
-            auto res = lua_construct_vector3(L);
-
-            *res = *v3 / *rhs;
-        } else {
-            return 0;
-        }
-
-        return 1;
+        return lua_operate_vector3(L, &Vector3::operator/, &Vector3::operator/);
     }
 
     int Vector3::lua_length_vector3(lua_State *L) {

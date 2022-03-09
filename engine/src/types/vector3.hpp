@@ -79,6 +79,11 @@ namespace Silica {
 
         static int lua_tostring_vector3(lua_State *L);
 
+        typedef Vector3(Vector3::*scalar_operator_t)(const float&) const;
+        typedef Vector3(Vector3::*vector_operator_t)(const Vector3&) const;
+
+        static int lua_operate_vector3(lua_State *L, scalar_operator_t scalar_op, vector_operator_t vector_op);
+
         static int lua_add_vector3(lua_State *L);
         static int lua_sub_vector3(lua_State *L);
         static int lua_mul_vector3(lua_State *L);

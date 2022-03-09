@@ -3,19 +3,12 @@
 -- Any behavior here is purely for type hinting!
 
 vector2 = {
+    new = function(x, y) return {} end
+
     Vector2 = {
+        __index = Vector2,
+
         x = 0.0,
-        y = 0.0,
-        __index = Vector2
+        y = 0.0
     }
 }
-
-function vector2.new(x, y)
-    return setmetatable({}, vector2.Vector2)
-end
-
-function dummy()
-    return setmetatable({}, vector2.Vector2)
-end
-
-vector2.Vector2.__add = dummy();
