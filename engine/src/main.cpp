@@ -11,7 +11,6 @@
 #include "types/vector2.hpp"
 #include "types/vector3.hpp"
 #include "types/vector4.hpp"
-#include "types/matrix4x4.hpp"
 
 #include "rendering/mesh.hpp"
 #include "rendering/shader.hpp"
@@ -20,6 +19,10 @@
 #include "data/timing.hpp"
 
 #include "lua_common.hpp"
+
+#include <glm/mat4x4.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 using namespace Silica;
 
@@ -237,10 +240,10 @@ int main(int argc, char** argv) {
         Timing::UpdateTime();
 
         camera.position.x = sinf(Timing::time) * 2.0f;
-        camera.position.z = -5;
+        camera.position.z = 3;
 
         camera.lookAt = true;
-        camera.target = Vector3(0, 0, 0);
+        camera.target = glm::vec3(0, 0, 0);
 
         int width, height;
         SDL_GetWindowSize(sdl_window, &width, &height);
@@ -252,7 +255,13 @@ int main(int argc, char** argv) {
         glClearColor(config->clear_r, config->clear_g, config->clear_b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        Matrix4x4 model = Matrix4x4::MakeRotation(Vector3(Timing::time * 20, Timing::time * 20, Timing::time * 20)) * Matrix4x4::MakeTranslation(Vector3(0, cosf(Timing::time), 0));
+        //Matrix4x4 model = Matrix4x4::MakeRotation(Vector3()) * Matrix4x4::MakeTranslation(Vector3(0, cosf(Timing::time), 0));
+
+        glm::vec3 euler = glm::vec3(Timing::time * 20, Timing::time * 20, Timing::time * 20);
+        glm::quat rotation = glm::quat(glm::radians(euler));
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+        model *= glm::toMat4(rotation);
+
         mesh->DrawNow(model, &camera, shader);
 
         SDL_GL_SwapWindow(sdl_window);

@@ -1,5 +1,7 @@
 #include "vector4.hpp"
 
+#include <stdexcept>
+
 namespace Silica {
     float Vector4::Sum() const {
         return x + y + z + w;
@@ -9,7 +11,7 @@ namespace Silica {
         return { x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w };
     }
 
-    float Vector4::operator[] (const int &idx) const {
+    float& Vector4::operator[] (const int &idx) {
         switch (idx) {
             case 0:
                 return x;
@@ -24,7 +26,7 @@ namespace Silica {
                 return w;
 
             default:
-                return 0.0F;
+                throw std::runtime_error("Out of range!");
         }
     };
 }

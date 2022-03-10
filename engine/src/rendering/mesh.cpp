@@ -5,6 +5,9 @@
 
 #include <GL/glew.h>
 
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
+
 #include <fstream>
 #include <sstream>
 #include <algorithm>
@@ -32,14 +35,27 @@ namespace Silica {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
-    void Mesh::DrawNow(const Matrix4x4 &transform, Camera* camera, Shader *shader) {
+    void Mesh::DrawNow(const glm::mat4& transform, Camera* camera, Shader* shader) {
         shader->Use();
 
         //TODO: Make me not complete and utter shit!
         uint32_t mvp_uniform = glGetUniformLocation(shader->handle, "SILICA_MVP");
-        Matrix4x4 mvp_mat = transform * camera->eye;
+        glm::mat4 mvp_mat = camera->eye * transform;
+        glUniformMatrix4fv(mvp_uniform, 1, GL_FALSE, glm::value_ptr(mvp_mat));
 
-        glUniformMatrix4fv(mvp_uniform, 1, GL_FALSE, mvp_mat.ValuePtr());
+        uint32_t m_uniform = glGetUniformLocation(shader->handle, "SILICA_M");
+        glUniformMatrix4fv(m_uniform, 1, GL_FALSE, glm::value_ptr(transform));
+
+        uint32_t mit_uniform = glGetUniformLocation(shader->handle, "SILICA_M_IT");
+        glm::mat4 mit_mat = glm::inverseTranspose(transform);
+        glUniformMatrix4fv(mit_uniform, 1, GL_FALSE, glm::value_ptr(mit_mat));
+
+        uint32_t cam_pos_uniform = glGetUniformLocation(shader->handle, "SILICA_CAM_POS");
+        glUniform3fv(cam_pos_uniform, 1, glm::value_ptr(camera->position));
+
+        //
+        //
+        //
 
         glBindVertexArray(vao);
 
@@ -96,9 +112,9 @@ namespace Silica {
     }
 
     void Mesh::ReadObj(const std::string& source) {
-            std::vector<Vector3> positions;
-            std::vector<Vector3> normals;
-            std::vector<Vector2> uv0s;
+            std::vector<glm::vec3> positions;
+            std::vector<glm::vec3> normals;
+            std::vector<glm::vec2> uv0s;
             std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> triangles;
 
             std::string line;
@@ -119,10 +135,10 @@ namespace Silica {
                 //    name = contents;
 
                 if (id[0] == 'v') {
-                    Vector3 v3data;
+                    glm::vec3 v3data;
 
                     if (id[1] == 't') {
-                        Vector2 uv;
+                        glm::vec2 uv;
                         sscanf(contents.c_str(), "%f %f", &uv.x, &uv.y);
                         uv0s.emplace_back(uv);
                         continue;

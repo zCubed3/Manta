@@ -1,9 +1,9 @@
 #ifndef SILICA_MESH_HPP
 #define SILICA_MESH_HPP
 
-#include <types/vector2.hpp>
-#include <types/vector3.hpp>
-#include <types/matrix4x4.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
 
 #include <vector>
 #include <string>
@@ -16,9 +16,9 @@ namespace Silica {
     public:
         // We have 1 vertex type in the engine for now, later more will come with different data configs allowed inside them!
         struct Vertex {
-            Vector3 position;
-            Vector3 normal;
-            Vector2 uv0;
+            glm::vec3 position;
+            glm::vec3 normal;
+            glm::vec2 uv0;
 
             bool operator==(const Vertex& v);
         };
@@ -32,7 +32,7 @@ namespace Silica {
         static Mesh * LoadFromFile(const std::string &path);
 
         // Meshes can draw themselves, though it is preferred to use renderers!
-        void DrawNow(const Matrix4x4& transform, Camera* camera, Shader* shader);
+        void DrawNow(const glm::mat4& transform, Camera* camera, Shader* shader);
 
     protected:
         uint32_t vao;

@@ -18,7 +18,7 @@ namespace Silica {
         [[nodiscard]] float Sum() const;
 
         Vector4 operator*(const Vector4& rhs) const;
-        float operator[](const int &idx) const;
+        float& operator[](const int &idx);
     };
 }
 

@@ -2,7 +2,8 @@ set(SOURCES
     "src/types/vector2.cpp"
     "src/types/vector3.cpp"
     "src/types/vector4.cpp"
-    "src/types/matrix4x4.cpp"
+
+    "src/lua_binds/vec3.cpp"
 
     "src/rendering/mesh.cpp"
     "src/rendering/shader.cpp"
@@ -15,7 +16,7 @@ set(SOURCES
 
 set(INCLUDE_DIRS
     "${ENGINE_DIR}/src"
-    "${DEPENDS_DIR}/openvr/headers"
+    "${DEPENDS_DIR}/glm"
 )
 
 set(LINK_DIRS)

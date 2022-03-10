@@ -1,16 +1,21 @@
 #include "camera.hpp"
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/quaternion.hpp>
+
 namespace Silica {
     void Camera::UpdateMatrices() {
+        glm::vec3 forward;
+
         if (lookAt)
-            rotation = Vector3::EulerFromLookAt((position - target).Normalize());
+            forward = glm::normalize(target - position);
+        else
+            forward = glm::quat(glm::radians(euler)) * glm::vec3(0, 0, 1);
 
-        view = Matrix4x4::MakeTranslation(position);
+        view = glm::lookAt(position, position + forward, glm::vec3(0, 1, 0));
+        perspective = glm::perspective(glm::radians(fov), aspect, 0.001f, 100.0f);
 
-        // TODO: Make this better
-
-        perspective = Matrix4x4::MakePerspective(fov, aspect, 0.001f, 100.0f);
-
-        eye = view * perspective;
+        eye = perspective * view;
     }
 }
