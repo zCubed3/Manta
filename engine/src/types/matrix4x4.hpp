@@ -13,6 +13,8 @@ namespace Silica {
         Vector4 Column2() const;
         Vector4 Column3() const;
 
+        float* ValuePtr();
+
         static Matrix4x4 MakeRotationX(const float& degrees);
         static Matrix4x4 MakeRotationY(const float& degrees);
         static Matrix4x4 MakeRotationZ(const float& degrees);
@@ -25,7 +27,7 @@ namespace Silica {
 
         static Matrix4x4 MakePerspective(float fov_y, float aspect, float near_cull, float far_cull);
 
-        Vector4 operator[] (const int &idx) const;
+        Vector4& operator[] (const int &idx);
         Matrix4x4 operator* (const Matrix4x4& rhs) const;
 
         static Matrix4x4 Identity();

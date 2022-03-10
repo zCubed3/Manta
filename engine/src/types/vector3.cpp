@@ -52,6 +52,14 @@ namespace Silica {
         };
     }
 
+    Vector3 Vector3::EulerFromLookAt(Vector3 look) {
+        return {
+            atan2f(look.x, look.z),
+            asin(look.y),
+            0
+        };
+    }
+
     //
     // Addition
     //
@@ -95,6 +103,13 @@ namespace Silica {
     Vector3 Vector3::operator/(const float &rhs) const {
         return {x / rhs, y / rhs, z / rhs};
     }
+
+    //
+    // Comparison
+    //
+    bool Vector3::operator==(const Vector3& rhs) const {
+        return x == rhs.x && y == rhs.y && z == rhs.z;
+    };
 
     //
     // Lua bindings
@@ -289,7 +304,7 @@ namespace Silica {
             {nullptr, nullptr}
     };
 
-    int Vector3::lua_open_vector3(lua_State *L) {
+    int Vector3::LuaOpenVector3(lua_State *L) {
         luaL_newmetatable(L, "Vector3");
         lua_pushvalue(L, -1);
         lua_setfield(L, -2, "__index");

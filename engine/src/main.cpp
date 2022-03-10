@@ -15,9 +15,9 @@
 
 #include "rendering/mesh.hpp"
 #include "rendering/shader.hpp"
+#include "rendering/camera.hpp"
 
-// TODO: Proof of concept implementation first
-// TODO: Then clean up
+#include "data/timing.hpp"
 
 #include "lua_common.hpp"
 
@@ -129,9 +129,10 @@ lua_State* lua_init(bool as_debug) {
 
     luaL_openlibs(lua);
 
-    // Register silica primitive types
-    luaL_requiref(lua, "vector2", Vector2::lua_open_vector2, 1);
-    luaL_requiref(lua, "vector3", Vector3::lua_open_vector3, 1);
+    // TODO: Structure the lua bindings better
+    luaL_requiref(lua, "timing", Timing::LuaOpenTiming, 1);
+    luaL_requiref(lua, "vector2", Vector2::LuaOpenVector2, 1);
+    luaL_requiref(lua, "vector3", Vector3::LuaOpenVector3, 1);
 
     // Enables debug mode
     if (as_debug) {
@@ -206,32 +207,25 @@ int main(int argc, char** argv) {
     sdl_context = SDL_GL_CreateContext(sdl_window);
     SDL_GL_SetSwapInterval(1);
 
+    glewExperimental = true;
     if (glewInit() != 0) {
         throw std::runtime_error("GLEW failed to initialize!");
     }
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
     SDL_Event sdl_event;
     bool keep_running = true;
 
     Shader::CreateEngineShaders();
+
     Shader* shader = Shader::LoadFile("shaders/unlit.glsl");
+    shader->Compile();
 
-    Mesh* mesh = new Mesh();
-    Mesh::Vertex vertex { Vector3(), Vector3(), Vector2() };
+    Mesh* mesh = Mesh::LoadFromFile("test.obj");
 
-    mesh->vertices.emplace_back(vertex);
-
-    vertex.position = Vector3(0, 1, 0);
-    mesh->vertices.emplace_back(vertex);
-
-    vertex.position = Vector3(1, 0, 0);
-    mesh->vertices.emplace_back(vertex);
-
-    mesh->indices.emplace_back(0);
-    mesh->indices.emplace_back(1);
-    mesh->indices.emplace_back(2);
-
-    mesh->CreateBuffers();
+    Camera camera;
 
     while (keep_running) {
         // Event polling
@@ -240,10 +234,26 @@ int main(int argc, char** argv) {
                 keep_running = false;
         }
 
-        glClearColor(config->clear_r, config->clear_g, config->clear_b, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        Timing::UpdateTime();
 
-        mesh->DrawNow(Matrix4x4::Identity(), Shader::error_shader);
+        camera.position.x = sinf(Timing::time) * 2.0f;
+        camera.position.z = -5;
+
+        camera.lookAt = true;
+        camera.target = Vector3(0, 0, 0);
+
+        int width, height;
+        SDL_GetWindowSize(sdl_window, &width, &height);
+
+        camera.aspect = (float)width / (float)height;
+
+        camera.UpdateMatrices();
+
+        glClearColor(config->clear_r, config->clear_g, config->clear_b, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        Matrix4x4 model = Matrix4x4::MakeRotation(Vector3(Timing::time * 20, Timing::time * 20, Timing::time * 20)) * Matrix4x4::MakeTranslation(Vector3(0, cosf(Timing::time), 0));
+        mesh->DrawNow(model, &camera, shader);
 
         SDL_GL_SwapWindow(sdl_window);
     }

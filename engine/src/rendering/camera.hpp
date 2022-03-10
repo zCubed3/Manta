@@ -7,10 +7,15 @@
 namespace Silica {
     class Camera {
     public:
-        Vector3 position = Vector3(0, 0, -1), rotation;
-        float fov = 90;
+        Vector3 position = Vector3(0, 0, -1), rotation = Vector3(0, 180, 0);
+        float fov = 60;
+        float aspect = 1.0;
 
-        Matrix4x4 view, perspective;
+        // TODO: Make a better alternative eventually!
+        bool lookAt = false;
+        Vector3 target = Vector3();
+
+        Matrix4x4 view, perspective, eye;
 
         void UpdateMatrices();
     };

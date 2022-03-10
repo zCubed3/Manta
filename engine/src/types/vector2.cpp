@@ -72,6 +72,13 @@ namespace Silica {
     }
 
     //
+    // Comparison
+    //
+    bool Vector2::operator==(const Vector2& rhs) const {
+        return x == rhs.x && y == rhs.y;
+    };
+
+    //
     // Lua bindings
     //
     Vector2 *Vector2::lua_construct_vector2(lua_State *L) {
@@ -193,7 +200,7 @@ namespace Silica {
             {nullptr, nullptr}
     };
 
-    int Vector2::lua_open_vector2(lua_State *L) {
+    int Vector2::LuaOpenVector2(lua_State *L) {
         luaL_newmetatable(L, "Vector2");
         lua_pushvalue(L, -1);
         lua_setfield(L, -2, "__index");

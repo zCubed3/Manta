@@ -21,6 +21,10 @@ namespace Silica {
         return { r0.w, r1.w, r2.w, r3.w };
     }
 
+    float* Matrix4x4::ValuePtr() {
+        return &r0.x;
+    }
+
     Matrix4x4 Matrix4x4::MakeRotationX(const float& degrees) {
         auto mat = Matrix4x4::Identity();
         float rad = degrees * DEG_TO_RAD;
@@ -45,8 +49,8 @@ namespace Silica {
         auto mat = Matrix4x4::Identity();
         float rad = degrees * DEG_TO_RAD;
 
-        mat[0] = Vector4(cosf(rad), 0, -sinf(rad), 0);
-        mat[1] = Vector4(sinf(rad), 0, cosf(rad), 0);
+        mat[0] = Vector4(cosf(rad), -sinf(rad), 0, 0);
+        mat[1] = Vector4(sinf(rad), cosf(rad), 0, 0);
 
         return mat;
     }
@@ -72,21 +76,18 @@ namespace Silica {
     }
 
     Matrix4x4 Matrix4x4::MakePerspective(float fov_y, float aspect, float near_cull, float far_cull) {
-        float rad = (fov_y / 2.0f) * DEG_TO_RAD;
-
-        float y_scale = 1.0f / tanf(rad);
-        float x_scale = y_scale / aspect;
-        float comp = near_cull - far_cull;
+        float rad = (fov_y * DEG_TO_RAD) / 2.0f;
+        float tan_rad = tanf(rad);
 
         return {
-            Vector4(x_scale, 0, 0, 0),
-            Vector4(0, y_scale, 0, 0),
-            Vector4(0, 0, (far_cull + near_cull) / comp, -1.0),
-            Vector4(0, 0, 2 * far_cull * near_cull / comp, 0)
+            { 1 / (aspect * tan_rad), 0, 0, 0 },
+            { 0, 1 / tan_rad, 0, 0 },
+            { 0, 0, -(far_cull + near_cull) / (far_cull - near_cull), -1 },
+            { 0, 0, -(2 * far_cull * near_cull) / (far_cull - near_cull), 0 }
         };
     }
 
-    Vector4 Matrix4x4::operator[] (const int &idx) const {
+    Vector4& Matrix4x4::operator[] (const int &idx) {
         switch (idx) {
             case 0:
                 return r0;
@@ -101,15 +102,15 @@ namespace Silica {
                 return r3;
 
             default:
-                return {};
+                throw std::runtime_error("Out of range!");
         }
     }
 
     Matrix4x4 Matrix4x4::operator*(const Matrix4x4 &rhs) const {
-        auto c0 = Column0();
-        auto c1 = Column1();
-        auto c2 = Column2();
-        auto c3 = Column3();
+        auto c0 = rhs.Column0();
+        auto c1 = rhs.Column1();
+        auto c2 = rhs.Column2();
+        auto c3 = rhs.Column3();
 
         auto mat = Matrix4x4();
 

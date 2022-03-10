@@ -44,6 +44,11 @@ namespace Silica {
         Vector2 operator/(const float &rhs) const;
 
         //
+        // Comparison
+        //
+        bool operator==(const Vector2& rhs) const;
+
+        //
         // Lua bindings
         //
     protected:
@@ -68,7 +73,7 @@ namespace Silica {
 
         // Lua register function
     public:
-        static int lua_open_vector2(lua_State *L);
+        static int LuaOpenVector2(lua_State *L);
     };
 }
 

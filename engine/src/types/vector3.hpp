@@ -33,6 +33,11 @@ namespace Silica {
         [[nodiscard]] Vector3 Cross(const Vector3& rhs) const;
 
         //
+        // Helpers
+        //
+        static Vector3 EulerFromLookAt(Vector3 look);
+
+        //
         // Addition
         //
         Vector3 operator+(const Vector3 &rhs) const;
@@ -55,6 +60,11 @@ namespace Silica {
         //
         Vector3 operator/(const Vector3 &rhs) const;
         Vector3 operator/(const float &rhs) const;
+
+        //
+        // Comparison
+        //
+        bool operator==(const Vector3& rhs) const;
 
         //
         // Lua bindings
@@ -90,7 +100,7 @@ namespace Silica {
 
         // Lua register function
     public:
-        static int lua_open_vector3(lua_State *L);
+        static int LuaOpenVector3(lua_State *L);
     };
 }
 

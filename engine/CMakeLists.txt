@@ -1,6 +1,4 @@
 set(SOURCES
-    "src/main.cpp"
-
     "src/types/vector2.cpp"
     "src/types/vector3.cpp"
     "src/types/vector4.cpp"
@@ -9,6 +7,10 @@ set(SOURCES
     "src/rendering/mesh.cpp"
     "src/rendering/shader.cpp"
     "src/rendering/camera.cpp"
+
+    "src/data/timing.cpp"
+
+    "src/main.cpp"
 )
 
 set(INCLUDE_DIRS
@@ -19,10 +21,10 @@ set(INCLUDE_DIRS
 set(LINK_DIRS)
 
 if (DEFINED WIN32)
-    set(LINK_DIRS "${DEPENDS_DIR}/openvr/lib/win64" "${DEPENDS_DIR}/vulkan/lib" "${DEPENDS_DIR}/SDL2/lib/x64" "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
-    set(LIBRARIES "SDL2" "SDL2main" lua)
+    set(LINK_DIRS "${DEPENDS_DIR}/openvr/lib/win64" "${DEPENDS_DIR}/vulkan/lib" "${DEPENDS_DIR}/SDL2/lib/x64" "${DEPENDS_DIR}/glew/lib/Release/x64" "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
+    set(LIBRARIES "SDL2" "SDL2main" "glew32" "opengl32" lua)
 
-    set(INCLUDE_DIRS ${INCLUDE_DIRS} "${DEPENDS_DIR}/vulkan/include" "${DEPENDS_DIR}/SDL2/include" "${DEPENDS_DIR}/lua/src")
+    set(INCLUDE_DIRS ${INCLUDE_DIRS} "${DEPENDS_DIR}/vulkan/include" "${DEPENDS_DIR}/SDL2/include" "${DEPENDS_DIR}/lua/src" "${DEPENDS_DIR}/glew/include")
 else ()
     set(LINK_DIRS "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
     set(LIBRARIES "SDL2" "SDL2main" "GL" "GLEW" lua)
