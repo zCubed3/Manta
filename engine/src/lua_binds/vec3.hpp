@@ -1,5 +1,5 @@
-#ifndef SILICA_VEC3_HPP
-#define SILICA_VEC3_HPP
+#ifndef SILICA_LUA_BINDS_VEC3_HPP
+#define SILICA_LUA_BINDS_VEC3_HPP
 
 #include <lua_common.hpp>
 

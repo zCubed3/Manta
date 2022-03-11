@@ -1,9 +1,7 @@
 set(SOURCES
-    "src/types/vector2.cpp"
-    "src/types/vector3.cpp"
-    "src/types/vector4.cpp"
-
+    "src/lua_binds/vec2.cpp"
     "src/lua_binds/vec3.cpp"
+    "src/lua_binds/timing.cpp"
 
     "src/rendering/mesh.cpp"
     "src/rendering/shader.cpp"

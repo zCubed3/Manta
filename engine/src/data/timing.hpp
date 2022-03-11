@@ -12,15 +12,9 @@ namespace Silica {
 
         static void UpdateTime();
 
-        static int LuaOpenTiming(lua_State* L);
-
     private:
         Timing(); // Disables instantiation
         static uint64_t last_tick;
-
-        // Lua binding stuff
-        static const struct luaL_Reg LuaTimingFunctions[];
-        static int LuaGetTiming(lua_State* L);
     };
 }
 

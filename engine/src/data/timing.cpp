@@ -19,18 +19,4 @@ namespace Silica {
         time += delta_time;
         last_tick = tick;
     }
-
-    const struct luaL_Reg Timing::LuaTimingFunctions[] = {
-            {"__index",    Timing::LuaGetTiming},
-    };
-
-    int Timing::LuaOpenTiming(lua_State* L) {
-        luaL_newlib(L, LuaTimingFunctions);
-
-        return 1;
-    }
-
-    int Timing::LuaGetTiming(lua_State* L) {
-        std::cout << "PINGUS\n";
-    }
 }

@@ -30,8 +30,7 @@ namespace Silica::LuaBindings {
     }
 
     int lua_gc_vector3(lua_State *L) {
-        auto v3 = lua_get_userdata<glm::vec3*>(L);
-        delete v3;
+        delete lua_get_userdata<glm::vec3*>(L);
         return 1;
     }
 

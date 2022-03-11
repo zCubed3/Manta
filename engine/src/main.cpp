@@ -8,10 +8,6 @@
 #include <GL/glew.h>
 
 // Types
-#include "types/vector2.hpp"
-#include "types/vector3.hpp"
-#include "types/vector4.hpp"
-
 #include "rendering/mesh.hpp"
 #include "rendering/shader.hpp"
 #include "rendering/camera.hpp"
@@ -20,7 +16,7 @@
 
 #include "lua_common.hpp"
 
-#include "lua_binds/vec3.hpp"
+#include "lua_binds/silica_types.hpp"
 
 #include <glm/mat4x4.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -135,8 +131,8 @@ lua_State* lua_init(bool as_debug) {
     luaL_openlibs(lua);
 
     // TODO: Structure the lua bindings better
-    luaL_requiref(lua, "timing", Timing::LuaOpenTiming, 1);
-    luaL_requiref(lua, "vector2", Vector2::LuaOpenVector2, 1);
+    luaL_requiref(lua, "timing", LuaBindings::lua_open_timing, 1);
+    luaL_requiref(lua, "vector2", LuaBindings::lua_open_vector2, 1);
     luaL_requiref(lua, "vector3", LuaBindings::lua_open_vector3, 1);
 
     // Enables debug mode
