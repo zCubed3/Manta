@@ -5,8 +5,11 @@
 #include <glm/mat4x4.hpp>
 
 #include <string>
+#include <vector>
 
 namespace Silica {
+    class Behavior;
+
     class Actor {
     public:
         glm::vec3 position = glm::vec3(0, 0, 0);
@@ -17,12 +20,17 @@ namespace Silica {
         glm::mat4 model_i_matrix;
         glm::mat4 model_it_matrix;
 
-        std::string name;
+        std::string name = "New Actor";
+        bool enabled = true;
+
+        std::vector<Behavior*> behaviors;
 
         Actor(const std::string& name);
 
         void Update();
         void Draw(); // Updates anything that implements draw, usually renderer components
+
+        void AddBehavior(Behavior* behavior);
 
     protected:
         void UpdateMatrices();

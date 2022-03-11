@@ -20,6 +20,7 @@
 
 #include "world/world.hpp"
 #include "world/actor.hpp"
+#include "world/behavior.hpp"
 
 // Misc
 #include <glm/mat4x4.hpp>
@@ -101,13 +102,7 @@ lua_State* lua_init(bool as_debug) {
     // luaopen_math(lua_State*)
 
     luaL_openlibs(lua);
-
-    // TODO: Structure the lua bindings better
-    luaL_requiref(lua, "timing", LuaBindings::lua_open_timing, 1);
-    luaL_requiref(lua, "vector2", LuaBindings::lua_open_vector2, 1);
-    luaL_requiref(lua, "vector3", LuaBindings::lua_open_vector3, 1);
-    luaL_requiref(lua, "actor", LuaBindings::lua_open_actor, 1);
-    luaL_requiref(lua, "world", LuaBindings::lua_open_world, 1);
+    LuaBindings::lua_open_silica(lua);
 
     // Enables debug mode
     if (as_debug) {

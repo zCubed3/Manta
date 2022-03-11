@@ -3,15 +3,7 @@
 
 #include <lua_common.hpp>
 
-namespace Silica {
-    class Actor;
-}
-
 namespace Silica::LuaBindings {
-    struct LuaActorReference {
-        Actor* actor;
-    };
-
     int lua_open_actor(lua_State *L);
 }
 

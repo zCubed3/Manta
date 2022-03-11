@@ -1,7 +1,5 @@
-#ifndef SILICA_LUA_BINDS_HELPERS_HPP
-#define SILICA_LUA_BINDS_HELPERS_HPP
-
-#include <lua_common.hpp>
+#ifndef SILICA_LUA_BINDS_CONSTRUCTION_HPP
+#define SILICA_LUA_BINDS_CONSTRUCTION_HPP
 
 namespace Silica::LuaBindings {
     template<typename target>

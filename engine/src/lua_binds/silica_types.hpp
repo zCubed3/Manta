@@ -7,5 +7,12 @@
 #include "world.hpp"
 #include "actor.hpp"
 #include "timing.hpp"
+#include "behavior.hpp"
+
+#include "lua_common.hpp"
+
+namespace Silica::LuaBindings {
+    int lua_open_silica(lua_State* L);
+}
 
 #endif

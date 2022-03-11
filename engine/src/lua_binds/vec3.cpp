@@ -7,7 +7,7 @@
 #include <glm/vec3.hpp>
 #include <glm/geometric.hpp>
 
-#include "lua_helpers.hpp"
+#include "helpers/lua_helpers.hpp"
 
 namespace Silica::LuaBindings {
     typedef glm::vec3(*scalar_operator_t)(glm::vec3&, const float&);

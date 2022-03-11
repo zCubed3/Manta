@@ -4,37 +4,43 @@
 
 #include <world/actor.hpp>
 
-#include "lua_helpers.hpp"
+#include "helpers/lua_helpers.hpp"
 
 namespace Silica::LuaBindings {
-    int lua_actor_get(lua_State* L) {
-        auto actor = lua_get_userdata<LuaActorReference*>(L);
+    using ActorRef = LuaBindReference<Actor>;
+
+    int lua_get_actor(lua_State* L) {
+        auto actor_ref = lua_get_userdata<ActorRef*>(L);
         std::string member = lua_tostring(L, 2);
+
+        Actor* actor = *actor_ref;
 
         // TODO: Lua weak refs to prevent copies
         if (member == "euler") {
             auto value = lua_generic_construct<glm::vec3>(L, "Vector3");
-            *value = actor->actor->euler;
+            *value = actor->euler;
         }
 
         return 1;
     }
 
-    int lua_actor_set(lua_State* L) {
-        auto actor = lua_get_userdata<LuaActorReference*>(L);
+    int lua_set_actor(lua_State* L) {
+        auto actor_ref = lua_get_userdata<ActorRef*>(L);
         std::string member = lua_tostring(L, 2);
+
+        Actor* actor = *actor_ref;
 
         if (member == "euler") {
             auto value = lua_get_userdata<glm::vec3*>(L, 3);
-            actor->actor->euler = *value;
+            actor->euler = *value;
         }
 
         return 1;
     }
 
     const struct luaL_Reg lua_actor_methods[] = {
-            {"__index", lua_actor_get},
-            {"__newindex", lua_actor_set},
+            {"__index", lua_get_actor},
+            {"__newindex", lua_set_actor},
             {nullptr, nullptr}
     };
 

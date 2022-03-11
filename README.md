@@ -1,13 +1,5 @@
 # Silica Engine
 
-Nothing is to be described here yet!
+### DISCLAIMER: This is a hobby engine, it isn't expected to produce an actual game in the current working state!
 
-### Third Party / Open Source Software Used
-
-#### SDL 2.0:
-https://www.libsdl.org/license.php
-
-#### Lua:
-Copyright © 1994–2021 Lua.org, PUC-Rio
-
-https://www.lua.org/license.html
+### [Third Party / Open Source Software Used](SOFTWARE.md)

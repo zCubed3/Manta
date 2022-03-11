@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string>
 
-#include "lua_helpers.hpp"
+#include "helpers/lua_helpers.hpp"
 
 namespace Silica::LuaBindings {
     typedef glm::vec2(*scalar_operator_t)(glm::vec2&, const float&);

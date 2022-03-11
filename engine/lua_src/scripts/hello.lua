@@ -114,7 +114,7 @@ local state, err = pcall(function()
 
         print("PRE NORM = " .. tostring(v3))
         v3 = v3:normalize()
-        print("POST NORM = " .. tostring(v3));
+        print("POST NORM = " .. tostring(v3))
     end
 end)
 
