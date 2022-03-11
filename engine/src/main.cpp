@@ -20,6 +20,8 @@
 
 #include "lua_common.hpp"
 
+#include "lua_binds/vec3.hpp"
+
 #include <glm/mat4x4.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -135,7 +137,7 @@ lua_State* lua_init(bool as_debug) {
     // TODO: Structure the lua bindings better
     luaL_requiref(lua, "timing", Timing::LuaOpenTiming, 1);
     luaL_requiref(lua, "vector2", Vector2::LuaOpenVector2, 1);
-    luaL_requiref(lua, "vector3", Vector3::LuaOpenVector3, 1);
+    luaL_requiref(lua, "vector3", LuaBindings::lua_open_vector3, 1);
 
     // Enables debug mode
     if (as_debug) {

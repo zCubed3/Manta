@@ -4,7 +4,7 @@
 #include <lua_common.hpp>
 
 namespace Silica::LuaBindings {
-    static int lua_open_vector3(lua_State *L);
+    int lua_open_vector3(lua_State *L);
 }
 
 #endif

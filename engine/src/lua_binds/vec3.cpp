@@ -5,24 +5,22 @@
 #include <functional>
 
 #include <glm/vec3.hpp>
+#include <glm/geometric.hpp>
+
+#include "lua_helpers.hpp"
 
 namespace Silica::LuaBindings {
-    typedef glm::vec3(glm::vec3::*scalar_operator_t)(const float&) const;
-    typedef glm::vec3(glm::vec3::*vector_operator_t)(const glm::vec3&) const;
+    typedef glm::vec3(*scalar_operator_t)(glm::vec3&, const float&);
+    typedef glm::vec3(*vector_operator_t)(glm::vec3&, const glm::vec3&);
 
-    glm::vec3* lua_construct_vector3(lua_State *L) {
-        auto vector3 = reinterpret_cast<glm::vec3*>(lua_newuserdata(L, sizeof(glm::vec3)));
-        luaL_getmetatable(L, "Vector3");
-        lua_setmetatable(L, -2);
-        return vector3;
-    }
+    #define LUA_MAKE_VECTOR3(L) lua_generic_construct<glm::vec3>(L, "Vector3");
 
     int lua_new_vector3(lua_State *L) {
         float x = luaL_checknumber(L, 1);
         float y = luaL_checknumber(L, 2);
         float z = luaL_checknumber(L, 3);
 
-        auto vector3 = lua_construct_vector3(L);
+        auto vector3 = LUA_MAKE_VECTOR3(L);
 
         vector3->x = x;
         vector3->y = y;
@@ -32,13 +30,138 @@ namespace Silica::LuaBindings {
     }
 
     int lua_gc_vector3(lua_State *L) {
-        auto v3 = reinterpret_cast<glm::vec3*>(lua_touserdata(L, 1));
+        auto v3 = lua_get_userdata<glm::vec3*>(L);
         delete v3;
         return 1;
     }
 
+    int lua_set_vector3(lua_State *L) {
+        auto v3 = lua_get_userdata<glm::vec3*>(L);
+        std::string member = lua_tostring(L, 2);
+        float value = luaL_checknumber(L, 3);
+
+        if (member == "x") {
+            v3->x = value;
+        } else if (member == "y") {
+            v3->y = value;
+        } else if (member == "z") {
+            v3->z = value;
+        } else {
+#ifdef DEBUG
+            std::cout << "LUA: Set '" << member << "' was called!" << std::endl;
+#endif
+            return 0;
+        }
+
+        return 1;
+    }
+
+    int lua_tostring_vector3(lua_State *L) {
+        auto v3 = lua_get_userdata<glm::vec3*>(L);
+
+        std::string str = "{ " + std::to_string(v3->x) + ", " + std::to_string(v3->y) + ", " + std::to_string(v3->z) + " }";
+        lua_pushstring(L, str.c_str());
+
+        return 1;
+    }
+
+    int lua_operate_vector3(lua_State *L, vector_operator_t vector_op, scalar_operator_t scalar_op) {
+        auto v3 = lua_get_userdata<glm::vec3*>(L);
+
+        if (lua_isnumber(L, 2)) {
+            float rhs = luaL_checknumber(L, 2);
+            auto res = LUA_MAKE_VECTOR3(L);
+
+            *res = scalar_op(*v3, rhs);
+        } else if (lua_istable(L, 2)) {
+            auto rhs = reinterpret_cast<glm::vec3*>(lua_touserdata(L, 2));
+
+            if (rhs == nullptr)
+                throw std::runtime_error("lua_add_vector3() rhs table was nullptr!");
+
+            auto res = LUA_MAKE_VECTOR3(L);
+            *res = vector_op(*v3, *rhs);
+        } else {
+            return 0;
+        }
+
+        return 1;
+    }
+
+    int lua_add_vector3(lua_State *L) {
+        // GLM doesn't expose operators nicely!
+        return lua_operate_vector3(L,
+            [](glm::vec3& a, const glm::vec3& b) { return a + b; },
+            [](glm::vec3& a, const float& b) { return a + b; }
+        );
+    }
+
+    int lua_sub_vector3(lua_State *L) {
+        return lua_operate_vector3(L,
+            [](glm::vec3& a, const glm::vec3& b) { return a - b; },
+            [](glm::vec3& a, const float& b) { return a - b; }
+        );
+    }
+
+    int lua_mul_vector3(lua_State *L) {
+        return lua_operate_vector3(L,
+            [](glm::vec3& a, const glm::vec3& b) { return a * b; },
+            [](glm::vec3& a, const float& b) { return a * b; }
+        );
+    }
+
+    int lua_div_vector3(lua_State *L) {
+        return lua_operate_vector3(L,
+            [](glm::vec3& a, const glm::vec3& b) { return a / b; },
+            [](glm::vec3& a, const float& b) { return a / b; }
+        );
+    }
+
+    //
+    // TODO: Find a way to make things like this more generic
+    //
+    int lua_length_vector3(lua_State *L) {
+        auto v3 = lua_get_userdata<glm::vec3*>(L);
+        lua_pushnumber(L, glm::length(*v3));
+
+        return 1;
+    }
+
+    int lua_dot_vector3(lua_State *L) {
+        auto v3 = lua_get_userdata<glm::vec3*>(L);
+        auto rhs = lua_get_userdata<glm::vec3*>(L, 2);
+
+        if (rhs == nullptr)
+            return 0;
+
+        lua_pushnumber(L, glm::dot(*v3, *rhs));
+
+        return 1;
+    }
+
+    int lua_normalize_vector3(lua_State *L) {
+        auto v3 = lua_get_userdata<glm::vec3*>(L);
+        auto res = LUA_MAKE_VECTOR3(L);
+
+        *res = glm::normalize(*v3);
+        return 1;
+    }
+
+    int lua_cross_vector3(lua_State *L) {
+        auto v3 = lua_get_userdata<glm::vec3*>(L);
+        auto rhs = lua_get_userdata<glm::vec3*>(L, 2);
+
+        if (rhs == nullptr)
+            return 0;
+
+        auto res = LUA_MAKE_VECTOR3(L);
+        *res = glm::cross(*v3, *rhs);
+
+        return 1;
+    }
+
     int lua_get_vector3(lua_State* L) {
-        auto v3 = reinterpret_cast<glm::vec3*>(lua_touserdata(L, 1));
+        auto v3 = lua_get_userdata<glm::vec3*>(L);
         std::string member = lua_tostring(L, 2);
 
         if (member == "x") {
@@ -71,76 +194,6 @@ namespace Silica::LuaBindings {
         }
 
         return 1;
-    }
-
-    int lua_set_vector3(lua_State *L) {
-        auto v3 = reinterpret_cast<glm::vec3*>(lua_touserdata(L, 1));
-        std::string member = lua_tostring(L, 2);
-        float value = luaL_checknumber(L, 3);
-
-        if (member == "x") {
-            v3->x = value;
-        } else if (member == "y") {
-            v3->y = value;
-        } else if (member == "z") {
-            v3->z = value;
-        } else {
-#ifdef DEBUG
-            std::cout << "LUA: Set '" << member << "' was called!" << std::endl;
-#endif
-            return 0;
-        }
-
-        return 1;
-    }
-
-    int lua_tostring_vector3(lua_State *L) {
-        auto v3 = reinterpret_cast<glm::vec3*>(lua_touserdata(L, 1));
-
-        std::string str = "{ " + std::to_string(v3->x) + ", " + std::to_string(v3->y) + ", " + std::to_string(v3->z) + " }";
-        lua_pushstring(L, str.c_str());
-
-        return 1;
-    }
-
-    int lua_operate_vector3(lua_State *L, vector_operator_t plus_po[]) {
-        auto v3 = reinterpret_cast<glm::vec3*>(lua_touserdata(L, 1));
-
-        if (lua_isnumber(L, 2)) {
-            float rhs = luaL_checknumber(L, 2);
-            auto res = lua_construct_vector3(L);
-
-            *res = std::invoke(scalar_op, v3, rhs);
-        } else if (lua_istable(L, 2)) {
-            auto rhs = reinterpret_cast<glm::vec3*>(lua_touserdata(L, 2));
-
-            if (rhs == nullptr)
-                throw std::runtime_error("lua_add_vector3() rhs table was nullptr!");
-
-            auto res = lua_construct_vector3(L);
-
-            *res = std::invoke(vector_op, v3, *rhs);
-        } else {
-            return 0;
-        }
-
-        return 1;
-    }
-
-    int lua_add_vector3(lua_State *L) {
-        return lua_operate_vector3(L, &std::plus(), &Vector3::operator+);
-    }
-
-    int lua_sub_vector3(lua_State *L) {
-        return lua_operate_vector3(L, &Vector3::operator-, &Vector3::operator-);
-    }
-
-    int lua_mul_vector3(lua_State *L) {
-        return lua_operate_vector3(L, &Vector3::operator*, &Vector3::operator+);
-    }
-
-    int lua_div_vector3(lua_State *L) {
-        return lua_operate_vector3(L, &Vector3::operator/, &Vector3::operator/);
     }
 
     const struct luaL_Reg lua_vector3_methods[] = {

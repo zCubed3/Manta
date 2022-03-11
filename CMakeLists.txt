@@ -18,6 +18,7 @@ message("Build type = ${CMAKE_BUILD_TYPE}")
 
 # idk why CMake doesn't do this automatically
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    # set(CMAKE_VERBOSE_MAKEFILE ON) # Our shiny red button of debugging
     add_compile_definitions("_DEBUG" "DEBUG")
 endif()
 
