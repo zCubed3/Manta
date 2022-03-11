@@ -3,16 +3,17 @@ set(SOURCES
 
     "src/world/world.cpp"
     "src/world/actor.cpp"
+    "src/world/timing.cpp"
 
     "src/rendering/mesh.cpp"
     "src/rendering/shader.cpp"
     "src/rendering/camera.cpp"
 
-    "src/data/timing.cpp"
-
     "src/lua_binds/vec2.cpp"
     "src/lua_binds/vec3.cpp"
     "src/lua_binds/timing.cpp"
+    "src/lua_binds/world.cpp"
+    "src/lua_binds/actor.cpp"
 
     "src/main.cpp"
 )

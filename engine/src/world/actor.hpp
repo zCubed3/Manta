@@ -4,6 +4,8 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
+#include <string>
+
 namespace Silica {
     class Actor {
     public:
@@ -15,8 +17,12 @@ namespace Silica {
         glm::mat4 model_i_matrix;
         glm::mat4 model_it_matrix;
 
+        std::string name;
+
+        Actor(const std::string& name);
+
         void Update();
-        void Draw(); // Updates anything that implements draw, usually renderers
+        void Draw(); // Updates anything that implements draw, usually renderer components
 
     protected:
         void UpdateMatrices();

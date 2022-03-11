@@ -35,7 +35,11 @@ namespace Silica {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
-    void Mesh::DrawNow(const glm::mat4& transform, Camera* camera, Shader* shader) {
+    void Mesh::DrawNow(const glm::mat4 &transform, Camera *camera, Shader *shader) {
+        Mesh::DrawNow(transform, glm::inverseTranspose(transform), camera, shader);
+    }
+
+    void Mesh::DrawNow(const glm::mat4& transform, const glm::mat4& transform_it, Camera* camera, Shader* shader) {
         shader->Use();
 
         //TODO: Make me not complete and utter shit!
@@ -47,8 +51,7 @@ namespace Silica {
         glUniformMatrix4fv(m_uniform, 1, GL_FALSE, glm::value_ptr(transform));
 
         uint32_t mit_uniform = glGetUniformLocation(shader->handle, "SILICA_M_IT");
-        glm::mat4 mit_mat = glm::inverseTranspose(transform);
-        glUniformMatrix4fv(mit_uniform, 1, GL_FALSE, glm::value_ptr(mit_mat));
+        glUniformMatrix4fv(mit_uniform, 1, GL_FALSE, glm::value_ptr(transform_it));
 
         uint32_t cam_pos_uniform = glGetUniformLocation(shader->handle, "SILICA_CAM_POS");
         glUniform3fv(cam_pos_uniform, 1, glm::value_ptr(camera->position));

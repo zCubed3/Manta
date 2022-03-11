@@ -29,18 +29,17 @@ namespace Silica {
         void CreateBuffers();
         void UpdateBuffers();
 
-        static Mesh * LoadFromFile(const std::string &path);
+        static Mesh* LoadFromFile(const std::string &path);
 
         // Meshes can draw themselves, though it is preferred to use renderers!
         void DrawNow(const glm::mat4& transform, Camera* camera, Shader* shader);
+        void DrawNow(const glm::mat4& transform, const glm::mat4& transform_it, Camera* camera, Shader* shader);
 
     protected:
         uint32_t vao;
         uint32_t vbo, ibo;
 
         void ReadObj(const std::string& source);
-
-
     };
 }
 

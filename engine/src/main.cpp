@@ -12,7 +12,7 @@
 #include "rendering/shader.hpp"
 #include "rendering/camera.hpp"
 
-#include "data/timing.hpp"
+#include "world/timing.hpp"
 
 #include "lua_common.hpp"
 
@@ -106,6 +106,8 @@ lua_State* lua_init(bool as_debug) {
     luaL_requiref(lua, "timing", LuaBindings::lua_open_timing, 1);
     luaL_requiref(lua, "vector2", LuaBindings::lua_open_vector2, 1);
     luaL_requiref(lua, "vector3", LuaBindings::lua_open_vector3, 1);
+    luaL_requiref(lua, "actor", LuaBindings::lua_open_actor, 1);
+    luaL_requiref(lua, "world", LuaBindings::lua_open_world, 1);
 
     // Enables debug mode
     if (as_debug) {
@@ -200,7 +202,11 @@ int main(int argc, char** argv) {
 
     Camera camera;
 
-    Actor* test = new Actor();
+    Actor* test = new Actor("test");
+    World::AddActor(test);
+
+    // TODO: REPLACE ME ASAP
+    lua_load_script(lua_vm, "lua/scripts/test.lua");
 
     while (keep_running) {
         // Event polling
@@ -230,7 +236,11 @@ int main(int argc, char** argv) {
         //
         // Test Actor
         //
-        test->euler += glm::vec3(Timing::delta_time, Timing::delta_time, Timing::delta_time);
+        //test->euler += glm::vec3(Timing::delta_time, Timing::delta_time, Timing::delta_time);
+        lua_getglobal(lua_vm, "TestBehavior");
+        lua_getfield(lua_vm, -1, "update");
+        bool good = lua_isfunction(lua_vm, -1);
+        lua_pcall(lua_vm, 0, 0, 0);
 
         test->Update();
 

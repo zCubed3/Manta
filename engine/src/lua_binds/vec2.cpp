@@ -26,7 +26,7 @@ namespace Silica::LuaBindings {
     }
 
     int lua_gc_vector2(lua_State *L) {
-        delete lua_get_userdata<glm::vec2*>(L);
+        //delete lua_get_userdata<glm::vec2*>(L);
         return 1;
     }
 

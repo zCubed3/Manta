@@ -4,6 +4,8 @@
 #include "vec2.hpp"
 #include "vec3.hpp"
 
+#include "world.hpp"
+#include "actor.hpp"
 #include "timing.hpp"
 
 #endif

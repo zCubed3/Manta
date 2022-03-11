@@ -2,13 +2,17 @@
 #define SILICA_WORLD_HPP
 
 #include <vector>
+#include <string>
 
 namespace Silica {
     class Actor;
 
-    class World {
+    class World final {
     public:
-        std::vector<Actor> actors;
+        static void AddActor(Actor* actor);
+        static Actor* FindActor(const std::string& path);
+
+        static std::vector<Actor*> actors;
     };
 }
 

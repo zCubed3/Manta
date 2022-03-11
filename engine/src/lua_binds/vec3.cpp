@@ -30,7 +30,7 @@ namespace Silica::LuaBindings {
     }
 
     int lua_gc_vector3(lua_State *L) {
-        delete lua_get_userdata<glm::vec3*>(L);
+        //delete lua_get_userdata<glm::vec3*>(L);
         return 1;
     }
 
@@ -72,16 +72,14 @@ namespace Silica::LuaBindings {
             auto res = LUA_MAKE_VECTOR3(L);
 
             *res = scalar_op(*v3, rhs);
-        } else if (lua_istable(L, 2)) {
-            auto rhs = reinterpret_cast<glm::vec3*>(lua_touserdata(L, 2));
+        } else {
+            auto rhs = reinterpret_cast<glm::vec3 *>(lua_touserdata(L, 2));
 
             if (rhs == nullptr)
                 throw std::runtime_error("lua_add_vector3() rhs table was nullptr!");
 
             auto res = LUA_MAKE_VECTOR3(L);
             *res = vector_op(*v3, *rhs);
-        } else {
-            return 0;
         }
 
         return 1;
