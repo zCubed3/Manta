@@ -7,7 +7,7 @@
 // Opengl
 #include <GL/glew.h>
 
-// Types
+// Silica
 #include "rendering/mesh.hpp"
 #include "rendering/shader.hpp"
 #include "rendering/camera.hpp"
@@ -18,43 +18,15 @@
 
 #include "lua_binds/silica_types.hpp"
 
+#include "world/world.hpp"
+#include "world/actor.hpp"
+
+// Misc
 #include <glm/mat4x4.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 using namespace Silica;
-
-// A base behavior that has 2 variants, LuaBehavior and NativeBehavior
-// LuaBehavior is self-explanatory
-// NativeBehavior is a behavior defined in C++
-// Something like a renderer would be a NativeBehavior!
-class Behavior {
-public:
-    std::string type_id = "invalid"; // This is done for cross language type safety!
-    int update_priority = 1000; // Everything is at 1000 by default, if this is more important shift it down!
-    bool enabled = true; // Is this behavior allowed to update?
-
-    virtual void Start() {};
-    virtual void Update() {};
-    virtual void PreDraw() {};
-};
-
-// You can inherit from Behavior but for safety please inherit from NativeBehavior!
-class NativeBehavior : Behavior {
-
-};
-
-// Globals are a terrible idea but...
-// Rather than creating a new Lua State per behavior they all live in the same state,
-// But to work correctly we need to define a module we work in!
-// Refer to silica/examples/lua_behavior for how to implement a behavior!
-// Be aware, they don't load automatically, you must tell the engine to load it beforehand!
-class LuaBehavior : Behavior {
-public:
-    LuaBehavior(lua_State* lua, const std::string& script) {
-        luaL_dofile(lua, script.c_str());
-    }
-};
 
 bool lua_load_script(lua_State* lua_vm, const char* path) {
     int lua_file_status = luaL_loadfile(lua_vm, path);
@@ -228,6 +200,8 @@ int main(int argc, char** argv) {
 
     Camera camera;
 
+    Actor* test = new Actor();
+
     while (keep_running) {
         // Event polling
         while (SDL_PollEvent(&sdl_event) != 0) {
@@ -237,7 +211,10 @@ int main(int argc, char** argv) {
 
         Timing::UpdateTime();
 
-        camera.position.x = sinf(Timing::time) * 2.0f;
+        //
+        // Camera
+        //
+        //camera.position.x = sinf(Timing::time) * 2.0f;
         camera.position.z = 3;
 
         camera.lookAt = true;
@@ -250,17 +227,20 @@ int main(int argc, char** argv) {
 
         camera.UpdateMatrices();
 
+        //
+        // Test Actor
+        //
+        test->euler += glm::vec3(Timing::delta_time, Timing::delta_time, Timing::delta_time);
+
+        test->Update();
+
+        //
+        // Drawing
+        //
         glClearColor(config->clear_r, config->clear_g, config->clear_b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //Matrix4x4 model = Matrix4x4::MakeRotation(Vector3()) * Matrix4x4::MakeTranslation(Vector3(0, cosf(Timing::time), 0));
-
-        glm::vec3 euler = glm::vec3(Timing::time * 20, Timing::time * 20, Timing::time * 20);
-        glm::quat rotation = glm::quat(glm::radians(euler));
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-        model *= glm::toMat4(rotation);
-
-        mesh->DrawNow(model, &camera, shader);
+        mesh->DrawNow(test->model_matrix, &camera, shader);
 
         SDL_GL_SwapWindow(sdl_window);
     }
