@@ -45,17 +45,17 @@ namespace Manta {
         shader->Use();
 
         //TODO: Make me not complete and utter shit!
-        uint32_t mvp_uniform = glGetUniformLocation(shader->handle, "SILICA_MVP");
+        uint32_t mvp_uniform = glGetUniformLocation(shader->handle, "MANTA_MVP");
         glm::mat4 mvp_mat = camera->eye * transform;
         glUniformMatrix4fv(mvp_uniform, 1, GL_FALSE, glm::value_ptr(mvp_mat));
 
-        uint32_t m_uniform = glGetUniformLocation(shader->handle, "SILICA_M");
+        uint32_t m_uniform = glGetUniformLocation(shader->handle, "MANTA_M");
         glUniformMatrix4fv(m_uniform, 1, GL_FALSE, glm::value_ptr(transform));
 
-        uint32_t mit_uniform = glGetUniformLocation(shader->handle, "SILICA_M_IT");
+        uint32_t mit_uniform = glGetUniformLocation(shader->handle, "MANTA_M_IT");
         glUniformMatrix4fv(mit_uniform, 1, GL_FALSE, glm::value_ptr(transform_it));
 
-        uint32_t cam_pos_uniform = glGetUniformLocation(shader->handle, "SILICA_CAM_POS");
+        uint32_t cam_pos_uniform = glGetUniformLocation(shader->handle, "MANTA_CAM_POS");
         glUniform3fv(cam_pos_uniform, 1, glm::value_ptr(camera->position));
 
         //

@@ -1,5 +1,5 @@
-#ifndef SILICA_ACTOR_HPP
-#define SILICA_ACTOR_HPP
+#ifndef MANTA_ACTOR_HPP
+#define MANTA_ACTOR_HPP
 
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>

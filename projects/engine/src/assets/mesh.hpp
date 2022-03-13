@@ -1,5 +1,5 @@
-#ifndef SILICA_MESH_HPP
-#define SILICA_MESH_HPP
+#ifndef MANTA_MESH_HPP
+#define MANTA_MESH_HPP
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>

@@ -1,5 +1,5 @@
-#ifndef SILICA_CAMERA_HPP
-#define SILICA_CAMERA_HPP
+#ifndef MANTA_CAMERA_HPP
+#define MANTA_CAMERA_HPP
 
 // TODO: Phase out Silica math since it's bad
 //#include <types/vector3.hpp>

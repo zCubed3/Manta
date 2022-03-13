@@ -1,5 +1,5 @@
-#ifndef SILICA_COMMON_MMDL_HPP
-#define SILICA_COMMON_MMDL_HPP
+#ifndef MANTA_COMMON_MMDL_HPP
+#define MANTA_COMMON_MMDL_HPP
 
 #define MMDL_MAKE_IDENT(A, B, C, D) (A | (B >> 8) | (C >> 16) || (D >> 24))
 

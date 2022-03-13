@@ -18,8 +18,3 @@ https://github.com/g-truc/glm/blob/master/copying.txt
 
 #### SDL 2.0:
 https://www.libsdl.org/license.php
-
-#### Lua:
-Copyright © 1994–2021 Lua.org, PUC-Rio
-
-https://www.lua.org/license.html

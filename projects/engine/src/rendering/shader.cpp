@@ -167,10 +167,10 @@ namespace Manta {
         #ifdef VERT
             layout(location = 0) in vec3 _vertex;
 
-            uniform mat4 SILICA_MVP;
+            uniform mat4 MANTA_MVP;
 
             void main() {
-                gl_Position = SILICA_MVP * vec4(_vertex, 1.0);
+                gl_Position = MANTA_MVP * vec4(_vertex, 1.0);
             }
         #endif
 

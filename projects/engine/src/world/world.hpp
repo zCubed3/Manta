@@ -1,5 +1,5 @@
-#ifndef SILICA_WORLD_HPP
-#define SILICA_WORLD_HPP
+#ifndef MANTA_WORLD_HPP
+#define MANTA_WORLD_HPP
 
 #include <vector>
 #include <string>

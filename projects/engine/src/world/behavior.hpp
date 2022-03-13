@@ -1,5 +1,5 @@
-#ifndef SILICA_BEHAVIOR_HPP
-#define SILICA_BEHAVIOR_HPP
+#ifndef MANTA_BEHAVIOR_HPP
+#define MANTA_BEHAVIOR_HPP
 
 #include <string>
 

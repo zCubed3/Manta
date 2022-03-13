@@ -1,5 +1,5 @@
-#ifndef SILICA_SHADER_HPP
-#define SILICA_SHADER_HPP
+#ifndef MANTA_SHADER_HPP
+#define MANTA_SHADER_HPP
 
 #include <string>
 #include <vector>

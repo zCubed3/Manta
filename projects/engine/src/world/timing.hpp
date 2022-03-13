@@ -1,5 +1,5 @@
-#ifndef SILICA_TIMING_HPP
-#define SILICA_TIMING_HPP
+#ifndef MANTA_TIMING_HPP
+#define MANTA_TIMING_HPP
 
 #include <cstdint>
 
