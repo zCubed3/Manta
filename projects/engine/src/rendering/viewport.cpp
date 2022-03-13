@@ -9,7 +9,7 @@ namespace Manta {
     Viewport* Viewport::active_viewport = nullptr;
 
     Viewport::Viewport() {
-        transform.only_local = true;
+
     }
 
     void Viewport::UpdateMatrices() {
@@ -18,6 +18,6 @@ namespace Manta {
 
         transform.UpdateMatrices();
 
-        eye = perspective * glm::inverse(transform.local_to_world);
+        eye = perspective * transform.world_to_local;
     }
 }

@@ -11,11 +11,13 @@ namespace Manta {
         static std::vector<Viewport*> active_viewports;
         static Viewport* active_viewport;
 
-        Transform transform;
-        float fov = 60;
-
         uint16_t width = 512, height = 512;
         uint16_t x = 0, y = 0;
+        float fov = 60;
+        glm::vec3 clear_color = glm::vec3(0.1f, 0.1f, 0.1f);
+        bool clear = true, clear_depth = true;
+
+        Transform transform;
 
         glm::mat4x4 perspective, eye;
 

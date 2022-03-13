@@ -23,7 +23,6 @@ namespace Manta {
         Actor(const std::string& name);
 
         void Update();
-        void Draw(); // Updates anything that implements draw, usually renderer components
 
         void AddBehavior(Behavior* behavior);
     };

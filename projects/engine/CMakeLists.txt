@@ -20,6 +20,7 @@ set(SOURCES
         "src/assets/mesh.cpp"
         "src/assets/shader.cpp"
 
+        "src/rendering/renderer.cpp"
         "src/rendering/viewport.cpp"
 
         "src/main.cpp"
