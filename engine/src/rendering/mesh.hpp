@@ -23,6 +23,7 @@ namespace Silica {
             bool operator==(const Vertex& v);
         };
 
+        std::string name = "Unnamed";
         std::vector<uint32_t> indices;
         std::vector<Vertex> vertices;
 
@@ -39,7 +40,7 @@ namespace Silica {
         uint32_t vao;
         uint32_t vbo, ibo;
 
-        void ReadObj(const std::string& source);
+        void ReadObj(std::stringstream& source);
     };
 }
 

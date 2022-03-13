@@ -1,6 +1,8 @@
 #ifndef SILICA_BEHAVIOR_HPP
 #define SILICA_BEHAVIOR_HPP
 
+#include <string>
+
 namespace Silica {
     class Actor;
 
@@ -11,7 +13,9 @@ namespace Silica {
         virtual void Start(Actor* owner);
         virtual void Update(Actor* owner);
 
-        bool IsNew();
+        virtual std::string get_TypeId() = 0;
+
+        bool get_IsNew();
 
     protected:
         bool is_new = true;

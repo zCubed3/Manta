@@ -2,7 +2,6 @@
 #define SILICA_TIMING_HPP
 
 #include <cstdint>
-#include <lua_common.hpp>
 
 namespace Silica {
     class Timing final {

@@ -26,8 +26,5 @@ endif()
 set(ENGINE_DIR ${CMAKE_SOURCE_DIR}/engine)
 set(DEPENDS_DIR "${CMAKE_SOURCE_DIR}/dependencies")
 
-# Dependencies that are source only
-add_subdirectory(${DEPENDS_DIR}/lua)
-
 # Engine
 add_subdirectory(${ENGINE_DIR})

@@ -14,7 +14,7 @@ namespace Silica {
             return;
     }
 
-    bool Behavior::IsNew() {
+    bool Behavior::get_IsNew() {
         return is_new;
     }
 }

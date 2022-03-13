@@ -8,9 +8,11 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <chrono>
 
 namespace Silica {
     void Mesh::CreateBuffers() {
@@ -89,11 +91,6 @@ namespace Silica {
         std::stringstream source;
         source << file.rdbuf();
 
-        std::string source_str = source.str();
-        source.clear();
-
-        file.close();
-
         // Try to grab the file extension
         // We look backwards in the path
         std::string extension;
@@ -104,112 +101,119 @@ namespace Silica {
             extension.insert(0, 1, path.at(c));
         }
 
+        std::transform(extension.begin(), extension.end(), extension.begin(), tolower);
+
         Mesh* mesh = new Mesh();
 
+        auto start = std::chrono::high_resolution_clock::now();
+
         if (extension == "obj")
-            mesh->ReadObj(source_str);
+            mesh->ReadObj(source);
+
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+        std::cout << "Loading '" << mesh->name << "' took " << duration.count() << std::endl;
 
         mesh->CreateBuffers();
 
         return mesh;
     }
 
-    void Mesh::ReadObj(const std::string& source) {
-            std::vector<glm::vec3> positions;
-            std::vector<glm::vec3> normals;
-            std::vector<glm::vec2> uv0s;
-            std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> triangles;
+    void Mesh::ReadObj(std::stringstream& source) {
+        std::vector<glm::vec3> positions;
+        std::vector<glm::vec3> normals;
+        std::vector<glm::vec2> uv0s;
+        std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> triangles;
 
-            std::string line;
-            std::stringstream file(source);
+        std::string line;
+        while (std::getline(source, line)) {
+            if (line.size() <= 2)
+                continue;
 
-            while (std::getline(file, line)) {
-                if (line.size() <= 2)
+            // First two characters are a data id
+            std::string id = line.substr(0, 2);
+            std::string contents = line.substr(2);
+
+            if (id[0] == '#')
+                continue;
+
+            //if (id[0] == 'o')
+            //    name = contents;
+
+            if (id[0] == 'v') {
+                glm::vec3 v3data;
+
+                if (id[1] == 't') {
+                    glm::vec2 uv;
+                    sscanf(contents.c_str(), "%f %f", &uv.x, &uv.y);
+                    uv0s.emplace_back(uv);
                     continue;
-
-                // First two characters are a data id
-                std::string id = line.substr(0, 2);
-                std::string contents = line.substr(2);
-
-                if (id[0] == '#')
-                    continue;
-
-                //if (id[0] == 'o')
-                //    name = contents;
-
-                if (id[0] == 'v') {
-                    glm::vec3 v3data;
-
-                    if (id[1] == 't') {
-                        glm::vec2 uv;
-                        sscanf(contents.c_str(), "%f %f", &uv.x, &uv.y);
-                        uv0s.emplace_back(uv);
-                        continue;
-                    }
-
-                    sscanf(contents.c_str(), "%f %f %f", &v3data.x, &v3data.y, &v3data.z);
-
-                    if (id[1] == 'n')
-                        normals.emplace_back(v3data);
-                    else
-                        positions.emplace_back(v3data);
                 }
 
-                // F = face, we either iterate 3 times to make a tri, or once to make it a vert, depends on the obj
-                // Ugly method of loading faces but idc enough to fix it
-                //
-                // Thanks to https://stackoverflow.com/questions/8888748/how-to-check-if-given-c-string-or-char-contains-only-digits for the digit checker
-                if (id[0] == 'f') {
-                    uint32_t t1i1, t1i2, t1i3;
-                    uint32_t t2i1, t2i2, t2i3;
-                    uint32_t t3i1, t3i2, t3i3;
+                sscanf(contents.c_str(), "%f %f %f", &v3data.x, &v3data.y, &v3data.z);
 
-                    // TODO: MAKE BETTER
-                    sscanf(contents.c_str(), "%i/%i/%i %i/%i/%i %i/%i/%i",
-                           &t1i1, &t1i2, &t1i3,
-                           &t2i1, &t2i2, &t2i3,
-                           &t3i1, &t3i2, &t3i3
-                    );
-
-                    t1i1 -= 1;
-                    t1i2 -= 1;
-                    t1i3 -= 1;
-
-                    t2i1 -= 1;
-                    t2i2 -= 1;
-                    t2i3 -= 1;
-
-                    t3i1 -= 1;
-                    t3i2 -= 1;
-                    t3i3 -= 1;
-
-                    triangles.emplace_back(std::make_tuple(t1i1, t1i2, t1i3));
-                    triangles.emplace_back(std::make_tuple(t2i1, t2i2, t2i3));
-                    triangles.emplace_back(std::make_tuple(t3i1, t3i2, t3i3));
-                }
+                if (id[1] == 'n')
+                    normals.emplace_back(v3data);
+                else
+                    positions.emplace_back(v3data);
             }
 
-            for (int t = 0; t < triangles.size(); t++) {
-                std::tuple<uint32_t, uint32_t, uint32_t> tri = triangles[t];
-                Vertex vert;
+            // F = face, we either iterate 3 times to make a tri, or once to make it a vert, depends on the obj
+            // Ugly method of loading faces but idc enough to fix it
+            //
+            // Thanks to https://stackoverflow.com/questions/8888748/how-to-check-if-given-c-string-or-char-contains-only-digits for the digit checker
+            if (id[0] == 'f') {
+                uint32_t t1i1, t1i2, t1i3;
+                uint32_t t2i1, t2i2, t2i3;
+                uint32_t t3i1, t3i2, t3i3;
 
-                vert.position = positions[std::get<0>(tri)];
-                vert.uv0 = uv0s[std::get<1>(tri)];
-                vert.normal = normals[std::get<2>(tri)];
+                // TODO: MAKE BETTER
+                sscanf(contents.c_str(), "%i/%i/%i %i/%i/%i %i/%i/%i",
+                       &t1i1, &t1i2, &t1i3,
+                       &t2i1, &t2i2, &t2i3,
+                       &t3i1, &t3i2, &t3i3
+                );
 
-                bool similarVert = false;
-                for (int v = 0; v < vertices.size(); v++)
-                    if (vertices[v] == vert) {
-                        indices.emplace_back(v);
-                        similarVert = true;
-                        break;
-                    }
+                t1i1 -= 1;
+                t1i2 -= 1;
+                t1i3 -= 1;
 
-                if (!similarVert) {
-                    indices.emplace_back(vertices.size());
-                    vertices.emplace_back(vert);
-                }
+                t2i1 -= 1;
+                t2i2 -= 1;
+                t2i3 -= 1;
+
+                t3i1 -= 1;
+                t3i2 -= 1;
+                t3i3 -= 1;
+
+                triangles.emplace_back(std::make_tuple(t1i1, t1i2, t1i3));
+                triangles.emplace_back(std::make_tuple(t2i1, t2i2, t2i3));
+                triangles.emplace_back(std::make_tuple(t3i1, t3i2, t3i3));
             }
+        }
+
+        for (int t = 0; t < triangles.size(); t++) {
+            std::tuple<uint32_t, uint32_t, uint32_t> tri = triangles[t];
+            Vertex vert;
+
+            vert.position = positions[std::get<0>(tri)];
+            vert.uv0 = uv0s[std::get<1>(tri)];
+            vert.normal = normals[std::get<2>(tri)];
+
+            bool similarVert = false;
+            for (int v = 0; v < vertices.size(); v++)
+                if (vertices[v] == vert) {
+                    indices.emplace_back(v);
+                    similarVert = true;
+                    break;
+                }
+
+            if (!similarVert) {
+                indices.emplace_back(vertices.size());
+                vertices.emplace_back(vert);
+            }
+        }
     }
 
     bool Mesh::Vertex::operator==(const Vertex& v) {
