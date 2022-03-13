@@ -10,7 +10,10 @@ set(SOURCES
         "${COMMON_DIR}/data/meshes/smf.cpp"
         "${COMMON_DIR}/data/meshes/mmdl.cpp"
 
+        "src/data/bifurcated_ostream.cpp"
+
         "src/world/world.cpp"
+        "src/world/transform.cpp"
         "src/world/actor.cpp"
         "src/world/behavior.cpp"
         "src/world/timing.cpp"

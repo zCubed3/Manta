@@ -25,6 +25,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
+#include <data/bifurcated_ostream.hpp>
+
 using namespace Manta;
 using namespace Manta::Data::Meshes;
 
@@ -44,7 +46,7 @@ int main(int argc, char** argv) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,4);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,2);
 
     sdl_context = SDL_GL_CreateContext(sdl_window);
     SDL_GL_SetSwapInterval(1);
@@ -72,49 +74,11 @@ int main(int argc, char** argv) {
     Actor* test = new Actor("test");
     World::AddActor(test);
 
-    Actor* test2 = new Actor("test2");
-    World::AddActor(test);
-
     int last_width = 0, last_height = 0;
 
-    // SMF Testing
-    auto smf = SMF();
-
-    for (auto idx : mesh->indices)
-        smf.indices.emplace_back(idx);
-
-    for (auto vert : mesh->vertices) {
-        SMF::SMFVertex smf_vert {};
-
-        for (int p = 0; p < 3; p++)
-            smf_vert.position[p] = vert.position[p];
-
-        for (int u = 0; u < 2; u++)
-            smf_vert.uv[u] = vert.uv0[u];
-
-        float yaw = atan2f(vert.normal.x, vert.normal.z);
-        float pitch = asinf(vert.normal.y);
-
-        smf_vert.normal[0] = yaw;
-        smf_vert.normal[1] = pitch;
-
-        smf.vertices.emplace_back(smf_vert);
-    }
-
-    smf.name = mesh->name;
-    smf.WriteToFile("test.smf");
-
-    //SMF* smf_test = SMF::LoadFromFile("test.smf");
-    auto mesh2 = Mesh::LoadFromFile("test.smf");
-
-    // Test SMF compression
-    float total = 0;
-    for (int i = 0; i < mesh->vertices.size(); i++) {
-        total += glm::distance(mesh->vertices[i].normal, mesh2->vertices[i].normal);
-    }
-
-    total /= mesh->vertices.size();
-    std::cout << "About '" << total << "' total compression error!" << std::endl;
+    // Used to allow for an in-engine console!
+    std::ostringstream engine_stream;
+    BifurcatedStream engine_out(std::cout, engine_stream);
 
     while (keep_running) {
         // Event polling
@@ -144,13 +108,9 @@ int main(int argc, char** argv) {
         //
         // Test Actor
         //
-        test->position = glm::vec3(0.5f, 0, 0);
-        test->euler += glm::vec3(Timing::delta_time, Timing::delta_time, Timing::delta_time) * 20.0f;
+        //test->position = glm::vec3(0.5f, 0, 0);
+        test->transform.euler += glm::vec3(Timing::delta_time, Timing::delta_time, Timing::delta_time) * 20.0f;
         test->Update();
-
-        test2->position = glm::vec3(-0.5f, 0, 0);
-        test2->euler += glm::vec3(Timing::delta_time, Timing::delta_time, Timing::delta_time) * 20.0f;
-        test2->Update();
 
         //
         // Drawing
@@ -162,8 +122,7 @@ int main(int argc, char** argv) {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        mesh->DrawNow(test->model_matrix, test->model_it_matrix, &camera, shader);
-        mesh2->DrawNow(test2->model_matrix, test2->model_it_matrix, &camera, shader);
+        mesh->DrawNow(test->transform.local_to_world, test->transform.world_to_local_t, &camera, shader);
 
         SDL_GL_SwapWindow(sdl_window);
 
