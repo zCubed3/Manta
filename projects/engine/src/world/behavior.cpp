@@ -2,7 +2,7 @@
 
 #include "actor.hpp"
 
-namespace Silica {
+namespace Manta {
     void Behavior::Start(Actor *owner) {
         is_new = false;
     }

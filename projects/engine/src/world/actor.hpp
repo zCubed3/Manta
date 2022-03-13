@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace Silica {
+namespace Manta {
     class Behavior;
 
     class Actor {

@@ -5,7 +5,7 @@
 
 #include "behavior.hpp"
 
-namespace Silica {
+namespace Manta {
     Actor::Actor(const std::string &name) {
         this->name = name;
     }

@@ -4,7 +4,7 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-namespace Silica {
+namespace Manta {
     void Camera::UpdateMatrices() {
         glm::vec3 forward;
 

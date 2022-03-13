@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace Silica {
+namespace Manta {
     class Actor;
 
     class Behavior {

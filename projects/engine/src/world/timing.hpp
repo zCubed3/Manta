@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-namespace Silica {
+namespace Manta {
     class Timing final {
     public:
         static float delta_time;

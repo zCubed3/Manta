@@ -1,7 +1,7 @@
 #include "mesh.hpp"
 
-#include "shader.hpp"
-#include "camera.hpp"
+#include <rendering/shader.hpp>
+#include <rendering/camera.hpp>
 
 #include <GL/glew.h>
 
@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <chrono>
 
-namespace Silica {
+namespace Manta {
     void Mesh::CreateBuffers() {
         glGenVertexArrays(1, &vao);
         glGenBuffers(1, &vbo);
@@ -113,7 +113,7 @@ namespace Silica {
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
-        std::cout << "Loading '" << mesh->name << "' took " << duration.count() << std::endl;
+        std::cout << "Loading '" << mesh->name << "' took " << duration.count() << "ms" << std::endl;
 
         mesh->CreateBuffers();
 
@@ -124,7 +124,7 @@ namespace Silica {
         std::vector<glm::vec3> positions;
         std::vector<glm::vec3> normals;
         std::vector<glm::vec2> uv0s;
-        std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> triangles;
+        std::vector<glm::u32vec3> triangles;
 
         std::string line;
         while (std::getline(source, line)) {
@@ -138,8 +138,8 @@ namespace Silica {
             if (id[0] == '#')
                 continue;
 
-            //if (id[0] == 'o')
-            //    name = contents;
+            if (id[0] == 'o')
+                name = contents;
 
             if (id[0] == 'v') {
                 glm::vec3 v3data;
@@ -161,45 +161,36 @@ namespace Silica {
 
             // F = face, we either iterate 3 times to make a tri, or once to make it a vert, depends on the obj
             // Ugly method of loading faces but idc enough to fix it
-            //
-            // Thanks to https://stackoverflow.com/questions/8888748/how-to-check-if-given-c-string-or-char-contains-only-digits for the digit checker
             if (id[0] == 'f') {
-                uint32_t t1i1, t1i2, t1i3;
-                uint32_t t2i1, t2i2, t2i3;
-                uint32_t t3i1, t3i2, t3i3;
+                glm::u32vec3 tri;
+                std::string face = contents;
 
-                // TODO: MAKE BETTER
-                sscanf(contents.c_str(), "%i/%i/%i %i/%i/%i %i/%i/%i",
-                       &t1i1, &t1i2, &t1i3,
-                       &t2i1, &t2i2, &t2i3,
-                       &t3i1, &t3i2, &t3i3
-                );
+                size_t pos;
+                while (true) {
+                    pos = face.find(" ");
 
-                t1i1 -= 1;
-                t1i2 -= 1;
-                t1i3 -= 1;
+                    sscanf(face.c_str(), "%i/%i/%i",
+                           &tri.x, &tri.y, &tri.z
+                    );
 
-                t2i1 -= 1;
-                t2i2 -= 1;
-                t2i3 -= 1;
+                    face.erase(0, pos + 1);
 
-                t3i1 -= 1;
-                t3i2 -= 1;
-                t3i3 -= 1;
+                    tri -= 1;
+                    triangles.emplace_back(tri);
 
-                triangles.emplace_back(std::make_tuple(t1i1, t1i2, t1i3));
-                triangles.emplace_back(std::make_tuple(t2i1, t2i2, t2i3));
-                triangles.emplace_back(std::make_tuple(t3i1, t3i2, t3i3));
+                    if (pos == std::string::npos)
+                        break;
+                }
             }
         }
 
         for (int t = 0; t < triangles.size(); t++) {
-            std::tuple<uint32_t, uint32_t, uint32_t> tri = triangles[t];
+            auto tri = triangles[t];
             Vertex vert;
 
-            vert.position = positions[std::get<0>(tri)];
-            vert.uv0 = uv0s[std::get<1>(tri)];
-            vert.normal = normals[std::get<2>(tri)];
+            vert.position = positions[tri.x];
+            vert.uv0 = uv0s[tri.y];
+            vert.normal = normals[tri.z];
 
             bool similarVert = false;
             for (int v = 0; v < vertices.size(); v++)

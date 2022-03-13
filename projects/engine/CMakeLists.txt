@@ -4,7 +4,8 @@ set(SOURCES
     "src/world/behavior.cpp"
     "src/world/timing.cpp"
 
-    "src/rendering/mesh.cpp"
+    "src/assets/mesh.cpp"
+
     "src/rendering/shader.cpp"
     "src/rendering/camera.cpp"
 
@@ -14,6 +15,7 @@ set(SOURCES
 set(INCLUDE_DIRS
     "${ENGINE_DIR}/src"
     "${DEPENDS_DIR}/glm"
+    "${COMMON_DIR}"
 )
 
 set(LINK_DIRS)
@@ -29,13 +31,13 @@ else ()
     set(INCLUDE_DIRS ${INCLUDE_DIRS})
 endif ()
 
-add_executable(Silica ${GLOB_SOURCES} ${SOURCES})
-target_include_directories(Silica PUBLIC ${INCLUDE_DIRS})
-target_link_directories(Silica PUBLIC ${LINK_DIRS})
-target_link_libraries(Silica PUBLIC ${LIBRARIES})
+add_executable(Manta ${GLOB_SOURCES} ${SOURCES})
+target_include_directories(Manta PUBLIC ${INCLUDE_DIRS})
+target_link_directories(Manta PUBLIC ${LINK_DIRS})
+target_link_libraries(Manta PUBLIC ${LIBRARIES})
 
-set_target_properties(Silica PROPERTIES
-    OUTPUT_NAME "Silica"
+set_target_properties(Manta PROPERTIES
+    OUTPUT_NAME "Manta"
 )
 
 # https://stackoverflow.com/questions/34799916/copy-file-from-source-directory-to-binary-directory-using-cmake
@@ -45,5 +47,5 @@ add_custom_target(copy-content ALL
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/content/engine
 )
 
-add_dependencies(Silica copy-content)
+add_dependencies(Manta copy-content)
 

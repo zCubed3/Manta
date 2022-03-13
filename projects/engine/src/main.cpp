@@ -8,7 +8,8 @@
 #include <GL/glew.h>
 
 // Silica
-#include "rendering/mesh.hpp"
+#include <assets/mesh.hpp>
+
 #include "rendering/shader.hpp"
 #include "rendering/camera.hpp"
 
@@ -23,7 +24,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-using namespace Silica;
+using namespace Manta;
 
 int main(int argc, char** argv) {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS);

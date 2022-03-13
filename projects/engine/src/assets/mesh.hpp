@@ -8,7 +8,9 @@
 #include <vector>
 #include <string>
 
-namespace Silica {
+#include <data/mmdl.hpp>
+
+namespace Manta {
     class Shader;
     class Camera;
 

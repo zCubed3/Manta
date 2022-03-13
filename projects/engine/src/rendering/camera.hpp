@@ -7,7 +7,7 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
-namespace Silica {
+namespace Manta {
     class Camera {
     public:
         glm::vec3 position = glm::vec3(0, 0, 1);

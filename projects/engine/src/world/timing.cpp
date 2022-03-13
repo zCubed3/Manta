@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-namespace Silica {
+namespace Manta {
     Timing::Timing() {};
 
     float Timing::delta_time = 0.0f;

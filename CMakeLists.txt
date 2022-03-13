@@ -23,7 +23,9 @@ if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 endif()
 
 # Common directories
-set(ENGINE_DIR ${CMAKE_SOURCE_DIR}/engine)
+set(PROJECTS_DIR ${CMAKE_SOURCE_DIR}/projects)
+set(COMMON_DIR ${PROJECTS_DIR}/common)
+set(ENGINE_DIR ${PROJECTS_DIR}/engine)
 set(DEPENDS_DIR "${CMAKE_SOURCE_DIR}/dependencies")
 
 # Engine

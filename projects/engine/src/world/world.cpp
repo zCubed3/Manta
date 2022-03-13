@@ -2,7 +2,7 @@
 
 #include "actor.hpp"
 
-namespace Silica {
+namespace Manta {
     std::vector<Actor*> World::actors = std::vector<Actor*>();
 
     void World::AddActor(Actor *actor) {
