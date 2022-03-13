@@ -9,7 +9,7 @@
 #include <string>
 
 #include <data/meshes/mmdl.hpp>
-#include <data/meshes/smf.hpp>
+#include <data/meshes/bsm.hpp>
 
 namespace Manta {
     class Shader;
@@ -44,7 +44,7 @@ namespace Manta {
         uint32_t vbo, ibo;
 
         void ReadOBJ(std::stringstream& source);
-        void ReadSMF(std::stringstream& source);
+        void ReadBSM(std::stringstream& source);
     };
 }
 

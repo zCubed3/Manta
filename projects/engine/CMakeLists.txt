@@ -7,7 +7,7 @@ set(SOURCES
         "${DEPENDS_DIR}/imgui/backends/imgui_impl_sdl.cpp"
         "${DEPENDS_DIR}/imgui/backends/imgui_impl_opengl3.cpp"
 
-        "${COMMON_DIR}/data/meshes/smf.cpp"
+        "${COMMON_DIR}/data/meshes/bsm.cpp"
         "${COMMON_DIR}/data/meshes/mmdl.cpp"
 
         "src/data/bifurcated_ostream.cpp"

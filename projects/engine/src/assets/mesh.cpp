@@ -115,7 +115,7 @@ namespace Manta {
             mesh->ReadOBJ(source);
 
         if (extension == "smf")
-            mesh->ReadSMF(source);
+            mesh->ReadBSM(source);
 
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
@@ -214,25 +214,25 @@ namespace Manta {
         }
     }
 
-    void Mesh::ReadSMF(std::stringstream &source) {
-        auto smf = SMF::LoadFromStream(source);
+    void Mesh::ReadBSM(std::stringstream &source) {
+        auto bsm = BSM::LoadFromStream(source);
 
-        name = smf->name;
+        name = bsm->name;
 
-        for (auto indice : smf->indices)
+        for (auto indice : bsm->indices)
             indices.emplace_back(indice);
 
-        for (auto smf_vert : smf->vertices) {
+        for (auto bsf_vert : bsm->vertices) {
             Vertex vert {};
 
             for (int p = 0; p < 3; p++)
-                vert.position[p] = smf_vert.position[p];
+                vert.position[p] = bsf_vert.position[p];
 
             for (int u = 0; u < 2; u++)
-                vert.uv0[u] = smf_vert.uv[u];
+                vert.uv0[u] = bsf_vert.uv[u];
 
-            float yaw = smf_vert.normal[0];
-            float pitch = smf_vert.normal[1];
+            float yaw = bsf_vert.normal[0];
+            float pitch = bsf_vert.normal[1];
 
             float cos_t = cosf(pitch);
             vert.normal = glm::vec3(sinf(yaw) * cos_t, sin(pitch), cosf(yaw) * cos_t);
@@ -240,7 +240,7 @@ namespace Manta {
             vertices.emplace_back(vert);
         }
 
-        delete smf;
+        delete bsm;
     }
 
     bool Mesh::Vertex::operator==(const Vertex& v) {
