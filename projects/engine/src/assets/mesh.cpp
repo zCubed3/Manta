@@ -14,6 +14,10 @@
 #include <algorithm>
 #include <chrono>
 
+#include <math.h>
+
+using namespace Manta::Data::Meshes;
+
 namespace Manta {
     void Mesh::CreateBuffers() {
         glGenVertexArrays(1, &vao);
@@ -108,19 +112,22 @@ namespace Manta {
         auto start = std::chrono::high_resolution_clock::now();
 
         if (extension == "obj")
-            mesh->ReadObj(source);
+            mesh->ReadOBJ(source);
+
+        if (extension == "smf")
+            mesh->ReadSMF(source);
 
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
-        std::cout << "Loading '" << mesh->name << "' took " << duration.count() << "ms" << std::endl;
+        std::cout << "Loading '" << mesh->name << "' (from '" << path << "') took " << duration.count() << "ms" << std::endl;
 
         mesh->CreateBuffers();
 
         return mesh;
     }
 
-    void Mesh::ReadObj(std::stringstream& source) {
+    void Mesh::ReadOBJ(std::stringstream& source) {
         std::vector<glm::vec3> positions;
         std::vector<glm::vec3> normals;
         std::vector<glm::vec2> uv0s;
@@ -205,6 +212,35 @@ namespace Manta {
                 vertices.emplace_back(vert);
             }
         }
+    }
+
+    void Mesh::ReadSMF(std::stringstream &source) {
+        auto smf = SMF::LoadFromStream(source);
+
+        name = smf->name;
+
+        for (auto indice : smf->indices)
+            indices.emplace_back(indice);
+
+        for (auto smf_vert : smf->vertices) {
+            Vertex vert {};
+
+            for (int p = 0; p < 3; p++)
+                vert.position[p] = smf_vert.position[p];
+
+            for (int u = 0; u < 2; u++)
+                vert.uv0[u] = smf_vert.uv[u];
+
+            float yaw = smf_vert.normal[0];
+            float pitch = smf_vert.normal[1];
+
+            float cos_t = cosf(pitch);
+            vert.normal = glm::vec3(sinf(yaw) * cos_t, sin(pitch), cosf(yaw) * cos_t);
+
+            vertices.emplace_back(vert);
+        }
+
+        delete smf;
     }
 
     bool Mesh::Vertex::operator==(const Vertex& v) {

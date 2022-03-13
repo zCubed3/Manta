@@ -8,7 +8,8 @@
 #include <vector>
 #include <string>
 
-#include <data/mmdl.hpp>
+#include <data/meshes/mmdl.hpp>
+#include <data/meshes/smf.hpp>
 
 namespace Manta {
     class Shader;
@@ -42,7 +43,8 @@ namespace Manta {
         uint32_t vao;
         uint32_t vbo, ibo;
 
-        void ReadObj(std::stringstream& source);
+        void ReadOBJ(std::stringstream& source);
+        void ReadSMF(std::stringstream& source);
     };
 }
 
