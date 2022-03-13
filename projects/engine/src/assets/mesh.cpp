@@ -1,7 +1,8 @@
 #include "mesh.hpp"
 
-#include <rendering/shader.hpp>
-#include <rendering/camera.hpp>
+#include <rendering/viewport.hpp>
+
+#include <assets/shader.hpp>
 
 #include <GL/glew.h>
 
@@ -41,26 +42,28 @@ namespace Manta {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
-    void Mesh::DrawNow(const glm::mat4 &transform, Camera *camera, Shader *shader) {
-        Mesh::DrawNow(transform, glm::inverseTranspose(transform), camera, shader);
+    void Mesh::DrawNow(const glm::mat4 &transform, Shader *shader) {
+        Mesh::DrawNow(transform, glm::inverseTranspose(transform), shader);
     }
 
-    void Mesh::DrawNow(const glm::mat4& transform, const glm::mat4& transform_it, Camera* camera, Shader* shader) {
+    void Mesh::DrawNow(const glm::mat4& transform, const glm::mat4& transform_it, Shader* shader) {
         shader->Use();
 
         //TODO: Make me not complete and utter shit!
-        uint32_t mvp_uniform = glGetUniformLocation(shader->handle, "MANTA_MVP");
-        glm::mat4 mvp_mat = camera->eye * transform;
-        glUniformMatrix4fv(mvp_uniform, 1, GL_FALSE, glm::value_ptr(mvp_mat));
+        if (Viewport::active_viewport) {
+            uint32_t mvp_uniform = glGetUniformLocation(shader->handle, "MANTA_MVP");
+            glm::mat4 mvp_mat = Viewport::active_viewport->eye * transform;
+            glUniformMatrix4fv(mvp_uniform, 1, GL_FALSE, glm::value_ptr(mvp_mat));
 
-        uint32_t m_uniform = glGetUniformLocation(shader->handle, "MANTA_M");
-        glUniformMatrix4fv(m_uniform, 1, GL_FALSE, glm::value_ptr(transform));
+            uint32_t m_uniform = glGetUniformLocation(shader->handle, "MANTA_M");
+            glUniformMatrix4fv(m_uniform, 1, GL_FALSE, glm::value_ptr(transform));
 
-        uint32_t mit_uniform = glGetUniformLocation(shader->handle, "MANTA_M_IT");
-        glUniformMatrix4fv(mit_uniform, 1, GL_FALSE, glm::value_ptr(transform_it));
+            uint32_t mit_uniform = glGetUniformLocation(shader->handle, "MANTA_M_IT");
+            glUniformMatrix4fv(mit_uniform, 1, GL_FALSE, glm::value_ptr(transform_it));
 
-        uint32_t cam_pos_uniform = glGetUniformLocation(shader->handle, "MANTA_CAM_POS");
-        glUniform3fv(cam_pos_uniform, 1, glm::value_ptr(camera->position));
+            uint32_t cam_pos_uniform = glGetUniformLocation(shader->handle, "MANTA_CAM_POS");
+            glUniform3fv(cam_pos_uniform, 1, glm::value_ptr(Viewport::active_viewport->transform.position));
+        }
 
         //
         //

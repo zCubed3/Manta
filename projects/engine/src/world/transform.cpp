@@ -15,7 +15,9 @@ namespace Manta {
         local_to_world *= glm::toMat4(glm::quat(glm::radians(euler)));
         local_to_world = glm::scale(local_to_world, scale);
 
-        world_to_local = glm::inverse(local_to_world);
-        world_to_local_t = glm::transpose(world_to_local);
+        if (!only_local) {
+            world_to_local = glm::inverse(local_to_world);
+            world_to_local_t = glm::transpose(world_to_local);
+        }
     }
 }

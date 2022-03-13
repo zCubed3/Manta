@@ -8,12 +8,11 @@
 #include <vector>
 #include <string>
 
-#include <data/meshes/mmdl.hpp>
 #include <data/meshes/bsm.hpp>
 
 namespace Manta {
     class Shader;
-    class Camera;
+    class Viewport;
 
     class Mesh {
     public:
@@ -36,8 +35,8 @@ namespace Manta {
         static Mesh* LoadFromFile(const std::string &path);
 
         // Meshes can draw themselves, though it is preferred to use renderers!
-        void DrawNow(const glm::mat4& transform, Camera* camera, Shader* shader);
-        void DrawNow(const glm::mat4& transform, const glm::mat4& transform_it, Camera* camera, Shader* shader);
+        void DrawNow(const glm::mat4& transform, Shader* shader);
+        void DrawNow(const glm::mat4& transform, const glm::mat4& transform_it, Shader* shader);
 
     protected:
         uint32_t vao;

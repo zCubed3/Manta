@@ -2,9 +2,10 @@
 
 #include "actor.hpp"
 
-namespace Manta {
-    std::vector<Actor*> World::actors = std::vector<Actor*>();
+#include <iostream>
+#include <queue>
 
+namespace Manta {
     void World::AddActor(Actor *actor) {
         actors.emplace_back(actor);
     }
@@ -17,5 +18,31 @@ namespace Manta {
         }
 
         return nullptr;
+    }
+
+    void World::Update() {
+        std::queue<size_t> invalid_actors;
+
+        for (auto a = 0; a < actors.size(); a++) {
+            if (actors[a] == nullptr) {
+                invalid_actors.emplace(a);
+                continue;
+            }
+
+            actors[a]->Update();
+        }
+
+        size_t off = 0;
+        while (!invalid_actors.empty()) {
+            auto idx = invalid_actors.front();
+            actors.erase(actors.begin() + (idx - off));
+            off += 1;
+
+#ifdef DEBUG
+            std::cout << "Disposing of nullptr actor at (" << idx << " - " << off << ")!" << std::endl;
+#endif
+
+            invalid_actors.pop();
+        }
     }
 }

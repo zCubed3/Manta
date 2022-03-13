@@ -7,11 +7,11 @@
 // Opengl
 #include <GL/glew.h>
 
-// Silica
+// Engine
 #include <assets/mesh.hpp>
 
-#include "rendering/shader.hpp"
-#include "rendering/camera.hpp"
+#include "assets/shader.hpp"
+#include "rendering/viewport.hpp"
 
 #include "world/timing.hpp"
 
@@ -69,16 +69,26 @@ int main(int argc, char** argv) {
 
     Mesh* mesh = Mesh::LoadFromFile("test.obj");
 
-    Camera camera;
+    Viewport viewport;
+    Viewport viewport2;
+
+    auto world = new World();
 
     Actor* test = new Actor("test");
-    World::AddActor(test);
+    world->AddActor(test);
 
     int last_width = 0, last_height = 0;
 
     // Used to allow for an in-engine console!
     std::ostringstream engine_stream;
     BifurcatedStream engine_out(std::cout, engine_stream);
+
+    // Test if the world will dispose of a nullptr actor!
+    for (int i = 0; i < 10; i++)
+        world->AddActor(nullptr);
+
+    Viewport::active_viewports.emplace_back(&viewport);
+    Viewport::active_viewports.emplace_back(&viewport2);
 
     while (keep_running) {
         // Event polling
@@ -89,42 +99,56 @@ int main(int argc, char** argv) {
 
         Timing::UpdateTime();
 
-        //
-        // Camera
-        //
-        camera.fov = 60;
-        camera.position.z = 2;
-
-        camera.lookAt = true;
-        camera.target = glm::vec3(0, 0, 0);
-
         int width, height;
         SDL_GetWindowSize(sdl_window, &width, &height);
 
-        camera.aspect = (float)width / (float)height;
+        //
+        // Camera
+        //
+        viewport.fov = 60;
+        viewport.transform.position.x = sinf(Timing::time);
+        viewport.transform.position.z = 2;
 
-        camera.UpdateMatrices();
+        viewport.width = width / 2;
+        viewport.height = height;
+
+        viewport2.fov = 60;
+        viewport2.transform.position.z = 2;
+
+        viewport2.x = width / 2;
+        viewport2.width = width / 2;
+        viewport2.height = height;
 
         //
         // Test Actor
         //
         //test->position = glm::vec3(0.5f, 0, 0);
         test->transform.euler += glm::vec3(Timing::delta_time, Timing::delta_time, Timing::delta_time) * 20.0f;
-        test->Update();
+
+        world->Update();
 
         //
         // Drawing
         //
-        if (width != last_width || height != last_height) {
-            glViewport(0, 0, width, height);
-        }
-
+        glViewport(0, 0, width, height);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        mesh->DrawNow(test->transform.local_to_world, test->transform.world_to_local_t, &camera, shader);
+        for (auto target_viewport : Viewport::active_viewports) {
+            Viewport::active_viewport = target_viewport;
+
+            if (target_viewport)
+                target_viewport->UpdateMatrices();
+            else
+                continue;
+
+            glViewport(target_viewport->x, target_viewport->y,target_viewport->width, target_viewport->height);
+
+            mesh->DrawNow(test->transform.local_to_world, test->transform.world_to_local_t, shader);
+        }
 
         SDL_GL_SwapWindow(sdl_window);
+
 
         last_width = width;
         last_height = height;

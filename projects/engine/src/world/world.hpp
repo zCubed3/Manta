@@ -9,10 +9,12 @@ namespace Manta {
 
     class World final {
     public:
-        static void AddActor(Actor* actor);
-        static Actor* FindActor(const std::string& path);
+        void AddActor(Actor* actor);
+        Actor* FindActor(const std::string& path);
 
-        static std::vector<Actor*> actors;
+        void Update();
+
+        std::vector<Actor*> actors;
     };
 }
 

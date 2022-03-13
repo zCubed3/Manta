@@ -8,7 +8,6 @@ set(SOURCES
         "${DEPENDS_DIR}/imgui/backends/imgui_impl_opengl3.cpp"
 
         "${COMMON_DIR}/data/meshes/bsm.cpp"
-        "${COMMON_DIR}/data/meshes/mmdl.cpp"
 
         "src/data/bifurcated_ostream.cpp"
 
@@ -19,9 +18,9 @@ set(SOURCES
         "src/world/timing.cpp"
 
         "src/assets/mesh.cpp"
+        "src/assets/shader.cpp"
 
-        "src/rendering/shader.cpp"
-        "src/rendering/camera.cpp"
+        "src/rendering/viewport.cpp"
 
         "src/main.cpp"
 )

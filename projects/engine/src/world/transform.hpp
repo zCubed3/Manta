@@ -14,6 +14,8 @@ namespace Manta {
         glm::mat4 world_to_local;
         glm::mat4 world_to_local_t;
 
+        bool only_local = false;
+
         Transform(glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 euler = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(1, 1, 1));
 
         void UpdateMatrices();
