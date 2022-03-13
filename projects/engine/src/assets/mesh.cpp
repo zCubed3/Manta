@@ -114,7 +114,7 @@ namespace Manta {
         if (extension == "obj")
             mesh->ReadOBJ(source);
 
-        if (extension == "smf")
+        if (extension == "bsm")
             mesh->ReadBSM(source);
 
         auto end = std::chrono::high_resolution_clock::now();
