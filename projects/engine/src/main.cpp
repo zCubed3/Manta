@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 
     SDL_GLContext sdl_context = nullptr;
     SDL_Window* sdl_window = SDL_CreateWindow(
-            "Silica",
+            "Manta",
             SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,
             1280,
