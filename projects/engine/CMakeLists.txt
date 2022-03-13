@@ -1,20 +1,29 @@
 set(SOURCES
-    "src/world/world.cpp"
-    "src/world/actor.cpp"
-    "src/world/behavior.cpp"
-    "src/world/timing.cpp"
+        "${DEPENDS_DIR}/imgui/imgui.cpp"
+        "${DEPENDS_DIR}/imgui/imgui_draw.cpp"
+        "${DEPENDS_DIR}/imgui/imgui_demo.cpp"
+        "${DEPENDS_DIR}/imgui/imgui_tables.cpp"
+        "${DEPENDS_DIR}/imgui/imgui_widgets.cpp"
+        "${DEPENDS_DIR}/imgui/backends/imgui_impl_sdl.cpp"
+        "${DEPENDS_DIR}/imgui/backends/imgui_impl_opengl3.cpp"
 
-    "src/assets/mesh.cpp"
+        "src/world/world.cpp"
+        "src/world/actor.cpp"
+        "src/world/behavior.cpp"
+        "src/world/timing.cpp"
 
-    "src/rendering/shader.cpp"
-    "src/rendering/camera.cpp"
+        "src/assets/mesh.cpp"
 
-    "src/main.cpp"
+        "src/rendering/shader.cpp"
+        "src/rendering/camera.cpp"
+
+        "src/main.cpp"
 )
 
 set(INCLUDE_DIRS
     "${ENGINE_DIR}/src"
     "${DEPENDS_DIR}/glm"
+    "${DEPENDS_DIR}/imgui"
     "${COMMON_DIR}"
 )
 
