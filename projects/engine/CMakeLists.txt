@@ -7,6 +7,8 @@ set(SOURCES
         "${DEPENDS_DIR}/imgui/backends/imgui_impl_sdl.cpp"
         "${DEPENDS_DIR}/imgui/backends/imgui_impl_opengl3.cpp"
 
+        "${COMMON_DIR}/data/mmdl.cpp"
+
         "src/world/world.cpp"
         "src/world/actor.cpp"
         "src/world/behavior.cpp"

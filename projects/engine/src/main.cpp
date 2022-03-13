@@ -70,6 +70,18 @@ int main(int argc, char** argv) {
 
     int last_width = 0, last_height = 0;
 
+    // MMDL Testing
+    auto desc = MMDL::DescriptorV1({
+        MMDL::DescriptorV1::ChannelType::FLOAT3,
+        MMDL::DescriptorV1::ChannelType::FLOAT3,
+        MMDL::DescriptorV1::ChannelType::FLOAT2
+    },
+    {
+        MMDL::DescriptorV1::ChannelSemantic::VERTEX,
+        MMDL::DescriptorV1::ChannelSemantic::NORMAL,
+        MMDL::DescriptorV1::ChannelSemantic::UV0,
+    });
+
     while (keep_running) {
         // Event polling
         while (SDL_PollEvent(&sdl_event) != 0) {
