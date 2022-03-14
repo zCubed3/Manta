@@ -10,7 +10,7 @@
 namespace Manta::Data::Meshes {
     // BSM, a binary mesh format similar to OBJ!
     // One trade off is a bit of normal precision since we bake it as atan2(), asin() coords instead of a direction!
-    class BSM {
+    class MantaBSM {
     public:
         static const uint32_t BSM_IDENT;
 
@@ -34,8 +34,8 @@ namespace Manta::Data::Meshes {
         std::vector<uint32_t> indices;
         std::string name;
 
-        static BSM* LoadFromStream(std::istream& stream);
-        static BSM* LoadFromFile(const std::string &path);
+        static MantaBSM* LoadFromStream(std::istream& stream);
+        static MantaBSM* LoadFromFile(const std::string &path);
 
         void WriteToFile(const std::string& path);
     };

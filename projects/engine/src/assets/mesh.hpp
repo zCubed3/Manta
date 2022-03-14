@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 
+#include <data/meshes/obj.hpp>
 #include <data/meshes/bsm.hpp>
 
 namespace Manta {

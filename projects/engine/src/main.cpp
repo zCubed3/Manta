@@ -63,10 +63,13 @@ int main(int argc, char** argv) {
     for (int i = 0; i < 10; i++)
         world->AddActor(nullptr);
 
-    Viewport::active_viewports.emplace_back(&viewport);
-    Viewport::active_viewports.emplace_back(&viewport2);
+    // TODO: Differentiate between shipping and editor
+
 
     bool first_run = true;
+
+    Viewport::active_viewports.emplace_back(&viewport);
+    Viewport::active_viewports.emplace_back(&viewport2);
 
     while (keep_running) {
         // Event polling

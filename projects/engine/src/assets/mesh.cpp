@@ -131,111 +131,50 @@ namespace Manta {
     }
 
     void Mesh::ReadOBJ(std::stringstream& source) {
-        std::vector<glm::vec3> positions;
-        std::vector<glm::vec3> normals;
-        std::vector<glm::vec2> uv0s;
-        std::vector<glm::u32vec3> triangles;
+        auto obj = WavefrontOBJ::LoadFromStream(source);
 
-        std::string line;
-        while (std::getline(source, line)) {
-            if (line.size() <= 2)
-                continue;
+        for (auto indice : obj->indices)
+            indices.emplace_back(indice);
 
-            // First two characters are a data id
-            std::string id = line.substr(0, 2);
-            std::string contents = line.substr(2);
+        for (auto obj_vert : obj->vertices) {
+            Vertex vert {};
 
-            if (id[0] == '#')
-                continue;
+            for (int p = 0; p < 3; p++)
+                vert.position[p] = obj_vert.position[p];
 
-            if (id[0] == 'o')
-                name = contents;
+            for (int n = 0; n < 3; n++)
+                vert.normal[n] = obj_vert.normal[n];
 
-            if (id[0] == 'v') {
-                glm::vec3 v3data;
+            for (int u = 0; u < 2; u++)
+                vert.uv0[u] = obj_vert.uv[u];
 
-                if (id[1] == 't') {
-                    glm::vec2 uv;
-                    sscanf(contents.c_str(), "%f %f", &uv.x, &uv.y);
-                    uv0s.emplace_back(uv);
-                    continue;
-                }
-
-                sscanf(contents.c_str(), "%f %f %f", &v3data.x, &v3data.y, &v3data.z);
-
-                if (id[1] == 'n')
-                    normals.emplace_back(v3data);
-                else
-                    positions.emplace_back(v3data);
-            }
-
-            // F = face, we either iterate 3 times to make a tri, or once to make it a vert, depends on the obj
-            // Ugly method of loading faces but idc enough to fix it
-            if (id[0] == 'f') {
-                glm::u32vec3 tri;
-                std::string face = contents;
-
-                size_t pos;
-                while (true) {
-                    pos = face.find(" ");
-
-                    sscanf(face.c_str(), "%i/%i/%i",
-                           &tri.x, &tri.y, &tri.z
-                    );
-
-                    face.erase(0, pos + 1);
-
-                    tri -= 1;
-                    triangles.emplace_back(tri);
-
-                    if (pos == std::string::npos)
-                        break;
-                }
-            }
+            vertices.emplace_back(vert);
         }
 
-        for (int t = 0; t < triangles.size(); t++) {
-            auto tri = triangles[t];
-            Vertex vert;
+        name = obj->name;
 
-            vert.position = positions[tri.x];
-            vert.uv0 = uv0s[tri.y];
-            vert.normal = normals[tri.z];
-
-            bool similarVert = false;
-            for (int v = 0; v < vertices.size(); v++)
-                if (vertices[v] == vert) {
-                    indices.emplace_back(v);
-                    similarVert = true;
-                    break;
-                }
-
-            if (!similarVert) {
-                indices.emplace_back(vertices.size());
-                vertices.emplace_back(vert);
-            }
-        }
+        delete obj;
     }
 
     void Mesh::ReadBSM(std::stringstream &source) {
-        auto bsm = BSM::LoadFromStream(source);
+        auto bsm = MantaBSM::LoadFromStream(source);
 
         name = bsm->name;
 
         for (auto indice : bsm->indices)
             indices.emplace_back(indice);
 
-        for (auto bsf_vert : bsm->vertices) {
+        for (auto bsm_vert : bsm->vertices) {
             Vertex vert {};
 
             for (int p = 0; p < 3; p++)
-                vert.position[p] = bsf_vert.position[p];
+                vert.position[p] = bsm_vert.position[p];
 
             for (int u = 0; u < 2; u++)
-                vert.uv0[u] = bsf_vert.uv[u];
+                vert.uv0[u] = bsm_vert.uv[u];
 
-            float yaw = bsf_vert.normal[0];
-            float pitch = bsf_vert.normal[1];
+            float yaw = bsm_vert.normal[0];
+            float pitch = bsm_vert.normal[1];
 
             float cos_t = cosf(pitch);
             vert.normal = glm::vec3(sinf(yaw) * cos_t, sin(pitch), cosf(yaw) * cos_t);

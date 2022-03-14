@@ -3,10 +3,10 @@
 #include <fstream>
 
 namespace Manta::Data::Meshes {
-    const uint32_t BSM::BSM_IDENT = MAKE_32_IDENT("BSM#");
+    const uint32_t MantaBSM::BSM_IDENT = MAKE_32_IDENT("BSM#");
 
-    BSM* BSM::LoadFromStream(std::istream& stream) {
-        auto bsm = new BSM();
+    MantaBSM* MantaBSM::LoadFromStream(std::istream& stream) {
+        auto bsm = new MantaBSM();
 
         BSMHeader header {};
         stream.read(reinterpret_cast<char*>(&header), sizeof(BSMHeader));
@@ -32,7 +32,7 @@ namespace Manta::Data::Meshes {
         return bsm;
     }
 
-    BSM* BSM::LoadFromFile(const std::string& path) {
+    MantaBSM* MantaBSM::LoadFromFile(const std::string& path) {
         std::ifstream file(path, std::ofstream::binary);
         auto smf = LoadFromStream(file);
         file.close();
@@ -40,7 +40,7 @@ namespace Manta::Data::Meshes {
         return smf;
     }
 
-    void BSM::WriteToFile(const std::string &path) {
+    void MantaBSM::WriteToFile(const std::string &path) {
         std::ofstream file(path, std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
 
         BSMHeader header {};
