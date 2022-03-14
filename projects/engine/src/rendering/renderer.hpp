@@ -5,19 +5,23 @@
 
 namespace Manta {
     class World;
+    class Viewport;
 
     class Renderer {
     public:
+        Viewport* active_viewport = nullptr;
+
         void Initialize();
 
         void Update();
 
         void ClearScreen();
+
         void DrawWorld(World* world);
 
         void Present();
 
-        int width, height;
+        int width = 512, height = 512;
 
     protected:
         SDL_GLContext sdl_context = nullptr;

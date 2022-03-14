@@ -11,6 +11,8 @@
 
 namespace Manta {
     class Behavior;
+    class Mesh;
+    class Shader;
 
     class Actor {
     public:
@@ -18,11 +20,14 @@ namespace Manta {
         std::string name = "New Actor";
         bool enabled = true;
 
+        std::vector<Mesh*> meshes;
+        std::vector<Shader*> shaders;
         std::vector<Behavior*> behaviors;
 
         Actor(const std::string& name);
 
         void Update();
+        void Draw();
 
         void AddBehavior(Behavior* behavior);
     };

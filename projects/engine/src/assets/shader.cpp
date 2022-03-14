@@ -7,6 +7,8 @@
 // TODO: Make this more generic for other APIs?
 #include <GL/glew.h>
 
+#include <glm/gtc/type_ptr.hpp>
+
 namespace Manta {
     Shader* Shader::LoadCode(std::string code) {
         auto shader = new Shader();
@@ -106,6 +108,25 @@ namespace Manta {
         return status;
     }
 
+    bool did_compile_program(uint program) {
+        int status;
+        glGetProgramiv(program, GL_LINK_STATUS, &status);
+
+        if (status != GL_TRUE) {
+            int logLen = 0;
+            glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLen);
+
+            char *log = new char[logLen];
+
+            glGetProgramInfoLog(program, logLen, nullptr, log);
+            printf("Program failed to compile with error:\n%s\n", log);
+
+            delete[] log;
+        }
+
+        return status;
+    }
+
     uint32_t compile_source(const std::string& source_str, int version, bool isVertex) {
         uint32_t shader = glCreateShader(isVertex ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
 
@@ -142,43 +163,118 @@ namespace Manta {
         if (!analyzed)
             ProcessSource();
 
+        bool passed = false;
+
         // TODO: Geometry shaders?
         auto vert = compile_source(source, version, true);
-        did_compile_shader(vert);
+        bool vert_passed = did_compile_shader(vert);
 
         auto frag = compile_source(source, version, false);
-        did_compile_shader(frag);
+        bool frag_passed = did_compile_shader(frag);
 
-        auto prog = link_program(vert, frag);
+        if (vert_passed && frag_passed) {
+            auto prog = link_program(vert, frag);
+            bool prog_passed = did_compile_program(prog);
+
+            if (!prog_passed)
+                glDeleteProgram(prog);
+            else {
+                if (handle.has_value())
+                    handle.reset();
+            }
+
+            handle = prog;
+            passed = prog_passed;
+
+            uniform_cache.clear();
+        }
 
         glDeleteShader(vert);
         glDeleteShader(frag);
 
-        handle = prog;
-        return true;
+        return passed;
     }
 
-    void Shader::Use() {
-        glUseProgram(handle);
+    uint32_t Shader::Use() {
+        uint32_t h = GL_INVALID_INDEX;
+        if (handle.has_value())
+            h = handle.value();
+        else
+            h = error_shader->handle.value();
+
+        glUseProgram(h);
+        return h;
+    }
+
+    std::optional<uint32_t> Shader::GetUniform(const std::string &name) {
+        auto existing = uniform_cache.find(name);
+        if (existing == uniform_cache.end()) {
+            if (handle.has_value()) {
+                uint32_t loc = glGetUniformLocation(handle.value(), name.c_str());
+
+                if (loc != GL_INVALID_INDEX) {
+                    uniform_cache.emplace(name, loc);
+                    return loc;
+                } else {
+                    return {};
+                }
+            }
+        } else
+            return existing->second;
+
+        return {};
+    }
+
+    void Shader::SetMat4x4(const std::string& name, const glm::mat4x4 &matrix) {
+        auto uniform = GetUniform(name);
+
+        if (uniform.has_value())
+            glUniformMatrix4fv(uniform.value(), 1, GL_FALSE, glm::value_ptr(matrix));
+    }
+
+    void Shader::SetVec3(const std::string& name, const glm::vec3 &vec) {
+        auto uniform = GetUniform(name);
+
+        if (uniform.has_value())
+            glUniform3fv(uniform.value(), 1, glm::value_ptr(vec));
     }
 
     void Shader::CreateEngineShaders() {
         error_shader = LoadCode(R"(#version 330 core
         #ifdef VERT
             layout(location = 0) in vec3 _vertex;
+            layout(location = 1) in vec3 _normal;
 
             uniform mat4 MANTA_MVP;
+            uniform mat4 MANTA_M;
+            uniform mat4 MANTA_M_IT;
+            uniform vec3 MANTA_CAM_POS;
+
+            out vec3 view_dir;
+            out vec3 world_normal;
 
             void main() {
                 gl_Position = MANTA_MVP * vec4(_vertex, 1.0);
+
+                vec3 position = (MANTA_M * vec4(_vertex, 1.0)).xyz;
+                world_normal = (MANTA_M_IT * vec4(_normal, 1.0)).xyz;
+
+                view_dir = normalize(MANTA_CAM_POS - position);
             }
         #endif
 
         #ifdef FRAG
             out vec4 col;
 
+            in vec3 view_dir;
+            in vec3 world_normal;
+
+            uniform mat4 MANTA_MVP;
+            uniform vec4 MANTA_SINTIME;
+
             void main() {
-                col = vec4(1.0, 0.0, 0.0, 1.0);
+                float f = pow(max(0.0, dot(world_normal, view_dir)), 0.5) * abs(MANTA_SINTIME.x);
+                col = vec4(vec3(0.956862745, 0.31764705882, 0.11764705882) * f, 1.0);
             }
         #endif
         )");

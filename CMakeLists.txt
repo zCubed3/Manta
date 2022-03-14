@@ -26,7 +26,9 @@ endif()
 set(PROJECTS_DIR ${CMAKE_SOURCE_DIR}/projects)
 set(COMMON_DIR ${PROJECTS_DIR}/common)
 set(ENGINE_DIR ${PROJECTS_DIR}/engine)
+set(PACKER_DIR ${PROJECTS_DIR}/packer)
 set(DEPENDS_DIR "${CMAKE_SOURCE_DIR}/dependencies")
 
-# Engine
+# Projects
+add_subdirectory(${PACKER_DIR})
 add_subdirectory(${ENGINE_DIR})

@@ -3,13 +3,16 @@
 
 #include <string>
 #include <vector>
+#include <optional>
 #include <unordered_map>
+
+#include <glm/mat4x4.hpp>
 
 namespace Manta {
     class Shader {
     public:
         std::string source, path;
-        uint32_t handle = 0;
+        std::optional<uint32_t> handle;
 
         static Shader* LoadCode(std::string code);
         static Shader* LoadFile(std::string path);
@@ -18,7 +21,12 @@ namespace Manta {
         void ProcessSource(); // Analyzes the source, locates #version
 
         bool Compile();
-        void Use();
+        uint32_t Use();
+
+        std::optional<uint32_t> GetUniform(const std::string& name);
+
+        void SetMat4x4(const std::string &name, const glm::mat4x4 &matrix);
+        void SetVec3(const std::string &name, const glm::vec3 &vec);
 
         static void CreateEngineShaders();
 
@@ -27,6 +35,9 @@ namespace Manta {
     protected:
         int version = 330;
         bool analyzed = false;
+
+        std::unordered_map<std::string, std::optional<uint32_t>> uniform_cache;
+
     };
 }
 

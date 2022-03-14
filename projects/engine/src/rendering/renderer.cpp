@@ -4,6 +4,11 @@
 
 #include <stdexcept>
 
+#include <world/world.hpp>
+#include <world/actor.hpp>
+
+#include "viewport.hpp"
+
 namespace Manta {
     void Renderer::Initialize() {
         sdl_context = nullptr;
@@ -40,6 +45,18 @@ namespace Manta {
 
     void Renderer::Update() {
         SDL_GetWindowSize(sdl_window, &width, &height);
+    }
+
+    void Renderer::DrawWorld(World *world) {
+        if (world == nullptr)
+            throw std::runtime_error("world was nullptr!");
+
+        for (const auto& actor : world->actors) {
+            if (actor == nullptr)
+                continue;
+
+            actor->Draw();
+        }
     }
 
     void Renderer::ClearScreen() {

@@ -1,4 +1,7 @@
 set(SOURCES
+    "${COMMON_DIR}/data/meshes/obj.cpp"
+    "${COMMON_DIR}/data/meshes/bsm.cpp"
+
     "src/main.cpp"
 )
 

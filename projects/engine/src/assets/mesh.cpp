@@ -15,6 +15,8 @@
 #include <algorithm>
 #include <chrono>
 
+#include <world/timing.hpp>
+
 #include <math.h>
 
 using namespace Manta::Data::Meshes;
@@ -47,23 +49,19 @@ namespace Manta {
     }
 
     void Mesh::DrawNow(const glm::mat4& transform, const glm::mat4& transform_it, Shader* shader) {
-        shader->Use();
+        uint32_t handle = shader->Use();
 
-        //TODO: Make me not complete and utter shit!
+        // TODO: Shader properties
         if (Viewport::active_viewport) {
-            uint32_t mvp_uniform = glGetUniformLocation(shader->handle, "MANTA_MVP");
-            glm::mat4 mvp_mat = Viewport::active_viewport->eye * transform;
-            glUniformMatrix4fv(mvp_uniform, 1, GL_FALSE, glm::value_ptr(mvp_mat));
+            shader->SetMat4x4("MANTA_MVP", Viewport::active_viewport->eye * transform);
+            shader->SetMat4x4("MANTA_M", transform);
+            shader->SetMat4x4("MANTA_M_IT", transform_it);
 
-            uint32_t m_uniform = glGetUniformLocation(shader->handle, "MANTA_M");
-            glUniformMatrix4fv(m_uniform, 1, GL_FALSE, glm::value_ptr(transform));
-
-            uint32_t mit_uniform = glGetUniformLocation(shader->handle, "MANTA_M_IT");
-            glUniformMatrix4fv(mit_uniform, 1, GL_FALSE, glm::value_ptr(transform_it));
-
-            uint32_t cam_pos_uniform = glGetUniformLocation(shader->handle, "MANTA_CAM_POS");
-            glUniform3fv(cam_pos_uniform, 1, glm::value_ptr(Viewport::active_viewport->transform.position));
+            shader->SetVec3("MANTA_CAM_POS", Viewport::active_viewport->transform.position);
         }
+
+        uint32_t sintime_uniform = glGetUniformLocation(handle, "MANTA_SINTIME");
+        glUniform4fv(sintime_uniform, 1, glm::value_ptr(Timing::sin_time));
 
         //
         //
@@ -94,9 +92,10 @@ namespace Manta {
     }
 
     Mesh* Mesh::LoadFromFile(const std::string& path) {
-        std::ifstream file(path); //TODO: SAFETY!
-        std::stringstream source;
-        source << file.rdbuf();
+        std::ifstream file(path);
+
+        if (!file.is_open())
+            throw std::runtime_error("File wasn't found / couldn't be read!");
 
         // Try to grab the file extension
         // We look backwards in the path
@@ -115,10 +114,10 @@ namespace Manta {
         auto start = std::chrono::high_resolution_clock::now();
 
         if (extension == "obj")
-            mesh->ReadOBJ(source);
+            mesh->ReadOBJ(file);
 
         if (extension == "bsm")
-            mesh->ReadBSM(source);
+            mesh->ReadBSM(file);
 
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
@@ -130,7 +129,7 @@ namespace Manta {
         return mesh;
     }
 
-    void Mesh::ReadOBJ(std::stringstream& source) {
+    void Mesh::ReadOBJ(std::istream& source) {
         auto obj = WavefrontOBJ::LoadFromStream(source);
 
         for (auto indice : obj->indices)
@@ -156,7 +155,7 @@ namespace Manta {
         delete obj;
     }
 
-    void Mesh::ReadBSM(std::stringstream &source) {
+    void Mesh::ReadBSM(std::istream &source) {
         auto bsm = MantaBSM::LoadFromStream(source);
 
         name = bsm->name;

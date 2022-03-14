@@ -8,7 +8,7 @@
 #include "../ident.hpp"
 
 namespace Manta::Data::Meshes {
-    // BSM, a binary mesh format similar to OBJ!
+    // BSM, "Binary Static Mesh", a binary mesh format similar to OBJ!
     // One trade off is a bit of normal precision since we bake it as atan2(), asin() coords instead of a direction!
     class MantaBSM {
     public:

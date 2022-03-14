@@ -43,8 +43,8 @@ namespace Manta {
         uint32_t vao;
         uint32_t vbo, ibo;
 
-        void ReadOBJ(std::stringstream& source);
-        void ReadBSM(std::stringstream& source);
+        void ReadOBJ(std::istream& source);
+        void ReadBSM(std::istream& source);
     };
 }
 

@@ -43,7 +43,8 @@ int main(int argc, char** argv) {
     Shader* shader = Shader::LoadFile("content/engine/shaders/lit.glsl");
     shader->Compile();
 
-    Mesh* mesh = Mesh::LoadFromFile("test.obj");
+    //Mesh* mesh = Mesh::LoadFromFile("test.obj");
+    Mesh* mesh = Mesh::LoadFromFile("test.bsm");
 
     Viewport viewport;
     Viewport viewport2;
@@ -51,6 +52,8 @@ int main(int argc, char** argv) {
     auto world = new World();
 
     Actor* test = new Actor("test");
+    test->meshes.emplace_back(mesh);
+
     world->AddActor(test);
 
     int last_width = 0, last_height = 0;
@@ -147,8 +150,8 @@ int main(int argc, char** argv) {
                 clear |= GL_DEPTH_BUFFER_BIT;
 
             glClear(clear);
-
-            mesh->DrawNow(test->transform.local_to_world, test->transform.world_to_local_t, shader);
+            renderer->DrawWorld(world);
+            //mesh->DrawNow(test->transform.local_to_world, test->transform.world_to_local_t, shader);
         }
 
         renderer->Present();
