@@ -19,7 +19,7 @@ namespace Manta {
 
         Transform transform;
 
-        glm::mat4x4 perspective, eye;
+        glm::mat4x4 view, perspective, eye;
 
         Viewport();
         void UpdateMatrices();

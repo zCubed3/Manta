@@ -225,6 +225,13 @@ namespace Manta {
         return {};
     }
 
+    void Shader::SetFloat(const std::string& name, float value) {
+        auto uniform = GetUniform(name);
+
+        if (uniform.has_value())
+            glUniform1f(uniform.value(), value);
+    }
+
     void Shader::SetMat4x4(const std::string& name, const glm::mat4x4 &matrix) {
         auto uniform = GetUniform(name);
 
@@ -237,6 +244,13 @@ namespace Manta {
 
         if (uniform.has_value())
             glUniform3fv(uniform.value(), 1, glm::value_ptr(vec));
+    }
+
+    void Shader::SetVec4(const std::string& name, const glm::vec4 &vec) {
+        auto uniform = GetUniform(name);
+
+        if (uniform.has_value())
+            glUniform4fv(uniform.value(), 1, glm::value_ptr(vec));
     }
 
     void Shader::CreateEngineShaders() {

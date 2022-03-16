@@ -2,10 +2,13 @@ set(SOURCES
     "${COMMON_DIR}/data/meshes/obj.cpp"
     "${COMMON_DIR}/data/meshes/bsm.cpp"
 
+    "${DEPENDS_DIR}/MikkTSpace/mikktspace.c"
+
     "src/main.cpp"
 )
 
 set(INCLUDE_DIRS
+    "${DEPENDS_DIR}/MikkTSpace"
     "${COMMON_DIR}"
 )
 

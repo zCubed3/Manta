@@ -45,23 +45,24 @@ namespace Manta {
     }
 
     void Mesh::DrawNow(const glm::mat4 &transform, Shader *shader) {
-        Mesh::DrawNow(transform, glm::inverseTranspose(transform), shader);
+        Mesh::DrawNow(transform, glm::inverse(transform), shader);
     }
 
-    void Mesh::DrawNow(const glm::mat4& transform, const glm::mat4& transform_it, Shader* shader) {
+    void Mesh::DrawNow(const glm::mat4& transform, const glm::mat4 &transform_i, Shader* shader) {
         uint32_t handle = shader->Use();
 
         // TODO: Shader properties
         if (Viewport::active_viewport) {
             shader->SetMat4x4("MANTA_MVP", Viewport::active_viewport->eye * transform);
             shader->SetMat4x4("MANTA_M", transform);
-            shader->SetMat4x4("MANTA_M_IT", transform_it);
+            shader->SetMat4x4("MANTA_M_I", transform_i);
+            shader->SetMat4x4("MANTA_M_IT", glm::transpose(transform_i));
 
             shader->SetVec3("MANTA_CAM_POS", Viewport::active_viewport->transform.position);
         }
 
-        uint32_t sintime_uniform = glGetUniformLocation(handle, "MANTA_SINTIME");
-        glUniform4fv(sintime_uniform, 1, glm::value_ptr(Timing::sin_time));
+        shader->SetFloat("MANTA_TIME", Timing::time);
+        shader->SetVec4("MANTA_SINTIME", Timing::sin_time);
 
         //
         //
@@ -74,12 +75,14 @@ namespace Manta {
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
+        glEnableVertexAttribArray(3);
 
         int v_size = sizeof(Vertex);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, v_size, nullptr);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, v_size, (void *) (sizeof(float) * 3));
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, v_size, (void *) (sizeof(float) * 6));
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, v_size, (void *) (sizeof(float) * 8));
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
@@ -87,6 +90,7 @@ namespace Manta {
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glDisableVertexAttribArray(2);
+        glDisableVertexAttribArray(3);
 
         glBindVertexArray(0);
     }
@@ -132,10 +136,10 @@ namespace Manta {
     void Mesh::ReadOBJ(std::istream& source) {
         auto obj = WavefrontOBJ::LoadFromStream(source);
 
-        for (auto indice : obj->indices)
+        for (auto indice : obj->weld_indices)
             indices.emplace_back(indice);
 
-        for (auto obj_vert : obj->vertices) {
+        for (auto obj_vert : obj->weld_vertices) {
             Vertex vert {};
 
             for (int p = 0; p < 3; p++)
@@ -177,6 +181,12 @@ namespace Manta {
 
             float cos_t = cosf(pitch);
             vert.normal = glm::vec3(sinf(yaw) * cos_t, sin(pitch), cosf(yaw) * cos_t);
+
+            yaw = bsm_vert.tangent[0];
+            pitch = bsm_vert.tangent[1];
+
+            cos_t = cosf(pitch);
+            vert.tangent = glm::vec4(sinf(yaw) * cos_t, sin(pitch), cosf(yaw) * cos_t, bsm_vert.tangent[2]);
 
             vertices.emplace_back(vert);
         }

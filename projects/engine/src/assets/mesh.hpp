@@ -3,6 +3,7 @@
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
 #include <vector>
@@ -22,6 +23,7 @@ namespace Manta {
             glm::vec3 position;
             glm::vec3 normal;
             glm::vec2 uv0;
+            glm::vec4 tangent;
 
             bool operator==(const Vertex& v);
         };
@@ -37,7 +39,7 @@ namespace Manta {
 
         // Meshes can draw themselves, though it is preferred to use renderers!
         void DrawNow(const glm::mat4& transform, Shader* shader);
-        void DrawNow(const glm::mat4& transform, const glm::mat4& transform_it, Shader* shader);
+        void DrawNow(const glm::mat4& transform, const glm::mat4& transform_i, Shader* shader);
 
     protected:
         uint32_t vao;

@@ -29,7 +29,14 @@ namespace Manta {
         void Update();
         void Draw();
 
-        void AddBehavior(Behavior* behavior);
+        template<typename behavior_type>
+        behavior_type* AddBehavior() {
+            static_assert(std::is_base_of<Behavior, behavior_type>::value, "behavior_type be a derivative of Behavior!");
+
+            auto b = new behavior_type();
+            behaviors.emplace_back(b);
+            return b;
+        }
     };
 }
 

@@ -7,6 +7,8 @@ set(SOURCES
         "${DEPENDS_DIR}/imgui/backends/imgui_impl_sdl.cpp"
         "${DEPENDS_DIR}/imgui/backends/imgui_impl_opengl3.cpp"
 
+        "${DEPENDS_DIR}/MikkTSpace/mikktspace.c"
+
         "${COMMON_DIR}/data/meshes/obj.cpp"
         "${COMMON_DIR}/data/meshes/bsm.cpp"
 
@@ -15,8 +17,10 @@ set(SOURCES
         "src/world/world.cpp"
         "src/world/transform.cpp"
         "src/world/actor.cpp"
-        "src/world/behavior.cpp"
         "src/world/timing.cpp"
+
+        "src/world/behavior.cpp"
+        "src/world/behaviors/camera.cpp"
 
         "src/assets/mesh.cpp"
         "src/assets/shader.cpp"
@@ -31,6 +35,7 @@ set(INCLUDE_DIRS
     "${ENGINE_DIR}/src"
     "${DEPENDS_DIR}/glm"
     "${DEPENDS_DIR}/imgui"
+    "${DEPENDS_DIR}/MikkTSpace"
     "${COMMON_DIR}"
 )
 

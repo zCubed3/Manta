@@ -13,6 +13,9 @@ namespace Manta {
         virtual void Start(Actor* owner);
         virtual void Update(Actor* owner);
 
+        virtual void OnDisable(Actor* owner);
+        virtual void OnEnable(Actor* owner);
+
         virtual std::string get_TypeId() = 0;
 
         bool get_IsNew();

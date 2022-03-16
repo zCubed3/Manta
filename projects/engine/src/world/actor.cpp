@@ -27,17 +27,12 @@ namespace Manta {
         for (const auto& mesh : meshes) {
             Shader* shader = Shader::error_shader;
 
-            if (shaders.size() < m) {
+            if (m < shaders.size()) {
                 shader = shaders[m];
             }
 
-            mesh->DrawNow(transform.local_to_world, transform.world_to_local_t, shader);
+            mesh->DrawNow(transform.local_to_world, transform.world_to_local, shader);
             m += 1;
         }
-    }
-
-    //TODO: SAFETY
-    void Actor::AddBehavior(Behavior *behavior) {
-        behaviors.emplace_back(behavior);
     }
 }

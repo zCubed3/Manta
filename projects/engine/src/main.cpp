@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 // Opengl
 #include <GL/glew.h>
@@ -17,6 +18,8 @@
 #include "world/world.hpp"
 #include "world/actor.hpp"
 #include "world/behavior.hpp"
+
+#include "world/behaviors/camera.hpp"
 
 // Misc
 #include <glm/mat4x4.hpp>
@@ -40,21 +43,19 @@ int main(int argc, char** argv) {
 
     Shader::CreateEngineShaders();
 
-    Shader* shader = Shader::LoadFile("content/engine/shaders/lit.glsl");
+    Shader* shader = Shader::LoadFile("content/engine/shaders/debug.glsl");
     shader->Compile();
 
     //Mesh* mesh = Mesh::LoadFromFile("test.obj");
     Mesh* mesh = Mesh::LoadFromFile("test.bsm");
 
-    Viewport viewport;
-    Viewport viewport2;
-
     auto world = new World();
 
-    Actor* test = new Actor("test");
-    test->meshes.emplace_back(mesh);
+    auto test_actor = new Actor("test");
+    test_actor->meshes.emplace_back(mesh);
+    test_actor->shaders.emplace_back(shader);
 
-    world->AddActor(test);
+    world->AddActor(test_actor);
 
     int last_width = 0, last_height = 0;
 
@@ -62,17 +63,14 @@ int main(int argc, char** argv) {
     std::ostringstream engine_stream;
     BifurcatedStream engine_out(std::cout, engine_stream);
 
-    // Test if the world will dispose of a nullptr actor!
-    for (int i = 0; i < 10; i++)
-        world->AddActor(nullptr);
-
-    // TODO: Differentiate between shipping and editor
-
+    // TODO: Differentiate between shipping and editor if we ever make an editor
 
     bool first_run = true;
 
-    Viewport::active_viewports.emplace_back(&viewport);
-    Viewport::active_viewports.emplace_back(&viewport2);
+    auto actor_camera = new Actor("camera");
+    auto camera = actor_camera->AddBehavior<CameraBehavior>();
+
+    world->AddActor(actor_camera);
 
     while (keep_running) {
         // Event polling
@@ -99,26 +97,17 @@ int main(int argc, char** argv) {
         //
         // Camera
         //
-        viewport.fov = 60;
-        viewport.transform.position.z = 2;
+        camera->viewport.fov = 60;
+        camera->viewport.transform.position.z = 2;
 
-        viewport.width = renderer->width / 2;
-        viewport.height = renderer->height;
-
-        viewport2.fov = 60;
-        viewport2.transform.position.z = -2;
-        viewport2.transform.euler = glm::vec3(0, 180, 0);
-
-        viewport2.x = renderer->width / 2;
-        viewport2.width = renderer->width / 2;
-        viewport2.height = renderer->height;
-        //viewport2.clear = false;
+        camera->viewport.width = renderer->width;
+        camera->viewport.height = renderer->height;
 
         //
         // Test Actor
         //
         //test->position = glm::vec3(0.5f, 0, 0);
-        test->transform.euler += glm::vec3(Timing::delta_time, Timing::delta_time, Timing::delta_time) * 20.0f;
+        test_actor->transform.euler += glm::vec3(Timing::delta_time, Timing::delta_time, Timing::delta_time) * 20.0f;
 
         world->Update();
 

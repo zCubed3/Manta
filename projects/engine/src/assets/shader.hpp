@@ -25,8 +25,10 @@ namespace Manta {
 
         std::optional<uint32_t> GetUniform(const std::string& name);
 
+        void SetFloat(const std::string &name, float value);
         void SetMat4x4(const std::string &name, const glm::mat4x4 &matrix);
         void SetVec3(const std::string &name, const glm::vec3 &vec);
+        void SetVec4(const std::string &name, const glm::vec4 &vec);
 
         static void CreateEngineShaders();
 

@@ -28,6 +28,7 @@ namespace Manta::Data::Meshes {
             float position[3];
             float normal[2]; // Yaw Pitch compressed normals
             float uv[2];
+            float tangent[3]; // Yaw Pitch compressed tangent
         };
 
         std::vector<BSMVertex> vertices;
