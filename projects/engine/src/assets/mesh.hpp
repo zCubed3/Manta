@@ -10,7 +10,8 @@
 #include <string>
 
 #include <data/meshes/obj.hpp>
-#include <data/meshes/bsm.hpp>
+#include <data/meshes/mbsm.hpp>
+#include <data/meshes/mmdl.hpp>
 
 namespace Manta {
     class Shader;
@@ -48,6 +49,7 @@ namespace Manta {
 
         void ReadOBJ(std::istream& source);
         void ReadBSM(std::istream& source);
+        void ReadMMDL(std::istream &source);
     };
 }
 

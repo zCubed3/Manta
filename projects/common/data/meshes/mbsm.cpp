@@ -1,4 +1,4 @@
-#include "bsm.hpp"
+#include "mbsm.hpp"
 
 #include <fstream>
 
@@ -24,7 +24,7 @@ namespace Manta::Data::Meshes {
         }
 
         BSMVertex vert{};
-        for (auto v = 0; v < header.indice_count; v++) {
+        for (auto v = 0; v < header.vertex_count; v++) {
             stream.read(reinterpret_cast<char*>(&vert), sizeof(BSMVertex));
             bsm->vertices.emplace_back(vert);
         }

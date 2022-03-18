@@ -51,7 +51,7 @@ namespace Manta {
     }
 
     void Mesh::DrawNow(const glm::mat4& transform, const glm::mat4 &transform_i, Shader* shader, EngineContext* engine) {
-        uint32_t handle = shader->Use();
+        uint32_t handle = shader->Use(engine);
 
         // TODO: Shader properties
         if (engine->active_viewport) {
@@ -125,10 +125,32 @@ namespace Manta {
         if (extension == "bsm")
             mesh->ReadBSM(file);
 
+        if (extension == "mmdl")
+            mesh->ReadMMDL(file);
+
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
         std::cout << "Loading '" << mesh->name << "' (from '" << path << "') took " << duration.count() << "ms" << std::endl;
+
+#ifdef DEBUG
+        std::cout << "Model Info:" << std::endl;
+        std::cout << "  Source Fmt: ";
+
+        if (extension == "obj")
+            std::cout << "Wavefront OBJ";
+
+        if (extension == "bsm")
+            std::cout << "MantaBSM (Binary Static Mesh)";
+
+        if (extension == "mmdl")
+            std::cout << "MantaMDL (MoDeL)";
+
+        std::cout << std::endl;
+
+        std::cout << "  Vertex Count: " << mesh->vertices.size() << std::endl;
+        std::cout << "  Indice Count: " << mesh->indices.size() << std::endl;
+#endif
 
         mesh->CreateBuffers();
 
@@ -194,6 +216,54 @@ namespace Manta {
         }
 
         delete bsm;
+    }
+
+    void Mesh::ReadMMDL(std::istream &source) {
+        auto mmdl = MantaMDL::LoadFromStream(source);
+
+        for (auto channel : mmdl->channels) {
+            uint32_t i = 0;
+            for (auto element : channel.data) {
+                if (channel.hint == MantaMDL::ChannelHint::VERTEX) {
+                    Vertex v{};
+
+                    auto v3 = reinterpret_cast<MantaMDL::Vec3*>(element);
+                    v.position = glm::vec3(v3->x, v3->y, v3->z);
+                    vertices.emplace_back(v);
+                }
+
+                // TODO: Make this order independent
+                if (channel.hint == MantaMDL::ChannelHint::NORMAL) {
+                    Vertex& v = vertices[i++];
+
+                    auto v3 = reinterpret_cast<MantaMDL::Vec3*>(element);
+                    v.normal = glm::vec3(v3->x, v3->y, v3->z);
+                }
+
+                if (channel.hint == MantaMDL::ChannelHint::UV0) {
+                    Vertex& v = vertices[i++];
+
+                    auto v2 = reinterpret_cast<MantaMDL::Vec2*>(element);
+                    v.uv0 = glm::vec2(v2->x, v2->y);
+                }
+
+                if (channel.hint == MantaMDL::ChannelHint::TANGENT) {
+                    Vertex& v = vertices[i++];
+
+                    auto v4 = reinterpret_cast<MantaMDL::Vec4*>(element);
+                    v.tangent = glm::vec4(v4->x, v4->y, v4->z, v4->w);
+                }
+
+                if (channel.hint == MantaMDL::ChannelHint::INDEXER) {
+                    auto i = reinterpret_cast<uint32_t*>(element);
+                    indices.emplace_back(*i);
+                }
+            }
+        }
+
+        name = mmdl->name;
+
+        delete mmdl;
     }
 
     bool Mesh::Vertex::operator==(const Vertex& v) {

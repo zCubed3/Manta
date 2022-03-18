@@ -30,8 +30,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include <data/bifurcated_ostream.hpp>
-
 using namespace Manta;
 using namespace Manta::Data::Meshes;
 
@@ -48,17 +46,6 @@ int main(int argc, char** argv) {
     auto renderer = new Renderer();
     renderer->Initialize();
 
-    Shader::CreateEngineShaders();
-
-    //Mesh* mesh = Mesh::LoadFromFile("test.obj");
-
-
-    int last_width = 0, last_height = 0;
-
-    // Used to allow for an in-engine console!
-    std::ostringstream engine_stream;
-    BifurcatedStream engine_out(std::cout, engine_stream);
-
     bool first_run = true;
 
     DynLib* dlib_game = DynLib::Open("./lib/game.so");
@@ -70,6 +57,8 @@ int main(int argc, char** argv) {
 
     engine->renderer = renderer;
     engine->timing = new Timing();
+
+    Shader::CreateEngineShaders(engine);
 
     game_module->Initialize(engine);
 

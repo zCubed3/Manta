@@ -1,6 +1,7 @@
 set(SOURCES
         "${COMMON_DIR}/data/meshes/obj.cpp"
-        "${COMMON_DIR}/data/meshes/bsm.cpp"
+        "${COMMON_DIR}/data/meshes/mbsm.cpp"
+        "${COMMON_DIR}/data/meshes/mmdl.cpp"
 
         "${ENGINE_DIR}/src/world/timing.cpp"
         "${ENGINE_DIR}/src/world/world.cpp"

@@ -6,6 +6,7 @@ namespace Manta {
     class Renderer;
     class Viewport;
     class Timing;
+    class Shader;
 
     class EngineContext {
     public:
@@ -14,6 +15,9 @@ namespace Manta {
 
         Timing* timing;
         Renderer* renderer;
+
+        // TODO: Move stupid data like this elsewhere
+        Shader* error_shader;
     };
 }
 

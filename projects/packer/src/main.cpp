@@ -1,5 +1,6 @@
 #include <data/meshes/obj.hpp>
-#include <data/meshes/bsm.hpp>
+#include <data/meshes/mbsm.hpp>
+#include <data/meshes/mmdl.hpp>
 
 using namespace Manta::Data::Meshes;
 
@@ -95,6 +96,65 @@ int main(int argc, char** argv) {
     obj->WeldVertices();
 
     auto bsm = new MantaBSM();
+    auto mmdl = new MantaMDL();
+
+    auto channel0 = &mmdl->channels[0];
+
+    channel0->type = MantaMDL::ChannelType::VEC3;
+    channel0->hint = MantaMDL::ChannelHint::VERTEX;
+
+    auto channel1 = &mmdl->channels[1];
+
+    channel1->type = MantaMDL::ChannelType::VEC3;
+    channel1->hint = MantaMDL::ChannelHint::NORMAL;
+
+    auto channel2 = &mmdl->channels[2];
+
+    channel2->type = MantaMDL::ChannelType::VEC2;
+    channel2->hint = MantaMDL::ChannelHint::UV0;
+
+    auto channel3 = &mmdl->channels[3];
+
+    channel3->type = MantaMDL::ChannelType::VEC4;
+    channel3->hint = MantaMDL::ChannelHint::TANGENT;
+
+    auto channel4 = &mmdl->channels[4];
+
+    channel4->type = MantaMDL::ChannelType::UINT32;
+    channel4->hint = MantaMDL::ChannelHint::INDEXER;
+
+    mmdl->name = obj->name;
+
+    for (auto vert : obj->weld_vertices) {
+        auto clone_pos = new MantaMDL::Vec3;
+        *clone_pos = { vert.position[0], vert.position[1], vert.position[2] };
+
+        channel0->data.push_back(clone_pos);
+
+        auto clone_norm = new MantaMDL::Vec3;
+        *clone_norm = { vert.normal[0], vert.normal[1], vert.normal[2] };
+
+        channel1->data.push_back(clone_norm);
+
+        auto clone_uv0 = new MantaMDL::Vec2;
+        *clone_uv0 = { vert.uv[0], vert.uv[1] };
+
+        channel2->data.push_back(clone_uv0);
+
+        auto clone_tan = new MantaMDL::Vec4;
+        *clone_tan = { vert.tangent[0], vert.tangent[1], vert.tangent[2], vert.tangent[3] };
+
+        channel3->data.push_back(clone_tan);
+    }
+
+    for (auto idx : obj->weld_indices) {
+        auto clone = new uint32_t;
+        *clone = idx;
+
+        channel4->data.push_back(clone);
+    }
+
+    mmdl->WriteToFile("test.mmdl");
 
     for (auto idx : obj->weld_indices)
         bsm->indices.emplace_back(idx);

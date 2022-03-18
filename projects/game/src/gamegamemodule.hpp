@@ -19,7 +19,7 @@ namespace Manta::Game {
 
     protected:
         World *world;
-        Actor *test_actor, *camera_actor;
+        Actor *test_actor, *test_actor2, *test_actor3, *camera_actor;
         CameraBehavior *camera;
     };
 }

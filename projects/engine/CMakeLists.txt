@@ -10,9 +10,8 @@ set(SOURCES
         "${DEPENDS_DIR}/MikkTSpace/mikktspace.c"
 
         "${COMMON_DIR}/data/meshes/obj.cpp"
-        "${COMMON_DIR}/data/meshes/bsm.cpp"
-
-        "src/data/bifurcated_ostream.cpp"
+        "${COMMON_DIR}/data/meshes/mbsm.cpp"
+        "${COMMON_DIR}/data/meshes/mmdl.cpp"
 
         "src/world/world.cpp"
         "src/world/transform.cpp"

@@ -1,6 +1,7 @@
 set(SOURCES
     "${COMMON_DIR}/data/meshes/obj.cpp"
-    "${COMMON_DIR}/data/meshes/bsm.cpp"
+    "${COMMON_DIR}/data/meshes/mbsm.cpp"
+    "${COMMON_DIR}/data/meshes/mmdl.cpp"
 
     "${DEPENDS_DIR}/MikkTSpace/mikktspace.c"
 

@@ -9,6 +9,8 @@
 #include <glm/mat4x4.hpp>
 
 namespace Manta {
+    class EngineContext;
+
     class Shader {
     public:
         std::string source, path;
@@ -21,7 +23,7 @@ namespace Manta {
         void ProcessSource(); // Analyzes the source, locates #version
 
         bool Compile();
-        uint32_t Use();
+        uint32_t Use(EngineContext* context);
 
         std::optional<uint32_t> GetUniform(const std::string& name);
 
@@ -30,9 +32,7 @@ namespace Manta {
         void SetVec3(const std::string &name, const glm::vec3 &vec);
         void SetVec4(const std::string &name, const glm::vec4 &vec);
 
-        static void CreateEngineShaders();
-
-        static Shader* error_shader;
+        static void CreateEngineShaders(EngineContext* engine);
 
     protected:
         int version = 330;

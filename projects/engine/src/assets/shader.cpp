@@ -7,6 +7,8 @@
 // TODO: Make this more generic for other APIs?
 #include <GL/glew.h>
 
+#include <data/engine_context.hpp>
+
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Manta {
@@ -195,12 +197,12 @@ namespace Manta {
         return passed;
     }
 
-    uint32_t Shader::Use() {
+    uint32_t Shader::Use(EngineContext* context) {
         uint32_t h = GL_INVALID_INDEX;
         if (handle.has_value())
             h = handle.value();
         else
-            h = error_shader->handle.value();
+            h = context->error_shader->handle.value();
 
         glUseProgram(h);
         return h;
@@ -253,8 +255,8 @@ namespace Manta {
             glUniform4fv(uniform.value(), 1, glm::value_ptr(vec));
     }
 
-    void Shader::CreateEngineShaders() {
-        error_shader = LoadCode(R"(#version 330 core
+    void Shader::CreateEngineShaders(EngineContext* engine) {
+        engine->error_shader = LoadCode(R"(#version 330 core
         #ifdef VERT
             layout(location = 0) in vec3 _vertex;
             layout(location = 1) in vec3 _normal;
@@ -287,14 +289,12 @@ namespace Manta {
             uniform vec4 MANTA_SINTIME;
 
             void main() {
-                float f = pow(max(0.0, dot(world_normal, view_dir)), 0.5) * abs(MANTA_SINTIME.x);
+                float f = pow(max(0.0, dot(normalize(world_normal), normalize(view_dir))), 0.5) * abs(MANTA_SINTIME.x);
                 col = vec4(vec3(0.956862745, 0.31764705882, 0.11764705882) * f, 1.0);
             }
         #endif
         )");
 
-        error_shader->Compile();
+        engine->error_shader->Compile();
     }
-
-    Shader* Shader::error_shader = nullptr;
 }

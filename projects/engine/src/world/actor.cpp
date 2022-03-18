@@ -4,6 +4,7 @@
 
 #include <assets/shader.hpp>
 #include <assets/mesh.hpp>
+#include <data/engine_context.hpp>
 
 namespace Manta {
     Actor::Actor(const std::string &name) {
@@ -25,7 +26,7 @@ namespace Manta {
     void Actor::Draw(EngineContext* engine) {
         int m = 0;
         for (const auto& mesh : meshes) {
-            Shader* shader = Shader::error_shader;
+            Shader* shader = engine->error_shader;
 
             if (m < shaders.size()) {
                 shader = shaders[m];
