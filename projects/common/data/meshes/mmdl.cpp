@@ -1,6 +1,7 @@
 #include "mmdl.hpp"
 
 #include <fstream>
+#include <cstring>
 
 namespace Manta::Data::Meshes {
     const uint32_t MantaMDL::MMDL_IDENT = MAKE_32_IDENT("MMDL");
@@ -10,7 +11,7 @@ namespace Manta::Data::Meshes {
             case MantaMDL::ChannelType::SCALAR:
                 return sizeof(float);
 
-            case MantaMDL::ChannelType::UINT32:
+            case MantaMDL::ChannelType::UINT:
                 return sizeof(uint32_t);
 
             case MantaMDL::ChannelType::VEC2:
@@ -30,8 +31,8 @@ namespace Manta::Data::Meshes {
     MantaMDL *MantaMDL::LoadFromStream(std::istream &stream) {
         auto mdl = new MantaMDL();
 
-        MMDLHeader header {};
-        stream.read(reinterpret_cast<char*>(&header), sizeof(MMDLHeader));
+        Header header {};
+        stream.read(reinterpret_cast<char*>(&header), sizeof(Header));
 
         mdl->name.resize(header.name_len);
         stream.read(mdl->name.data(), header.name_len);
@@ -58,7 +59,7 @@ namespace Manta::Data::Meshes {
     void MantaMDL::WriteToFile(const std::string &path) {
         std::ofstream file(path, std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
 
-        MMDLHeader header {};
+        Header header {};
 
         header.ident = MMDL_IDENT;
 
@@ -70,7 +71,7 @@ namespace Manta::Data::Meshes {
 
         header.name_len = name.length();
 
-        file.write(reinterpret_cast<char*>(&header), sizeof(MMDLHeader));
+        file.write(reinterpret_cast<char*>(&header), sizeof(Header));
         file.write(name.data(), header.name_len);
 
         for (auto & channel : channels) {
@@ -82,5 +83,36 @@ namespace Manta::Data::Meshes {
         }
 
         file.close();
+    }
+
+    void MantaMDL::SetChannelType(uint8_t idx, ChannelType type) {
+        channels[idx].type = type;
+    }
+
+    void MantaMDL::SetChannelHint(uint8_t idx, ChannelHint hint) {
+        channels[idx].hint = hint;
+    }
+
+    void MantaMDL::SetChannelProps(uint8_t idx, ChannelType type, ChannelHint hint) {
+        channels[idx].type = type;
+        channels[idx].hint = hint;
+    }
+
+    void MantaMDL::ClearChannel(uint8_t idx) {
+        for (auto element : channels[idx].data) {
+            free(element);
+        }
+
+        channels[idx].data.clear();
+    }
+
+    void* MantaMDL::CloneData(void* data, size_t size) {
+        void* dupe = malloc(size);
+        memcpy(dupe, data, size);
+        return dupe;
+    }
+
+    void MantaMDL::PushRawData(uint8_t idx, void *data) {
+        channels[idx].data.push_back(data);
     }
 }

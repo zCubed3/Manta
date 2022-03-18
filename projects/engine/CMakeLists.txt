@@ -27,6 +27,11 @@ set(SOURCES
         "src/rendering/renderer.cpp"
         "src/rendering/viewport.cpp"
 
+        "src/data/console.cpp"
+        "src/data/engine_context.cpp"
+
+        "src/ui/imguicontext.cpp"
+
         "src/modularity/dynlib.cpp"
 
         "src/main.cpp"
@@ -70,4 +75,5 @@ add_custom_target(copy-content ALL
 )
 
 add_dependencies(Manta copy-content)
+add_dependencies(Manta MantaGame)
 

@@ -9,6 +9,9 @@
 
 #include "viewport.hpp"
 
+#include <backends/imgui_impl_sdl.h>
+#include <backends/imgui_impl_opengl3.h>
+
 namespace Manta {
     void Renderer::Initialize() {
         sdl_context = nullptr;
@@ -57,6 +60,17 @@ namespace Manta {
 
             actor->Draw(engine);
         }
+    }
+
+    void Renderer::BeginImGui() {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame(sdl_window);
+        ImGui::NewFrame();
+    }
+
+    void Renderer::EndImGui() {
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
     void Renderer::ClearScreen() {

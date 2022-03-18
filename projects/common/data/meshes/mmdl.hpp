@@ -8,8 +8,8 @@
 #include <string>
 
 namespace Manta::Data::Meshes {
-    // V1 of MantaMDL format!
-    // V2 and future versions might change a lot!
+    // Prototype of MantaMDL format!
+    // V1 and future versions might change a lot!
     class MantaMDL {
     public:
         #define MMDL_CHANNEL_COUNT 8
@@ -22,7 +22,7 @@ namespace Manta::Data::Meshes {
             VEC3,
             VEC4,
 
-            UINT32,
+            UINT,
 
             BONE
         };
@@ -49,7 +49,7 @@ namespace Manta::Data::Meshes {
             SKELETON
         };
 
-        struct MMDLHeader {
+        struct Header {
             uint32_t ident;
             ChannelType channel_types[MMDL_CHANNEL_COUNT]; // What type is contained in this channel?
             ChannelHint channel_hints[MMDL_CHANNEL_COUNT]; // What data is provided by this channel?
@@ -57,7 +57,7 @@ namespace Manta::Data::Meshes {
             uint16_t name_len;
         };
 
-        struct MMDLChannel {
+        struct DataChannel {
             ChannelType type;
             ChannelHint hint;
             std::vector<void*> data;
@@ -87,9 +87,30 @@ namespace Manta::Data::Meshes {
         };
 
         std::string name;
-        MMDLChannel channels[MMDL_CHANNEL_COUNT];
+        DataChannel channels[MMDL_CHANNEL_COUNT];
 
         static MantaMDL* LoadFromStream(std::istream& stream);
+
+        // Helpers for setting tags
+        void SetChannelType(uint8_t idx, ChannelType type);
+        void SetChannelHint(uint8_t idx, ChannelHint hint);
+        void SetChannelProps(uint8_t idx, ChannelType type, ChannelHint hint);
+
+        // Clears the data contained in a channel
+        void ClearChannel(uint8_t idx);
+
+    protected:
+        void* CloneData(void* data, size_t size);
+
+    public:
+
+        // Push helper
+        void PushRawData(uint8_t idx, void* data);
+
+        template<typename tdata>
+        void PushData(uint8_t idx, tdata data) {
+            PushRawData(idx, CloneData(&data, sizeof(tdata)));
+        }
 
         void WriteToFile(const std::string& path);
     };

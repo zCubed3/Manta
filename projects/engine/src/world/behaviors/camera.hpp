@@ -8,12 +8,18 @@
 namespace Manta {
     class CameraBehavior : public Behavior {
     public:
-        Viewport viewport;
+        float fov = 90;
+        int width, height;
 
         void OnDisable(Actor *owner, EngineContext* engine) override;
         void OnEnable(Actor *owner, EngineContext* engine) override;
 
+        void Update(Actor *owner, EngineContext *engine) override;
+
         std::string get_TypeId() override;
+
+    protected:
+        Viewport viewport;
     };
 }
 

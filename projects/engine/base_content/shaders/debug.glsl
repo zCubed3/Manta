@@ -31,10 +31,10 @@
         world_pos = (MANTA_M * vec4(_vertex, 1.0)).xyz;
 
         obj_normal = _normal;
-        world_normal = (MANTA_M_IT * vec4(_normal, 1.0)).xyz;
+        world_normal = (MANTA_M_IT * vec4(_normal, 0.0)).xyz;
 
         obj_tangent = _tangent.xyz;
-        world_tangent = (MANTA_M * vec4(obj_tangent, 1.0)).xyz;
+        world_tangent = (MANTA_M * vec4(obj_tangent, 0.0)).xyz;
 
         world_bitangent = cross(world_normal, world_tangent) * _tangent.w;
 

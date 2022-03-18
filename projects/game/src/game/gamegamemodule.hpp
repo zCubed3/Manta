@@ -11,16 +11,20 @@ namespace Manta {
 }
 
 namespace Manta::Game {
+    class FreecamBehavior;
+
     class GameGameModule : public GameModule {
     public:
         void Initialize(EngineContext* engine) override;
         void Update(EngineContext* engine) override;
         void Draw(EngineContext* engine) override;
+        void DrawGUI(EngineContext* engine) override;
 
     protected:
         World *world;
         Actor *test_actor, *test_actor2, *test_actor3, *camera_actor;
         CameraBehavior *camera;
+        FreecamBehavior *freecam;
     };
 }
 

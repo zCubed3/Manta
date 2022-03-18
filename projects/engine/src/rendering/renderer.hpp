@@ -20,11 +20,13 @@ namespace Manta {
 
         void DrawWorld(World* world, EngineContext* engine);
 
+        void BeginImGui();
+        void EndImGui();
+
         void Present();
 
         int width = 512, height = 512;
 
-    protected:
         SDL_GLContext sdl_context = nullptr;
         SDL_Window* sdl_window = nullptr;
     };

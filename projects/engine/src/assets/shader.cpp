@@ -256,6 +256,7 @@ namespace Manta {
     }
 
     void Shader::CreateEngineShaders(EngineContext* engine) {
+        // TODO: Does this need simplification?
         engine->error_shader = LoadCode(R"(#version 330 core
         #ifdef VERT
             layout(location = 0) in vec3 _vertex;
@@ -264,33 +265,32 @@ namespace Manta {
             uniform mat4 MANTA_MVP;
             uniform mat4 MANTA_M;
             uniform mat4 MANTA_M_IT;
-            uniform vec3 MANTA_CAM_POS;
 
-            out vec3 view_dir;
+            out vec3 world_position;
             out vec3 world_normal;
 
             void main() {
                 gl_Position = MANTA_MVP * vec4(_vertex, 1.0);
 
-                vec3 position = (MANTA_M * vec4(_vertex, 1.0)).xyz;
+                world_position = (MANTA_M * vec4(_vertex, 1.0)).xyz;
                 world_normal = (MANTA_M_IT * vec4(_normal, 1.0)).xyz;
-
-                view_dir = normalize(MANTA_CAM_POS - position);
             }
         #endif
 
         #ifdef FRAG
             out vec4 col;
 
-            in vec3 view_dir;
+            in vec3 world_position;
             in vec3 world_normal;
 
             uniform mat4 MANTA_MVP;
             uniform vec4 MANTA_SINTIME;
+            uniform vec3 MANTA_CAM_POS;
 
             void main() {
-                float f = pow(max(0.0, dot(normalize(world_normal), normalize(view_dir))), 0.5) * abs(MANTA_SINTIME.x);
-                col = vec4(vec3(0.956862745, 0.31764705882, 0.11764705882) * f, 1.0);
+                vec3 view_dir = normalize(MANTA_CAM_POS - world_position);
+                float f = pow(1 - max(0.0, dot(normalize(world_normal), normalize(view_dir))), 0.5) * max(0.2, abs(MANTA_SINTIME.y));
+                col = vec4(vec3(1, 0, 0) * f, 1.0);
             }
         #endif
         )");

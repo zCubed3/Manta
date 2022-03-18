@@ -17,13 +17,19 @@ set(SOURCES
         "${ENGINE_DIR}/src/assets/shader.cpp"
         "${ENGINE_DIR}/src/assets/mesh.cpp"
 
-        "src/gamegamemodule.cpp"
+        "${ENGINE_DIR}/src/data/console.cpp"
+        "${ENGINE_DIR}/src/data/engine_context.cpp"
+
+        "src/behaviors/freecam.cpp"
+
+        "src/game/gamegamemodule.cpp"
 
         "src/main.cpp"
 )
 
 set(INCLUDE_DIRS
     "${ENGINE_DIR}/src"
+    "${GAME_DIR}/src"
     "${DEPENDS_DIR}/glm"
     "${DEPENDS_DIR}/imgui"
     "${DEPENDS_DIR}/MikkTSpace"

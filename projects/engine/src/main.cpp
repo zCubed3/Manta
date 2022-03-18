@@ -22,7 +22,11 @@
 #include "modularity/dynlib.hpp"
 #include "modularity/gamemodule.hpp"
 
+#include "data/console.hpp"
+#include "data/cvar.hpp"
 #include "data/engine_context.hpp"
+
+#include "ui/imguicontext.hpp"
 
 // Misc
 #include <glm/mat4x4.hpp>
@@ -53,14 +57,27 @@ int main(int argc, char** argv) {
     auto module_init = dlib_game->GetFunction<module_init_fptr>("module_init");
     GameModule* game_module = module_init();
 
+    auto imgui = new Manta::ImGuiContext(renderer->sdl_window, renderer->sdl_context);
+
     auto engine = new EngineContext();
 
     engine->renderer = renderer;
     engine->timing = new Timing();
+    engine->console = new Console::Console();
+    engine->imgui = imgui;
 
     Shader::CreateEngineShaders(engine);
 
     game_module->Initialize(engine);
+
+    std::vector<std::string> safe_argv;
+
+    for (int c = 1; c < argc; c++)
+        safe_argv.emplace_back(argv[c]);
+
+    engine->console->DoCommandLine(safe_argv);
+
+    safe_argv.clear();
 
     while (keep_running) {
         // Event polling
@@ -74,6 +91,8 @@ int main(int argc, char** argv) {
                 if (sdl_event.window.event == SDL_WINDOWEVENT_RESIZED)
                     resized = true;
             }
+
+            imgui->Process(&sdl_event);
         }
 
         if (first_run) {
@@ -120,6 +139,17 @@ int main(int argc, char** argv) {
 
             //mesh->DrawNow(test->transform.local_to_world, test->transform.world_to_local_t, shader);
         }
+
+        // We have a special viewport change for the UI itself
+        glViewport(0, 0, renderer->width, renderer->height);
+        glScissor(0, 0,renderer->width, renderer->height);
+
+        renderer->BeginImGui();
+
+        game_module->DrawGUI(engine);
+
+        renderer->EndImGui();
+
 
         renderer->Present();
     }

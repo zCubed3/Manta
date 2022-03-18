@@ -16,7 +16,7 @@
         gl_Position = MANTA_MVP * vec4(_vertex, 1.0);
 
         world_pos = (MANTA_M * vec4(_vertex, 1.0)).xyz;
-        world_normal = (MANTA_M_IT * vec4(_normal, 1.0)).xyz;
+        world_normal = (MANTA_M_IT * vec4(_normal, 0.0)).xyz;
     }
 #endif
 

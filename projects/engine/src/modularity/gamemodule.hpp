@@ -9,6 +9,7 @@ namespace Manta {
         virtual void Initialize(EngineContext* context) = 0;
         virtual void Update(EngineContext* engine) = 0;
         virtual void Draw(EngineContext* engine) = 0;
+        virtual void DrawGUI(EngineContext* engine) = 0;
     };
 }
 

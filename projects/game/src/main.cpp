@@ -1,6 +1,6 @@
 #include <defines.hpp>
 
-#include "gamegamemodule.hpp"
+#include "game/gamegamemodule.hpp"
 
 using namespace Manta;
 using namespace Manta::Game;
