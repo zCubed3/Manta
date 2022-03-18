@@ -5,17 +5,6 @@
 #include <iostream>
 
 namespace Manta {
-    Timing::Timing() {};
-
-    float Timing::delta_time = 0.0f;
-    float Timing::time = 0.0f;
-
-    uint64_t Timing::last_tick = 0;
-
-    glm::vec4 Timing::sin_time = glm::vec4();
-    glm::vec4 Timing::cos_time = glm::vec4();
-    glm::vec4 Timing::tan_time = glm::vec4();
-
     void Timing::UpdateTime() {
         uint64_t tick = SDL_GetTicks64();
         delta_time = (tick - last_tick) / 1000.0f;

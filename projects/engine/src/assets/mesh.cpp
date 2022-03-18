@@ -17,6 +17,8 @@
 
 #include <world/timing.hpp>
 
+#include <data/engine_context.hpp>
+
 #include <math.h>
 
 using namespace Manta::Data::Meshes;
@@ -44,25 +46,25 @@ namespace Manta {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
-    void Mesh::DrawNow(const glm::mat4 &transform, Shader *shader) {
-        Mesh::DrawNow(transform, glm::inverse(transform), shader);
+    void Mesh::DrawNow(const glm::mat4 &transform, Shader *shader, EngineContext* engine) {
+        Mesh::DrawNow(transform, glm::inverse(transform), shader, engine);
     }
 
-    void Mesh::DrawNow(const glm::mat4& transform, const glm::mat4 &transform_i, Shader* shader) {
+    void Mesh::DrawNow(const glm::mat4& transform, const glm::mat4 &transform_i, Shader* shader, EngineContext* engine) {
         uint32_t handle = shader->Use();
 
         // TODO: Shader properties
-        if (Viewport::active_viewport) {
-            shader->SetMat4x4("MANTA_MVP", Viewport::active_viewport->eye * transform);
+        if (engine->active_viewport) {
+            shader->SetMat4x4("MANTA_MVP", engine->active_viewport->eye * transform);
             shader->SetMat4x4("MANTA_M", transform);
             shader->SetMat4x4("MANTA_M_I", transform_i);
             shader->SetMat4x4("MANTA_M_IT", glm::transpose(transform_i));
 
-            shader->SetVec3("MANTA_CAM_POS", Viewport::active_viewport->transform.position);
+            shader->SetVec3("MANTA_CAM_POS", engine->active_viewport->transform.position);
         }
 
-        shader->SetFloat("MANTA_TIME", Timing::time);
-        shader->SetVec4("MANTA_SINTIME", Timing::sin_time);
+        shader->SetFloat("MANTA_TIME", engine->timing->time);
+        shader->SetVec4("MANTA_SINTIME", engine->timing->sin_time);
 
         //
         //

@@ -10,8 +10,8 @@ namespace Manta {
     public:
         Viewport viewport;
 
-        void OnDisable(Actor *owner) override;
-        void OnEnable(Actor *owner) override;
+        void OnDisable(Actor *owner, EngineContext* engine) override;
+        void OnEnable(Actor *owner, EngineContext* engine) override;
 
         std::string get_TypeId() override;
     };

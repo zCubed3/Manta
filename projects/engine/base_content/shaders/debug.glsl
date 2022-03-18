@@ -34,9 +34,9 @@
         world_normal = (MANTA_M_IT * vec4(_normal, 1.0)).xyz;
 
         obj_tangent = _tangent.xyz;
-        world_tangent = (MANTA_M_I * vec4(obj_tangent, 1.0)).xyz;
+        world_tangent = (MANTA_M * vec4(obj_tangent, 1.0)).xyz;
 
-        world_bitangent = cross(obj_normal, obj_tangent) * _tangent.w;
+        world_bitangent = cross(world_normal, world_tangent) * _tangent.w;
 
         uv = _uv;
     }

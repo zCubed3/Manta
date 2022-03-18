@@ -3,21 +3,21 @@
 #include "actor.hpp"
 
 namespace Manta {
-    void Behavior::Start(Actor *owner) {
+    void Behavior::Start(Actor *owner, EngineContext* engine) {
         if (enabled)
-            OnEnable(owner);
+            OnEnable(owner, engine);
         else
-            OnDisable(owner);
+            OnDisable(owner, engine);
 
         is_new = false;
     }
 
-    void Behavior::Update(Actor* actor) {
+    void Behavior::Update(Actor* actor, EngineContext* engine) {
         if (last_enabled != enabled) {
             if (enabled)
-                OnEnable(actor);
+                OnEnable(actor, engine);
             else
-                OnDisable(actor);
+                OnDisable(actor, engine);
         }
 
         last_enabled = enabled;
@@ -26,10 +26,10 @@ namespace Manta {
             return;
     }
 
-    void Behavior::OnDisable(Actor *owner) {}
-    void Behavior::OnEnable(Actor *owner) {}
+    void Behavior::OnDisable(Actor *owner, EngineContext* engine) {}
+    void Behavior::OnEnable(Actor *owner, EngineContext* engine) {}
 
-    bool Behavior::get_IsNew() {
+    bool Behavior::IsNew() {
         return is_new;
     }
 }

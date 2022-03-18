@@ -12,7 +12,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
 # Tells CMake to generate compile_commands.json
 # set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
-set(CMAKE_SHARED_LIBRARY_PREFIX "lib")
+set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
 message("Build type = ${CMAKE_BUILD_TYPE}")
 
@@ -27,8 +27,10 @@ set(PROJECTS_DIR ${CMAKE_SOURCE_DIR}/projects)
 set(COMMON_DIR ${PROJECTS_DIR}/common)
 set(ENGINE_DIR ${PROJECTS_DIR}/engine)
 set(PACKER_DIR ${PROJECTS_DIR}/packer)
+set(GAME_DIR ${PROJECTS_DIR}/game)
 set(DEPENDS_DIR "${CMAKE_SOURCE_DIR}/dependencies")
 
 # Projects
 add_subdirectory(${PACKER_DIR})
+add_subdirectory(${GAME_DIR})
 add_subdirectory(${ENGINE_DIR})

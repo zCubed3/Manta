@@ -28,6 +28,8 @@ set(SOURCES
         "src/rendering/renderer.cpp"
         "src/rendering/viewport.cpp"
 
+        "src/modularity/dynlib.cpp"
+
         "src/main.cpp"
 )
 

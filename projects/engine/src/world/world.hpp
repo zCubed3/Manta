@@ -6,13 +6,14 @@
 
 namespace Manta {
     class Actor;
+    class EngineContext;
 
     class World final {
     public:
         void AddActor(Actor* actor);
         Actor* FindActor(const std::string& path);
 
-        void Update();
+        void Update(EngineContext* engine);
 
         std::vector<Actor*> actors;
     };

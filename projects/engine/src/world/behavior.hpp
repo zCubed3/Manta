@@ -5,20 +5,21 @@
 
 namespace Manta {
     class Actor;
+    class EngineContext;
 
     class Behavior {
     public:
         bool enabled = true;
 
-        virtual void Start(Actor* owner);
-        virtual void Update(Actor* owner);
+        virtual void Start(Actor* owner, EngineContext* engine);
+        virtual void Update(Actor* owner, EngineContext* engine);
 
-        virtual void OnDisable(Actor* owner);
-        virtual void OnEnable(Actor* owner);
+        virtual void OnDisable(Actor* owner, EngineContext* engine);
+        virtual void OnEnable(Actor* owner, EngineContext* engine);
 
         virtual std::string get_TypeId() = 0;
 
-        bool get_IsNew();
+        bool IsNew();
 
     protected:
         bool is_new = true;

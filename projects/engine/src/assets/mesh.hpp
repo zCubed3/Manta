@@ -15,6 +15,7 @@
 namespace Manta {
     class Shader;
     class Viewport;
+    class EngineContext;
 
     class Mesh {
     public:
@@ -38,8 +39,8 @@ namespace Manta {
         static Mesh* LoadFromFile(const std::string &path);
 
         // Meshes can draw themselves, though it is preferred to use renderers!
-        void DrawNow(const glm::mat4& transform, Shader* shader);
-        void DrawNow(const glm::mat4& transform, const glm::mat4& transform_i, Shader* shader);
+        void DrawNow(const glm::mat4& transform, Shader* shader, EngineContext* engine);
+        void DrawNow(const glm::mat4& transform, const glm::mat4& transform_i, Shader* shader, EngineContext* engine);
 
     protected:
         uint32_t vao;

@@ -6,6 +6,7 @@
 namespace Manta {
     class World;
     class Viewport;
+    class EngineContext;
 
     class Renderer {
     public:
@@ -17,7 +18,7 @@ namespace Manta {
 
         void ClearScreen();
 
-        void DrawWorld(World* world);
+        void DrawWorld(World* world, EngineContext* engine);
 
         void Present();
 

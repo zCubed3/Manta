@@ -8,9 +8,6 @@
 namespace Manta {
     class Viewport {
     public:
-        static std::vector<Viewport*> active_viewports;
-        static Viewport* active_viewport;
-
         uint16_t width = 512, height = 512;
         uint16_t x = 0, y = 0;
         float fov = 60;

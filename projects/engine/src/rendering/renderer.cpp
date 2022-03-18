@@ -47,7 +47,7 @@ namespace Manta {
         SDL_GetWindowSize(sdl_window, &width, &height);
     }
 
-    void Renderer::DrawWorld(World *world) {
+    void Renderer::DrawWorld(World *world, EngineContext* engine) {
         if (world == nullptr)
             throw std::runtime_error("world was nullptr!");
 
@@ -55,7 +55,7 @@ namespace Manta {
             if (actor == nullptr)
                 continue;
 
-            actor->Draw();
+            actor->Draw(engine);
         }
     }
 

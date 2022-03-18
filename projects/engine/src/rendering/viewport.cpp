@@ -5,9 +5,6 @@
 #include <glm/gtx/quaternion.hpp>
 
 namespace Manta {
-    std::vector<Viewport*> Viewport::active_viewports = {};
-    Viewport* Viewport::active_viewport = nullptr;
-
     Viewport::Viewport() {
 
     }

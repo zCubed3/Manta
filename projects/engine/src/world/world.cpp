@@ -20,7 +20,7 @@ namespace Manta {
         return nullptr;
     }
 
-    void World::Update() {
+    void World::Update(EngineContext* engine) {
         std::queue<size_t> invalid_actors;
 
         for (auto a = 0; a < actors.size(); a++) {
@@ -29,7 +29,7 @@ namespace Manta {
                 continue;
             }
 
-            actors[a]->Update();
+            actors[a]->Update(engine);
         }
 
         size_t off = 0;

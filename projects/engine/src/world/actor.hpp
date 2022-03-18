@@ -13,6 +13,7 @@ namespace Manta {
     class Behavior;
     class Mesh;
     class Shader;
+    class EngineContext;
 
     class Actor {
     public:
@@ -26,8 +27,8 @@ namespace Manta {
 
         Actor(const std::string& name);
 
-        void Update();
-        void Draw();
+        void Update(EngineContext* engine);
+        void Draw(EngineContext* engine);
 
         template<typename behavior_type>
         behavior_type* AddBehavior() {

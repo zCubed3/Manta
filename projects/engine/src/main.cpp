@@ -14,12 +14,15 @@
 #include "rendering/viewport.hpp"
 
 #include "world/timing.hpp"
-
 #include "world/world.hpp"
 #include "world/actor.hpp"
 #include "world/behavior.hpp"
-
 #include "world/behaviors/camera.hpp"
+
+#include "modularity/dynlib.hpp"
+#include "modularity/gamemodule.hpp"
+
+#include "data/engine_context.hpp"
 
 // Misc
 #include <glm/mat4x4.hpp>
@@ -32,30 +35,23 @@
 using namespace Manta;
 using namespace Manta::Data::Meshes;
 
+typedef GameModule*(*module_init_fptr)();
+
+// TODO: Differentiate between shipping and editor if we ever make an editor
 int main(int argc, char** argv) {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS);
 
     SDL_Event sdl_event;
     bool keep_running = true;
 
+    // TODO: Renderer modularity?
     auto renderer = new Renderer();
     renderer->Initialize();
 
     Shader::CreateEngineShaders();
 
-    Shader* shader = Shader::LoadFile("content/engine/shaders/debug.glsl");
-    shader->Compile();
-
     //Mesh* mesh = Mesh::LoadFromFile("test.obj");
-    Mesh* mesh = Mesh::LoadFromFile("test.bsm");
 
-    auto world = new World();
-
-    auto test_actor = new Actor("test");
-    test_actor->meshes.emplace_back(mesh);
-    test_actor->shaders.emplace_back(shader);
-
-    world->AddActor(test_actor);
 
     int last_width = 0, last_height = 0;
 
@@ -63,14 +59,19 @@ int main(int argc, char** argv) {
     std::ostringstream engine_stream;
     BifurcatedStream engine_out(std::cout, engine_stream);
 
-    // TODO: Differentiate between shipping and editor if we ever make an editor
-
     bool first_run = true;
 
-    auto actor_camera = new Actor("camera");
-    auto camera = actor_camera->AddBehavior<CameraBehavior>();
+    DynLib* dlib_game = DynLib::Open("./lib/game.so");
 
-    world->AddActor(actor_camera);
+    auto module_init = dlib_game->GetFunction<module_init_fptr>("module_init");
+    GameModule* game_module = module_init();
+
+    auto engine = new EngineContext();
+
+    engine->renderer = renderer;
+    engine->timing = new Timing();
+
+    game_module->Initialize(engine);
 
     while (keep_running) {
         // Event polling
@@ -92,24 +93,9 @@ int main(int argc, char** argv) {
         }
 
         renderer->Update();
-        Timing::UpdateTime();
+        engine->timing->UpdateTime();
 
-        //
-        // Camera
-        //
-        camera->viewport.fov = 60;
-        camera->viewport.transform.position.z = 2;
-
-        camera->viewport.width = renderer->width;
-        camera->viewport.height = renderer->height;
-
-        //
-        // Test Actor
-        //
-        //test->position = glm::vec3(0.5f, 0, 0);
-        test_actor->transform.euler += glm::vec3(Timing::delta_time, Timing::delta_time, Timing::delta_time) * 20.0f;
-
-        world->Update();
+        game_module->Update(engine);
 
         //
         // Drawing
@@ -117,8 +103,8 @@ int main(int argc, char** argv) {
         if (resized)
             renderer->ClearScreen();
 
-        for (auto target_viewport : Viewport::active_viewports) {
-            Viewport::active_viewport = target_viewport;
+        for (auto target_viewport : engine->active_viewports) {
+            engine->active_viewport = target_viewport;
 
             if (target_viewport)
                 target_viewport->UpdateMatrices();
@@ -139,7 +125,10 @@ int main(int argc, char** argv) {
                 clear |= GL_DEPTH_BUFFER_BIT;
 
             glClear(clear);
-            renderer->DrawWorld(world);
+
+            // TODO: More generic draw loop
+            game_module->Draw(engine);
+
             //mesh->DrawNow(test->transform.local_to_world, test->transform.world_to_local_t, shader);
         }
 
