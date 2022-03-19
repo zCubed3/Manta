@@ -27,6 +27,9 @@ set(SOURCES
         "src/rendering/renderer.cpp"
         "src/rendering/viewport.cpp"
 
+        "src/input/axis.cpp"
+        "src/input/inputserver.cpp"
+
         "src/data/console.cpp"
         "src/data/engine_context.cpp"
 

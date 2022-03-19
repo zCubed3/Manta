@@ -15,6 +15,10 @@ namespace Manta {
         class Console;
     }
 
+    namespace Input {
+        class InputServer;
+    }
+
     class EngineContext {
     public:
         std::vector<Viewport*> active_viewports;
@@ -24,6 +28,7 @@ namespace Manta {
         Renderer* renderer;
 
         Console::Console* console;
+        Input::InputServer* input;
 
         ImGuiContext* imgui;
 

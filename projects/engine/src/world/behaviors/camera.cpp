@@ -19,10 +19,17 @@ namespace Manta {
     }
 
     void CameraBehavior::Update(Actor *owner, EngineContext *engine) {
-        viewport.transform = owner->transform;
+        owner->transform.gen_view = true;
+
+        viewport.view = owner->transform.view;
+        viewport.position = owner->transform.position;
         viewport.width = width;
         viewport.height = height;
         viewport.fov = fov;
+        viewport.z_near = z_near;
+        viewport.z_far = z_far;
+
+        viewport.UpdateMatrices();
     }
 
     std::string CameraBehavior::get_TypeId() { return "camera"; }

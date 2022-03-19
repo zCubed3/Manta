@@ -20,6 +20,9 @@ set(SOURCES
         "${ENGINE_DIR}/src/data/console.cpp"
         "${ENGINE_DIR}/src/data/engine_context.cpp"
 
+        "${ENGINE_DIR}/src/input/axis.cpp"
+        "${ENGINE_DIR}/src/input/inputserver.cpp"
+
         "src/behaviors/freecam.cpp"
 
         "src/game/gamegamemodule.cpp"

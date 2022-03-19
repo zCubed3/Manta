@@ -26,8 +26,10 @@ namespace Manta {
 
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,2);
+
+        // TODO: MSAA config
+        //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+        //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,2);
 
         sdl_context = SDL_GL_CreateContext(sdl_window);
         SDL_GL_SetSwapInterval(1);

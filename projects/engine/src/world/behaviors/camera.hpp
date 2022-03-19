@@ -8,7 +8,7 @@
 namespace Manta {
     class CameraBehavior : public Behavior {
     public:
-        float fov = 90;
+        float fov = 90, z_near = 0.001f, z_far = 100.0f;
         int width, height;
 
         void OnDisable(Actor *owner, EngineContext* engine) override;

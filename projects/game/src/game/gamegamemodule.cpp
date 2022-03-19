@@ -16,6 +16,9 @@
 
 #include <behaviors/freecam.hpp>
 
+#include <input/axis.hpp>
+#include <input/inputserver.hpp>
+
 namespace Manta::Game {
     void GameGameModule::Initialize(EngineContext *engine) {
         //Mesh* mesh = Mesh::LoadFromFile("test.bsm");
@@ -39,12 +42,23 @@ namespace Manta::Game {
         camera = camera_actor->AddBehavior<CameraBehavior>();
         freecam = camera_actor->AddBehavior<FreecamBehavior>();
 
+        camera_actor->transform.position.z = -1.5;
+
         world->AddActor(camera_actor);
+
+        auto vertical_axis = new Input::Axis();
+        vertical_axis->AddKey(SDLK_w, 1.0f);
+        vertical_axis->AddKey(SDLK_s, -1.0f);
+
+        auto horizontal_axis = new Input::Axis();
+        horizontal_axis->AddKey(SDLK_d, 1.0f);
+        horizontal_axis->AddKey(SDLK_a, -1.0f);
+
+        engine->input->AddAxis("horizontal", horizontal_axis);
+        engine->input->AddAxis("vertical", vertical_axis);
     }
 
     void GameGameModule::Update(EngineContext* engine) {
-        camera_actor->transform.position.y = 0.6;
-        camera_actor->transform.position.z = 0.5;
         camera->fov = 60;
         camera->width = engine->renderer->width;
         camera->height = engine->renderer->height;

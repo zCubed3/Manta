@@ -26,6 +26,8 @@
 #include "data/cvar.hpp"
 #include "data/engine_context.hpp"
 
+#include "input/inputserver.hpp"
+
 #include "ui/imguicontext.hpp"
 
 // Misc
@@ -50,8 +52,6 @@ int main(int argc, char** argv) {
     auto renderer = new Renderer();
     renderer->Initialize();
 
-    bool first_run = true;
-
     auto dlib_game = DynLib::Open("./lib/game.so");
 
     auto module_init = dlib_game->GetFunction<module_init_fptr>("module_init");
@@ -59,12 +59,15 @@ int main(int argc, char** argv) {
 
     auto imgui = new Manta::ImGuiContext(renderer->sdl_window, renderer->sdl_context);
 
+    auto input = new Input::InputServer();
+
     auto engine = new EngineContext();
 
     engine->renderer = renderer;
     engine->timing = new Timing();
     engine->console = new Console::Console();
     engine->imgui = imgui;
+    engine->input = input;
 
     Shader::CreateEngineShaders(engine);
 
@@ -79,6 +82,7 @@ int main(int argc, char** argv) {
 
     safe_argv.clear();
 
+    bool first_run = true;
     while (keep_running) {
         // Event polling
         bool resized = false;
@@ -92,7 +96,8 @@ int main(int argc, char** argv) {
                     resized = true;
             }
 
-            imgui->Process(&sdl_event);
+            input->ProcessEvent(&sdl_event);
+            //imgui->Process(&sdl_event);
         }
 
         if (first_run) {
@@ -102,6 +107,8 @@ int main(int argc, char** argv) {
 
         renderer->Update();
         engine->timing->UpdateTime();
+
+        input->UpdateBinds();
 
         game_module->Update(engine);
 
@@ -114,9 +121,7 @@ int main(int argc, char** argv) {
         for (auto target_viewport : engine->active_viewports) {
             engine->active_viewport = target_viewport;
 
-            if (target_viewport)
-                target_viewport->UpdateMatrices();
-            else
+            if (!target_viewport)
                 continue;
 
             glViewport(target_viewport->x, target_viewport->y,target_viewport->width, target_viewport->height);

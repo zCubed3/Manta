@@ -106,7 +106,7 @@ namespace Manta::Data::Meshes {
         void ClearChannel(uint8_t idx);
 
     protected:
-        void* CloneData(void* data, size_t size);
+        static void* CloneData(void* data, size_t size);
 
     public:
         // Push helper

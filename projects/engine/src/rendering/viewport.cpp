@@ -5,16 +5,10 @@
 #include <glm/gtx/quaternion.hpp>
 
 namespace Manta {
-    Viewport::Viewport() {
-
-    }
-
     void Viewport::UpdateMatrices() {
         float aspect = (float)width / (float)height;
-        perspective = glm::perspective(glm::radians(fov), aspect, 0.001f, 100.0f);
+        perspective = glm::perspective(glm::radians(fov), aspect, z_near, z_far);
 
-        transform.UpdateMatrices();
-
-        eye = perspective * transform.world_to_local;
+        eye = perspective * view;
     }
 }

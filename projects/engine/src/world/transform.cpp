@@ -19,5 +19,11 @@ namespace Manta {
             world_to_local = glm::inverse(local_to_world);
             world_to_local_t = glm::transpose(world_to_local);
         }
+
+        if (gen_view) {
+            glm::vec3 up = local_to_world * glm::vec4(0, 1, 0, 0);
+            glm::vec3 forward = local_to_world * glm::vec4(0, 0, 1, 0);
+            view = glm::lookAt(position, position + forward, up);
+        }
     }
 }
