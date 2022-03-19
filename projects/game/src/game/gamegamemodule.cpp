@@ -9,7 +9,9 @@
 #include <world/world.hpp>
 #include <world/actor.hpp>
 #include <world/behaviors/camera.hpp>
+#include <world/behaviors/light.hpp>
 
+#include <rendering/lighting.hpp>
 #include <rendering/renderer.hpp>
 
 #include <data/engine_context.hpp>
@@ -47,6 +49,12 @@ namespace Manta::Game {
 
         world->AddActor(camera_actor);
 
+        auto light_actor = new Actor("light");
+        light_actor->transform.position = glm::vec3(0, 1, 0);
+        auto light = light_actor->AddBehavior<LightBehavior>();
+
+        world->AddActor(light_actor);
+
         auto vertical_axis = new Input::Axis();
         vertical_axis->AddKey(SDLK_w, 1.0f);
         vertical_axis->AddKey(SDLK_s, -1.0f);
@@ -68,6 +76,8 @@ namespace Manta::Game {
         //test_actor->transform.euler += spin;
 
         world->Update(engine);
+
+        engine->lighting->Update();
     }
 
     void GameGameModule::Draw(EngineContext* engine) {

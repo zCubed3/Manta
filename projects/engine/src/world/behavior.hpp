@@ -12,7 +12,7 @@ namespace Manta {
         bool enabled = true;
 
         virtual void Start(Actor* owner, EngineContext* engine);
-        virtual void Update(Actor* owner, EngineContext* engine);
+        virtual bool Update(Actor* owner, EngineContext* engine);
 
         virtual void OnDisable(Actor* owner, EngineContext* engine);
         virtual void OnEnable(Actor* owner, EngineContext* engine);
@@ -20,6 +20,8 @@ namespace Manta {
         virtual std::string get_TypeId() = 0;
 
         bool IsNew();
+
+        Actor* owner = nullptr;
 
     protected:
         bool is_new = true;

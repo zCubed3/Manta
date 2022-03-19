@@ -126,10 +126,8 @@
 
             kD *= 1.0 - metallic;
 
-            vec3 radiance = MANTA_LIGHTS[l].color_w_intensity.rgb;
-            float intensity = MANTA_LIGHTS[l].color_w_intensity.w;
+            vec3 radiance = MANTA_LIGHTS[l].color_w_intensity.rgb * MANTA_LIGHTS[l].color_w_intensity.w;
 
-            vec3 diffuse = color * max(0.0, dot(normal, light));
             float NDotL = max(dot(normal, light), 0.0);
 
             col.rgb += ((kD * color / PI + specular) * radiance * NDotL);

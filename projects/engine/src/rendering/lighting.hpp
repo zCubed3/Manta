@@ -1,17 +1,20 @@
-#ifndef MANTA_LIGHTBUFFER_HPP
-#define MANTA_LIGHTBUFFER_HPP
+#ifndef MANTA_LIGHTING_HPP
+#define MANTA_LIGHTING_HPP
 
 #include <cstdint>
+#include <vector>
 
 #include <glm/vec4.hpp>
 
 namespace Manta {
+    class LightBehavior;
+
     struct LightData {
         glm::vec4 color_w_intensity;
         glm::vec4 position_w_type;
     };
 
-    class LightBuffer {
+    class Lighting {
     public:
         #define MAX_LIGHT_COUNT 24
         const uint32_t BUFFER_SIZE = sizeof(LightData) * MAX_LIGHT_COUNT + sizeof(uint32_t);
@@ -19,7 +22,10 @@ namespace Manta {
         LightData data[MAX_LIGHT_COUNT];
         uint32_t light_count;
 
+        std::vector<LightBehavior*> lights;
+
         void CreateBuffer();
+        void Update();
         void UpdateBuffer();
 
         uint32_t handle;

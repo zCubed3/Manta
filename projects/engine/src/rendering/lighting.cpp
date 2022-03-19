@@ -1,10 +1,13 @@
-#include "lightbuffer.hpp"
+#include "lighting.hpp"
 
 #include <GL/glew.h>
 
+#include <world/actor.hpp>
+#include <world/behaviors/light.hpp>
+
 // TODO: Don't rely entirely on OpenGL?
 namespace Manta {
-    void LightBuffer::CreateBuffer() {
+    void Lighting::CreateBuffer() {
         glGenBuffers(1, &handle);
 
         glBindBuffer(GL_UNIFORM_BUFFER, handle);
@@ -14,7 +17,21 @@ namespace Manta {
         UpdateBuffer();
     }
 
-    void LightBuffer::UpdateBuffer() {
+    void Lighting::Update() {
+        int actual_count = 0;
+        for (auto light : lights) {
+            if (!light->enabled || !light->owner->enabled)
+                continue;
+
+            data[actual_count].color_w_intensity = glm::vec4(light->color, light->intensity);
+            data[actual_count].position_w_type = glm::vec4(light->owner->transform.position, light->light_type);
+            actual_count++;
+        }
+
+        light_count = actual_count;
+    }
+
+    void Lighting::UpdateBuffer() {
         glBindBuffer(GL_UNIFORM_BUFFER, handle);
 
         uint32_t data_size = sizeof(LightData);

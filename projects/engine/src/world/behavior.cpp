@@ -12,18 +12,22 @@ namespace Manta {
         is_new = false;
     }
 
-    void Behavior::Update(Actor* actor, EngineContext* engine) {
+    bool Behavior::Update(Actor* owner, EngineContext* engine) {
         if (last_enabled != enabled) {
             if (enabled)
-                OnEnable(actor, engine);
+                OnEnable(owner, engine);
             else
-                OnDisable(actor, engine);
+                OnDisable(owner, engine);
         }
+
+        this->owner = owner;
 
         last_enabled = enabled;
 
-        if (!enabled || actor->enabled)
-            return;
+        if (!enabled || !owner->enabled)
+            return false;
+
+        return true;
     }
 
     void Behavior::OnDisable(Actor *owner, EngineContext* engine) {}

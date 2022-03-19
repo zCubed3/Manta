@@ -11,7 +11,7 @@
 #include "assets/shader.hpp"
 
 #include "rendering/renderer.hpp"
-#include "rendering/lightbuffer.hpp"
+#include "rendering/lighting.hpp"
 #include "rendering/viewport.hpp"
 
 #include "world/timing.hpp"
@@ -72,6 +72,9 @@ int main(int argc, char** argv) {
     engine->console = new Console::Console();
     engine->imgui = imgui;
     engine->input = input;
+    engine->lighting = new Lighting();
+
+    engine->lighting->CreateBuffer();
 
     Shader::CreateEngineShaders(engine);
 
@@ -124,17 +127,7 @@ int main(int argc, char** argv) {
             renderer->ClearScreen();
 
         // TODO: Dynamic lighting
-        auto buf = renderer->light_buffer;
-
-        buf->data[0].position_w_type = glm::vec4(engine->timing->sin_time.x, engine->timing->cos_time.x, 1, 1);
-        buf->data[0].color_w_intensity = glm::vec4(1, 0, 0, 1);
-
-        buf->data[1].position_w_type = glm::vec4(-engine->timing->sin_time.x, -engine->timing->cos_time.x, 1, 1);
-        buf->data[1].color_w_intensity = glm::vec4(0, 0, 1, 1);
-
-        buf->light_count = 2;
-
-        buf->UpdateBuffer();
+        engine->lighting->UpdateBuffer();
 
         for (auto target_viewport : engine->active_viewports) {
             engine->active_viewport = target_viewport;

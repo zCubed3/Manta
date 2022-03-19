@@ -20,13 +20,14 @@ set(SOURCES
 
         "src/world/behavior.cpp"
         "src/world/behaviors/camera.cpp"
+        "src/world/behaviors/light.cpp"
 
         "src/assets/mesh.cpp"
         "src/assets/shader.cpp"
 
         "src/rendering/renderer.cpp"
         "src/rendering/viewport.cpp"
-        "src/rendering/lightbuffer.cpp"
+        "src/rendering/lighting.cpp"
 
         "src/input/axis.cpp"
         "src/input/inputserver.cpp"

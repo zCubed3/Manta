@@ -18,7 +18,10 @@ namespace Manta {
         engine->active_viewports.emplace_back(&viewport);
     }
 
-    void CameraBehavior::Update(Actor *owner, EngineContext *engine) {
+    bool CameraBehavior::Update(Actor *owner, EngineContext *engine) {
+        if (!Behavior::Update(owner, engine))
+            return false;
+
         owner->transform.gen_view = true;
 
         viewport.view = owner->transform.view;
@@ -30,6 +33,8 @@ namespace Manta {
         viewport.z_far = z_far;
 
         viewport.UpdateMatrices();
+
+        return true;
     }
 
     std::string CameraBehavior::get_TypeId() { return "camera"; }

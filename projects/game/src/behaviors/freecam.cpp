@@ -11,8 +11,9 @@
 #include <iostream>
 
 namespace Manta::Game {
-    void FreecamBehavior::Update(Actor *owner, EngineContext *engine) {
-        Behavior::Update(owner, engine);
+    bool FreecamBehavior::Update(Actor *owner, EngineContext *engine) {
+        if (!Behavior::Update(owner, engine))
+            return false;
 
         glm::vec3 forward = owner->transform.local_to_world * glm::vec4(0, 0, 1, 0);
         glm::vec3 right = owner->transform.local_to_world * glm::vec4(1, 0, 0, 0);
@@ -26,6 +27,8 @@ namespace Manta::Game {
 
         owner->transform.euler.y -= engine->input->mouse_delta_x * 0.1f;
         owner->transform.euler.x += engine->input->mouse_delta_y * 0.1f;
+
+        return true;
     }
 
     std::string FreecamBehavior::get_TypeId() { return "freecamera"; }

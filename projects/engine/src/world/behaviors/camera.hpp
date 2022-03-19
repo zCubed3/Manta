@@ -14,7 +14,7 @@ namespace Manta {
         void OnDisable(Actor *owner, EngineContext* engine) override;
         void OnEnable(Actor *owner, EngineContext* engine) override;
 
-        void Update(Actor *owner, EngineContext *engine) override;
+        bool Update(Actor *owner, EngineContext *engine) override;
 
         std::string get_TypeId() override;
 

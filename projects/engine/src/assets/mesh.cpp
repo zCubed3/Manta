@@ -4,7 +4,7 @@
 
 #include <assets/shader.hpp>
 
-#include <rendering/lightbuffer.hpp>
+#include <rendering/lighting.hpp>
 #include <rendering/renderer.hpp>
 
 #include <GL/glew.h>
@@ -72,9 +72,9 @@ namespace Manta {
         shader->SetVec4("MANTA_TANTIME", engine->timing->tan_time);
 
         uint32_t lights_index = glGetUniformBlockIndex(handle, "MANTA_LIGHT_BUFFER");
-        glUniformBlockBinding(handle, lights_index, 8);
+        glUniformBlockBinding(handle, lights_index, 4);
 
-        glBindBufferBase(GL_UNIFORM_BUFFER, 8, engine->renderer->light_buffer->handle);
+        glBindBufferBase(GL_UNIFORM_BUFFER, 4, engine->lighting->handle);
 
         //
         //

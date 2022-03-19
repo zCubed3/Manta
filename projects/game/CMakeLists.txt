@@ -10,9 +10,11 @@ set(SOURCES
         "${ENGINE_DIR}/src/world/transform.cpp"
 
         "${ENGINE_DIR}/src/world/behaviors/camera.cpp"
+        "${ENGINE_DIR}/src/world/behaviors/light.cpp"
 
         "${ENGINE_DIR}/src/rendering/renderer.cpp"
         "${ENGINE_DIR}/src/rendering/viewport.cpp"
+        "${ENGINE_DIR}/src/rendering/lighting.cpp"
 
         "${ENGINE_DIR}/src/assets/shader.cpp"
         "${ENGINE_DIR}/src/assets/mesh.cpp"

@@ -10,6 +10,7 @@ namespace Manta {
     class Timing;
     class Shader;
     class ImGuiContext;
+    class Lighting;
 
     namespace Console {
         class Console;
@@ -26,6 +27,7 @@ namespace Manta {
 
         Timing* timing;
         Renderer* renderer;
+        Lighting* lighting;
 
         Console::Console* console;
         Input::InputServer* input;
