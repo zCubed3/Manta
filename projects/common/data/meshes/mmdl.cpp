@@ -35,22 +35,27 @@ namespace Manta::Data::Meshes {
         stream.read(reinterpret_cast<char*>(&header), sizeof(Header));
 
         mdl->name.resize(header.name_len);
+
+        for (int c = 0; c < header.descriptor_count; c++) {
+            ChannelDescriptor desc {};
+            stream.read(reinterpret_cast<char*>(&desc), sizeof(ChannelDescriptor));
+
+            auto channel = new Channel();
+            channel->descriptor = desc;
+
+            mdl->channels.emplace_back(channel);
+        }
+
         stream.read(mdl->name.data(), header.name_len);
 
-        uint32_t c = 0;
         for (auto & channel : mdl->channels) {
-            channel.type = header.channel_types[c];
-            channel.hint = header.channel_hints[c];
-
-            for (int d = 0; d < header.channel_lens[c]; d++) {
-                auto size = get_type_size(channel.type);
+            for (int d = 0; d < channel->descriptor.read_len; d++) {
+                auto size = get_type_size(channel->descriptor.type);
                 void* data = malloc(size);
                 stream.read(reinterpret_cast<char*>(data), size);
 
-                channel.data.push_back(data);
+                channel->data.push_back(data);
             }
-
-            c++;
         }
 
         return mdl;
@@ -62,22 +67,21 @@ namespace Manta::Data::Meshes {
         Header header {};
 
         header.ident = MMDL_IDENT;
-
-        for (int c = 0; c < MMDL_CHANNEL_COUNT; c++) {
-            header.channel_types[c] = channels[c].type;
-            header.channel_hints[c] = channels[c].hint;
-            header.channel_lens[c] = channels[c].data.size();
-        }
-
+        header.descriptor_count = channels.size();
         header.name_len = name.length();
 
         file.write(reinterpret_cast<char*>(&header), sizeof(Header));
+
+        for (auto & channel : channels) {
+            channel->descriptor.read_len = channel->data.size();
+            file.write(reinterpret_cast<char*>(channel), sizeof(ChannelDescriptor));
+        }
+
         file.write(name.data(), header.name_len);
 
         for (auto & channel : channels) {
-            for (auto raw_element : channel.data) {
-                uint32_t len = get_type_size(channel.type);
-
+            uint32_t len = get_type_size(channel->descriptor.type);
+            for (auto raw_element : channel->data) {
                 file.write(reinterpret_cast<char*>(raw_element), len);
             }
         }
@@ -85,25 +89,35 @@ namespace Manta::Data::Meshes {
         file.close();
     }
 
+    // TODO: Prevent duplicate semantics!
+    MantaMDL::Channel* MantaMDL::PushChannel(ChannelType type, ChannelHint hint) {
+        auto channel = new Channel();
+        channel->descriptor.type = type;
+        channel->descriptor.hint = hint;
+
+        channels.emplace_back(channel);
+        return channel;
+    }
+
     void MantaMDL::SetChannelType(uint8_t idx, ChannelType type) {
-        channels[idx].type = type;
+        channels[idx]->descriptor.type = type;
     }
 
     void MantaMDL::SetChannelHint(uint8_t idx, ChannelHint hint) {
-        channels[idx].hint = hint;
+        channels[idx]->descriptor.hint = hint;
     }
 
     void MantaMDL::SetChannelProps(uint8_t idx, ChannelType type, ChannelHint hint) {
-        channels[idx].type = type;
-        channels[idx].hint = hint;
+        channels[idx]->descriptor.type = type;
+        channels[idx]->descriptor.hint = hint;
     }
 
     void MantaMDL::ClearChannel(uint8_t idx) {
-        for (auto element : channels[idx].data) {
+        for (auto element : channels[idx]->data) {
             free(element);
         }
 
-        channels[idx].data.clear();
+        channels[idx]->data.clear();
     }
 
     void* MantaMDL::CloneData(void* data, size_t size) {
@@ -113,6 +127,12 @@ namespace Manta::Data::Meshes {
     }
 
     void MantaMDL::PushRawData(uint8_t idx, void *data) {
-        channels[idx].data.push_back(data);
+        channels[idx]->data.push_back(data);
+    }
+
+    MantaMDL::~MantaMDL() {
+        for (int c = 0; c < channels.size(); c++) {
+            ClearChannel(c);
+        }
     }
 }

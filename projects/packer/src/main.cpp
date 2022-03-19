@@ -98,11 +98,11 @@ int main(int argc, char** argv) {
     auto bsm = new MantaBSM();
     auto mmdl = new MantaMDL();
 
-    mmdl->SetChannelProps(0, MantaMDL::ChannelType::VEC3, MantaMDL::ChannelHint::VERTEX);
-    mmdl->SetChannelProps(1, MantaMDL::ChannelType::VEC3, MantaMDL::ChannelHint::NORMAL);
-    mmdl->SetChannelProps(2, MantaMDL::ChannelType::VEC2, MantaMDL::ChannelHint::UV0);
-    mmdl->SetChannelProps(3, MantaMDL::ChannelType::VEC4, MantaMDL::ChannelHint::TANGENT);
-    mmdl->SetChannelProps(4, MantaMDL::ChannelType::UINT, MantaMDL::ChannelHint::INDEXER);
+    mmdl->PushChannel(MantaMDL::ChannelType::VEC3, MantaMDL::ChannelHint::VERTEX);
+    mmdl->PushChannel(MantaMDL::ChannelType::VEC3, MantaMDL::ChannelHint::NORMAL);
+    mmdl->PushChannel(MantaMDL::ChannelType::VEC2, MantaMDL::ChannelHint::UV0);
+    mmdl->PushChannel(MantaMDL::ChannelType::VEC4, MantaMDL::ChannelHint::TANGENT);
+    mmdl->PushChannel(MantaMDL::ChannelType::UINT, MantaMDL::ChannelHint::INDEXER);
 
     mmdl->name = obj->name;
 

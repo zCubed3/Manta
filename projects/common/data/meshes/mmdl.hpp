@@ -12,10 +12,9 @@ namespace Manta::Data::Meshes {
     // V1 and future versions might change a lot!
     class MantaMDL {
     public:
-        #define MMDL_CHANNEL_COUNT 8
         static const uint32_t MMDL_IDENT;
 
-        enum class ChannelType : uint8_t {
+        enum ChannelType : uint8_t {
             NONE, // Special type, used by the writer mainly!
             SCALAR,
             VEC2,
@@ -45,21 +44,24 @@ namespace Manta::Data::Meshes {
             SMALL_NORMAL,
             SMALL_TANGENT,
 
-            // Bone data, redundant rn but V2 might add a purpose for it!
+            // Bone data
             SKELETON
         };
 
         struct Header {
             uint32_t ident;
-            ChannelType channel_types[MMDL_CHANNEL_COUNT]; // What type is contained in this channel?
-            ChannelHint channel_hints[MMDL_CHANNEL_COUNT]; // What data is provided by this channel?
-            uint32_t channel_lens[MMDL_CHANNEL_COUNT]; // How long are the blocks that represent this channel?
+            uint8_t descriptor_count;
             uint16_t name_len;
         };
 
-        struct DataChannel {
+        struct ChannelDescriptor {
+            uint32_t read_len; // This value is read back and setting it manually does nothing!
             ChannelType type;
             ChannelHint hint;
+        };
+
+        struct Channel {
+            ChannelDescriptor descriptor;
             std::vector<void*> data;
         };
 
@@ -86,12 +88,16 @@ namespace Manta::Data::Meshes {
             uint32_t connection; // If zero, this bone isn't parented!
         };
 
+        ~MantaMDL();
+
         std::string name;
-        DataChannel channels[MMDL_CHANNEL_COUNT];
+        std::vector<Channel*> channels;
 
         static MantaMDL* LoadFromStream(std::istream& stream);
 
         // Helpers for setting tags
+        Channel* PushChannel(ChannelType type, ChannelHint hint);
+
         void SetChannelType(uint8_t idx, ChannelType type);
         void SetChannelHint(uint8_t idx, ChannelHint hint);
         void SetChannelProps(uint8_t idx, ChannelType type, ChannelHint hint);
@@ -103,7 +109,6 @@ namespace Manta::Data::Meshes {
         void* CloneData(void* data, size_t size);
 
     public:
-
         // Push helper
         void PushRawData(uint8_t idx, void* data);
 

@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
 
     bool first_run = true;
 
-    DynLib* dlib_game = DynLib::Open("./lib/game.so");
+    auto dlib_game = DynLib::Open("./lib/game.so");
 
     auto module_init = dlib_game->GetFunction<module_init_fptr>("module_init");
     GameModule* game_module = module_init();
@@ -153,4 +153,8 @@ int main(int argc, char** argv) {
 
         renderer->Present();
     }
+
+    // Clean up
+    delete renderer;
+    delete dlib_game;
 }

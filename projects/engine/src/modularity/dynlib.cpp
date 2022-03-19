@@ -9,7 +9,7 @@
 
 namespace Manta {
     DynLib *DynLib::Open(const std::string &path) {
-        DynLib* lib = new DynLib();
+        auto lib = new DynLib();
 
 #ifdef __linux__
         lib->handle = dlopen(path.c_str(), RTLD_LAZY);

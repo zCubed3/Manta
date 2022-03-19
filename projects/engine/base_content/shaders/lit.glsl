@@ -25,6 +25,8 @@
 
     uniform vec3 MANTA_CAM_POS;
     uniform vec4 MANTA_SINTIME;
+    uniform vec4 MANTA_COSTIME;
+    uniform vec4 MANTA_TANTIME;
 
     in vec3 world_pos;
     in vec3 world_normal;
@@ -75,13 +77,13 @@
     void main() {
         vec3 normal = normalize(world_normal);
         vec3 view = normalize(MANTA_CAM_POS - world_pos);
-        vec3 light = normalize(vec3(MANTA_SINTIME.x, 1, 0));
+        vec3 light = normalize(vec3(0.5, 1, 0.5));
         vec3 halfway = normalize(view + light);
 
         vec3 color = vec3(1, 1, 1);
         color = normal;
 
-        float metallic = 0.0;
+        float metallic = abs(MANTA_SINTIME.x);
         float roughness = 0.1;
 
         vec3 F0 = vec3(0.04);

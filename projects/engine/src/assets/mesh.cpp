@@ -65,6 +65,8 @@ namespace Manta {
 
         shader->SetFloat("MANTA_TIME", engine->timing->time);
         shader->SetVec4("MANTA_SINTIME", engine->timing->sin_time);
+        shader->SetVec4("MANTA_COSTIME", engine->timing->cos_time);
+        shader->SetVec4("MANTA_TANTIME", engine->timing->tan_time);
 
         //
         //
@@ -223,8 +225,8 @@ namespace Manta {
 
         for (auto channel : mmdl->channels) {
             uint32_t i = 0;
-            for (auto element : channel.data) {
-                if (channel.hint == MantaMDL::ChannelHint::VERTEX) {
+            for (auto element : channel->data) {
+                if (channel->descriptor.hint == MantaMDL::ChannelHint::VERTEX) {
                     Vertex v{};
 
                     auto v3 = reinterpret_cast<MantaMDL::Vec3*>(element);
@@ -233,28 +235,28 @@ namespace Manta {
                 }
 
                 // TODO: Make this order independent
-                if (channel.hint == MantaMDL::ChannelHint::NORMAL) {
+                if (channel->descriptor.hint == MantaMDL::ChannelHint::NORMAL) {
                     Vertex& v = vertices[i++];
 
                     auto v3 = reinterpret_cast<MantaMDL::Vec3*>(element);
                     v.normal = glm::vec3(v3->x, v3->y, v3->z);
                 }
 
-                if (channel.hint == MantaMDL::ChannelHint::UV0) {
+                if (channel->descriptor.hint == MantaMDL::ChannelHint::UV0) {
                     Vertex& v = vertices[i++];
 
                     auto v2 = reinterpret_cast<MantaMDL::Vec2*>(element);
                     v.uv0 = glm::vec2(v2->x, v2->y);
                 }
 
-                if (channel.hint == MantaMDL::ChannelHint::TANGENT) {
+                if (channel->descriptor.hint == MantaMDL::ChannelHint::TANGENT) {
                     Vertex& v = vertices[i++];
 
                     auto v4 = reinterpret_cast<MantaMDL::Vec4*>(element);
                     v.tangent = glm::vec4(v4->x, v4->y, v4->z, v4->w);
                 }
 
-                if (channel.hint == MantaMDL::ChannelHint::INDEXER) {
+                if (channel->descriptor.hint == MantaMDL::ChannelHint::INDEXER) {
                     auto i = reinterpret_cast<uint32_t*>(element);
                     indices.emplace_back(*i);
                 }
