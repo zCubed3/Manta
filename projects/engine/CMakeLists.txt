@@ -26,11 +26,17 @@ set(SOURCES
 
         "src/rendering/renderer.cpp"
         "src/rendering/viewport.cpp"
+        "src/rendering/lightbuffer.cpp"
 
         "src/input/axis.cpp"
         "src/input/inputserver.cpp"
 
-        "src/data/console.cpp"
+        "src/data/console/console.cpp"
+        "src/data/console/celem.cpp"
+        "src/data/console/cfunc.cpp"
+        "src/data/console/cvar.cpp"
+        "src/data/console/stdelems.cpp"
+
         "src/data/engine_context.cpp"
 
         "src/ui/imguicontext.cpp"

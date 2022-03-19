@@ -12,6 +12,8 @@
 #include <backends/imgui_impl_sdl.h>
 #include <backends/imgui_impl_opengl3.h>
 
+#include "lightbuffer.hpp"
+
 namespace Manta {
     void Renderer::Initialize() {
         sdl_context = nullptr;
@@ -46,6 +48,9 @@ namespace Manta {
         glCullFace(GL_BACK);
 
         glEnable(GL_SCISSOR_TEST);
+
+        light_buffer = new LightBuffer();
+        light_buffer->CreateBuffer();
     }
 
     void Renderer::Update() {

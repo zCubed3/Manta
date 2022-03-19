@@ -42,7 +42,8 @@ namespace Manta::Game {
         camera = camera_actor->AddBehavior<CameraBehavior>();
         freecam = camera_actor->AddBehavior<FreecamBehavior>();
 
-        camera_actor->transform.position.z = -1.5;
+        camera_actor->transform.position.z = 1.5;
+        camera_actor->transform.euler.y = 180;
 
         world->AddActor(camera_actor);
 

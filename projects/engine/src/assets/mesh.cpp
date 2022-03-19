@@ -4,6 +4,9 @@
 
 #include <assets/shader.hpp>
 
+#include <rendering/lightbuffer.hpp>
+#include <rendering/renderer.hpp>
+
 #include <GL/glew.h>
 
 #include <glm/gtc/type_ptr.hpp>
@@ -67,6 +70,11 @@ namespace Manta {
         shader->SetVec4("MANTA_SINTIME", engine->timing->sin_time);
         shader->SetVec4("MANTA_COSTIME", engine->timing->cos_time);
         shader->SetVec4("MANTA_TANTIME", engine->timing->tan_time);
+
+        uint32_t lights_index = glGetUniformBlockIndex(handle, "MANTA_LIGHT_BUFFER");
+        glUniformBlockBinding(handle, lights_index, 8);
+
+        glBindBufferBase(GL_UNIFORM_BUFFER, 8, engine->renderer->light_buffer->handle);
 
         //
         //

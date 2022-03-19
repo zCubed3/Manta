@@ -5,21 +5,16 @@
 #include <string>
 #include <unordered_map>
 
-namespace Manta {
-    class EngineContext;
-}
+#include "celem.hpp"
 
 namespace Manta::Console {
-    class CElem {
-    public:
-        virtual void Execute(EngineContext* context);
-    };
-
     class Console {
     public:
-        void RegisterCommand(const std::string& key, CElem* elem);
+        void RegisterElement(const std::string& key, CElem* elem);
         void DoCommandLine(const std::vector<std::string>& argv);
         void DoString(const std::string& cmd);
+
+        void TryExecute(EngineContext* context, const std::string& key, const std::vector<std::string>& args);
 
     protected:
         std::unordered_map<std::string, CElem*> elements;

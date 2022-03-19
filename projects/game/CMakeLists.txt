@@ -17,7 +17,8 @@ set(SOURCES
         "${ENGINE_DIR}/src/assets/shader.cpp"
         "${ENGINE_DIR}/src/assets/mesh.cpp"
 
-        "${ENGINE_DIR}/src/data/console.cpp"
+        "${ENGINE_DIR}/src/data/console/console.cpp"
+
         "${ENGINE_DIR}/src/data/engine_context.cpp"
 
         "${ENGINE_DIR}/src/input/axis.cpp"

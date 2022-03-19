@@ -7,6 +7,7 @@ namespace Manta {
     class World;
     class Viewport;
     class EngineContext;
+    class LightBuffer;
 
     class Renderer {
     public:
@@ -26,6 +27,8 @@ namespace Manta {
         void Present();
 
         int width = 512, height = 512;
+
+        LightBuffer* light_buffer;
 
         SDL_GLContext sdl_context = nullptr;
         SDL_Window* sdl_window = nullptr;

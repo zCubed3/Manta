@@ -31,6 +31,18 @@
     in vec3 world_pos;
     in vec3 world_normal;
 
+    #define MAX_LIGHT_COUNT 24
+
+    struct MANTA_LIGHT {
+        vec4 color_w_intensity;
+        vec4 position_w_type;
+    };
+
+    layout (std140) uniform MANTA_LIGHT_BUFFER {
+        MANTA_LIGHT MANTA_LIGHTS[MAX_LIGHT_COUNT];
+        int MANTA_LIGHT_COUNT;
+    };
+
     const float PI = 3.14159265359;
 
     float BlinnPhongSpecular(vec3 N, vec3 V, vec3 L, float power) {
@@ -75,39 +87,56 @@
     }
 
     void main() {
+        col = vec4(0);
+
         vec3 normal = normalize(world_normal);
         vec3 view = normalize(MANTA_CAM_POS - world_pos);
-        vec3 light = normalize(vec3(0.5, 1, 0.5));
-        vec3 halfway = normalize(view + light);
 
-        vec3 color = vec3(1, 1, 1);
-        color = normal;
+        vec3 color = vec3(1);
 
-        float metallic = abs(MANTA_SINTIME.x);
+        float metallic = 0;
         float roughness = 0.1;
 
         vec3 F0 = vec3(0.04);
         F0 = mix(F0, color, metallic);
 
-        vec3 F = FresnelSchlick(max(dot(halfway, view), 0.0), F0);
-        float NDF = DistributionGGX(normal, halfway, roughness);
-        float G = GeometrySmith(normal, view, light, roughness);
+        for (int l = 0; l < MANTA_LIGHT_COUNT; l++) {
+            vec3 lpos = MANTA_LIGHTS[l].position_w_type.xyz;
+            float type = MANTA_LIGHTS[l].position_w_type.w;
 
-        vec3 numerator = NDF * G * F;
-        float denominator = 4.0 * max(dot(normal, view), 0.0) * max(dot(normal, light), 0.0);
-        vec3 specular = numerator / max(denominator, 0.001);
+            vec3 light = vec3(0, 0, 0);
 
-        vec3 kS = F;
-        vec3 kD = vec3(1.0) - kS;
+            if (type == 0)
+                light = normalize(lpos);
+            else
+                light = normalize(lpos - world_pos);
 
-        kD *= 1.0 - metallic;
+            vec3 halfway = normalize(view + light);
 
-        vec3 diffuse = color * max(0.0, dot(normal, light));
-        float NDotL = max(dot(normal, light), 0.0);
+            vec3 F = FresnelSchlick(max(dot(halfway, view), 0.0), F0);
+            float NDF = DistributionGGX(normal, halfway, roughness);
+            float G = GeometrySmith(normal, view, light, roughness);
 
-        vec3 final_color = ((kD * color / PI + specular) * NDotL);
+            vec3 numerator = NDF * G * F;
+            float denominator = 4.0 * max(dot(normal, view), 0.0) * max(dot(normal, light), 0.0);
+            vec3 specular = numerator / max(denominator, 0.001);
 
-        col = vec4(diffuse + specular, 1.0);
-        col.rgb = max(vec3(0.0), min(vec3(1.0), col.rgb));
+            vec3 kS = F;
+            vec3 kD = vec3(1.0) - kS;
+
+            kD *= 1.0 - metallic;
+
+            vec3 radiance = MANTA_LIGHTS[l].color_w_intensity.rgb;
+            float intensity = MANTA_LIGHTS[l].color_w_intensity.w;
+
+            vec3 diffuse = color * max(0.0, dot(normal, light));
+            float NDotL = max(dot(normal, light), 0.0);
+
+            col.rgb += ((kD * color / PI + specular) * radiance * NDotL);
+        }
+
+        col.rgb = min(vec3(1.0), col.rgb);
+
+        col.a = 1.0;
     }
 #endif
