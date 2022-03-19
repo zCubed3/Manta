@@ -12,11 +12,14 @@ namespace Manta {
     struct LightData {
         glm::vec4 color_w_intensity;
         glm::vec4 position_w_type;
+        glm::vec4 direction_w_todo;
+        glm::vec4 cone_cosines;
     };
 
     class Lighting {
     public:
-        #define MAX_LIGHT_COUNT 24
+        // Change this inside shaders too!
+        #define MAX_LIGHT_COUNT 64
         const uint32_t BUFFER_SIZE = sizeof(LightData) * MAX_LIGHT_COUNT + sizeof(uint32_t);
 
         LightData data[MAX_LIGHT_COUNT];

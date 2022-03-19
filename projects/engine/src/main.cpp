@@ -105,7 +105,7 @@ int main(int argc, char** argv) {
             }
 
             input->ProcessEvent(&sdl_event);
-            //imgui->Process(&sdl_event);
+            imgui->Process(&sdl_event);
         }
 
         if (first_run) {

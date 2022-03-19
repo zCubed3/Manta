@@ -14,7 +14,9 @@ namespace Manta {
             Spotlight
         };
 
-        float intensity = 1;
+        float intensity = 1.0f;
+        float cone_angle = 60.0f, inner_perc = 50.0f;
+
         LightType light_type = LightType::Sun;
         glm::vec3 color = glm::vec3(1, 1, 1);
 

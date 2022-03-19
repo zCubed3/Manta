@@ -31,11 +31,13 @@
     in vec3 world_pos;
     in vec3 world_normal;
 
-    #define MAX_LIGHT_COUNT 24
+    #define MAX_LIGHT_COUNT 64
 
     struct MANTA_LIGHT {
         vec4 color_w_intensity;
         vec4 position_w_type;
+        vec4 direction_w_todo;
+        vec4 cone_cosines;
     };
 
     layout (std140) uniform MANTA_LIGHT_BUFFER {
@@ -113,6 +115,16 @@
 
             vec3 halfway = normalize(view + light);
 
+            float atten = 1;
+            if (type == 2) {
+                float cone = dot(light, MANTA_LIGHTS[l].direction_w_todo.xyz) - MANTA_LIGHTS[l].cone_cosines.y;
+
+                if (cone <= 0)
+                    continue;
+
+                atten = max(0.0, min(1.0, cone * MANTA_LIGHTS[l].cone_cosines.z));
+            }
+
             vec3 F = FresnelSchlick(max(dot(halfway, view), 0.0), F0);
             float NDF = DistributionGGX(normal, halfway, roughness);
             float G = GeometrySmith(normal, view, light, roughness);
@@ -126,7 +138,7 @@
 
             kD *= 1.0 - metallic;
 
-            vec3 radiance = MANTA_LIGHTS[l].color_w_intensity.rgb * MANTA_LIGHTS[l].color_w_intensity.w;
+            vec3 radiance = MANTA_LIGHTS[l].color_w_intensity.rgb * MANTA_LIGHTS[l].color_w_intensity.w * atten;
 
             float NDotL = max(dot(normal, light), 0.0);
 

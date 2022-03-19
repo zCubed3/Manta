@@ -50,8 +50,9 @@ namespace Manta::Game {
         world->AddActor(camera_actor);
 
         auto light_actor = new Actor("light");
-        light_actor->transform.position = glm::vec3(0, 1, 0);
-        auto light = light_actor->AddBehavior<LightBehavior>();
+        light_actor->transform.position = glm::vec3(0, 0, 1);
+        light = light_actor->AddBehavior<LightBehavior>();
+        light->light_type = LightBehavior::LightType::Spotlight;
 
         world->AddActor(light_actor);
 
@@ -74,6 +75,8 @@ namespace Manta::Game {
 
         auto spin = glm::vec3(0, engine->timing->delta_time, 0) * 20.0f;
         //test_actor->transform.euler += spin;
+
+        light->cone_angle = 10 + abs(engine->timing->sin_time.x) * 100.0f;
 
         world->Update(engine);
 

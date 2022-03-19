@@ -22,6 +22,8 @@ set(SOURCES
         "src/world/behaviors/camera.cpp"
         "src/world/behaviors/light.cpp"
 
+        "src/math/fmath.cpp"
+
         "src/assets/mesh.cpp"
         "src/assets/shader.cpp"
 

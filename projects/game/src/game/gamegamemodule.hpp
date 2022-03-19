@@ -8,6 +8,7 @@ namespace Manta {
     class World;
 
     class CameraBehavior;
+    class LightBehavior;
 }
 
 namespace Manta::Game {
@@ -25,6 +26,7 @@ namespace Manta::Game {
         Actor *test_actor, *test_actor2, *test_actor3, *camera_actor;
         CameraBehavior *camera;
         FreecamBehavior *freecam;
+        LightBehavior *light;
     };
 }
 
