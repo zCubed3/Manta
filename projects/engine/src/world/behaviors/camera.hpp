@@ -19,7 +19,7 @@ namespace Manta {
         std::string get_TypeId() override;
 
     protected:
-        Viewport viewport;
+        Rendering::Viewport viewport;
     };
 }
 

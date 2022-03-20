@@ -5,7 +5,9 @@
 
 #include <vector>
 
-namespace Manta {
+namespace Manta::Rendering {
+    class RenderTarget;
+
     class Viewport {
     public:
         uint16_t width = 512, height = 512;
@@ -18,7 +20,10 @@ namespace Manta {
         glm::vec3 position; // Used to tell the renderer where this viewport is seeing from!
         glm::mat4x4 view, perspective, eye;
 
-        void UpdateMatrices();
+        // Are we drawing into a buffer?
+        RenderTarget* render_target = nullptr;
+
+        void Update();
     };
 }
 

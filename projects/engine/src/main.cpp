@@ -9,10 +9,12 @@
 // Engine
 #include "assets/mesh.hpp"
 #include "assets/shader.hpp"
+#include "assets/texture.hpp"
 
 #include "rendering/renderer.hpp"
 #include "rendering/lighting.hpp"
 #include "rendering/viewport.hpp"
+#include "rendering/render_target.hpp"
 
 #include "world/timing.hpp"
 #include "world/world.hpp"
@@ -30,7 +32,7 @@
 
 #include "data/engine_context.hpp"
 
-#include "input/inputserver.hpp"
+#include "input/input_server.hpp"
 
 #include "ui/imguicontext.hpp"
 
@@ -53,7 +55,7 @@ int main(int argc, char** argv) {
     bool keep_running = true;
 
     // TODO: Renderer modularity?
-    auto renderer = new Renderer();
+    auto renderer = new Rendering::Renderer();
     renderer->Initialize();
 
     auto dlib_game = DynLib::Open("./lib/game.so");
@@ -72,7 +74,7 @@ int main(int argc, char** argv) {
     engine->console = new Console::Console();
     engine->imgui = imgui;
     engine->input = input;
-    engine->lighting = new Lighting();
+    engine->lighting = new Rendering::Lighting();
 
     engine->lighting->CreateBuffer();
 
@@ -89,6 +91,17 @@ int main(int argc, char** argv) {
     engine->console->DoCommandLine(safe_argv);
 
     safe_argv.clear();
+
+    auto rt = new Rendering::RenderTarget(256, 256, Rendering::RenderTarget::DepthPrecision::Medium);
+    rt->Create();
+
+    auto viewport_transform = new Transform();
+    viewport_transform->gen_view = true;
+
+    auto viewport = new Rendering::Viewport();
+    viewport->render_target = rt;
+
+    engine->active_viewports.emplace_back(viewport);
 
     bool first_run = true;
     while (keep_running) {
@@ -129,11 +142,23 @@ int main(int argc, char** argv) {
         // TODO: Dynamic lighting
         engine->lighting->UpdateBuffer();
 
+        viewport_transform->position = glm::vec3(0, 0, 1);
+        viewport_transform->euler = glm::vec3(engine->timing->sin_time.y * 20, 180 + engine->timing->cos_time.y * 20, 0);
+        viewport_transform->UpdateMatrices();
+
+        viewport->position = viewport_transform->position;
+        viewport->view = viewport_transform->view;
+        viewport->Update();
+
         for (auto target_viewport : engine->active_viewports) {
             engine->active_viewport = target_viewport;
 
             if (!target_viewport)
                 continue;
+
+            if (target_viewport->render_target) {
+                renderer->SetRenderTarget(target_viewport->render_target);
+            }
 
             glViewport(target_viewport->x, target_viewport->y,target_viewport->width, target_viewport->height);
             glScissor(target_viewport->x, target_viewport->y,target_viewport->width, target_viewport->height);
@@ -153,6 +178,10 @@ int main(int argc, char** argv) {
             // TODO: More generic draw loop
             game_module->Draw(engine);
 
+            if (target_viewport->render_target) {
+                renderer->SetRenderTarget(nullptr);
+            }
+
             //mesh->DrawNow(test->transform.local_to_world, test->transform.world_to_local_t, shader);
         }
 
@@ -163,6 +192,12 @@ int main(int argc, char** argv) {
         renderer->BeginImGui();
 
         game_module->DrawGUI(engine);
+
+        ImGui::Begin("RT Test");
+
+        ImGui::Image((void *) (intptr_t) rt->color_buffer->handle, ImVec2(rt->width, rt->height), ImVec2(0, 1), ImVec2(1, 0));
+
+        ImGui::End();
 
         renderer->EndImGui();
 

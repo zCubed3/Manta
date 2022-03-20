@@ -19,7 +19,7 @@
 #include <behaviors/freecam.hpp>
 
 #include <input/axis.hpp>
-#include <input/inputserver.hpp>
+#include <input/input_server.hpp>
 
 namespace Manta::Game {
     void GameGameModule::Initialize(EngineContext *engine) {
@@ -37,7 +37,13 @@ namespace Manta::Game {
         test_actor->meshes.emplace_back(mmdl_mesh);
         test_actor->shaders.emplace_back(shader);
 
+        test_actor2 = new Actor("test2");
+        test_actor2->meshes.emplace_back(mmdl_mesh);
+
+        test_actor2->transform.position = glm::vec3(0, 0, -1);
+
         world->AddActor(test_actor);
+        world->AddActor(test_actor2);
 
         camera_actor = new Actor("camera");
         camera_actor->transform.position = glm::vec3(0, 0, 1);
@@ -50,9 +56,9 @@ namespace Manta::Game {
         world->AddActor(camera_actor);
 
         auto light_actor = new Actor("light");
-        light_actor->transform.position = glm::vec3(0, 0, 1);
+        light_actor->transform.position = glm::vec3(1, 1, 1);
         light = light_actor->AddBehavior<LightBehavior>();
-        light->light_type = LightBehavior::LightType::Spotlight;
+        light->light_type = LightBehavior::LightType::Sun;
 
         world->AddActor(light_actor);
 
@@ -75,8 +81,6 @@ namespace Manta::Game {
 
         auto spin = glm::vec3(0, engine->timing->delta_time, 0) * 20.0f;
         //test_actor->transform.euler += spin;
-
-        light->cone_angle = 10 + abs(engine->timing->sin_time.x) * 100.0f;
 
         world->Update(engine);
 

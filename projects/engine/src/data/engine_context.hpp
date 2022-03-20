@@ -5,12 +5,9 @@
 
 // Stores dynamically allocated parts of the engine inside a single class that is passed into modules for usage
 namespace Manta {
-    class Renderer;
-    class Viewport;
     class Timing;
     class Shader;
     class ImGuiContext;
-    class Lighting;
 
     namespace Console {
         class Console;
@@ -20,14 +17,24 @@ namespace Manta {
         class InputServer;
     }
 
+    namespace Rendering {
+        class Viewport;
+        class Lighting;
+        class Renderer;
+    }
+
     class EngineContext {
     public:
-        std::vector<Viewport*> active_viewports;
-        Viewport* active_viewport;
+        //
+        // Render data
+        //
+        std::vector<Rendering::Viewport*> active_viewports;
+        Rendering::Viewport* active_viewport;
+
+        Rendering::Lighting* lighting;
+        Rendering::Renderer* renderer;
 
         Timing* timing;
-        Renderer* renderer;
-        Lighting* lighting;
 
         Console::Console* console;
         Input::InputServer* input;

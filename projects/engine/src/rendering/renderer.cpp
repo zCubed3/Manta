@@ -4,17 +4,20 @@
 
 #include <stdexcept>
 
+#include <assets/texture.hpp>
+
 #include <world/world.hpp>
 #include <world/actor.hpp>
 
 #include "viewport.hpp"
+#include "render_target.hpp"
 
 #include <backends/imgui_impl_sdl.h>
 #include <backends/imgui_impl_opengl3.h>
 
 #include "lighting.hpp"
 
-namespace Manta {
+namespace Manta::Rendering {
     void Renderer::Initialize() {
         sdl_context = nullptr;
         sdl_window = SDL_CreateWindow(
@@ -82,6 +85,21 @@ namespace Manta {
         glScissor(0, 0, width, height);
         glClearColor(0, 0, 0, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    void Renderer::SetRenderTarget(RenderTarget *target) {
+        if (target == nullptr) {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            return;
+        }
+
+        glBindFramebuffer(GL_FRAMEBUFFER, target->fbo);
+
+        if (target->color_buffer)
+            glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target->color_buffer->handle, 0);
+
+        if (target->depth_buffer)
+            glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target->depth_buffer->handle, 0);
     }
 
     void Renderer::Present() {

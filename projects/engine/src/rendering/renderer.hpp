@@ -5,9 +5,13 @@
 
 namespace Manta {
     class World;
-    class Viewport;
     class EngineContext;
+}
+
+namespace Manta::Rendering {
+    class Viewport;
     class Lighting;
+    class RenderTarget;
 
     class Renderer {
     public:
@@ -23,6 +27,9 @@ namespace Manta {
 
         void BeginImGui();
         void EndImGui();
+
+        // Pass nullptr to draw to the default framebuffer!
+        void SetRenderTarget(RenderTarget* target);
 
         void Present();
 

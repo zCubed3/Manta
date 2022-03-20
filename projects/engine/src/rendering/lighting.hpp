@@ -8,7 +8,9 @@
 
 namespace Manta {
     class LightBehavior;
+}
 
+namespace Manta::Rendering {
     struct LightData {
         glm::vec4 color_w_intensity;
         glm::vec4 position_w_type;

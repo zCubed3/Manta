@@ -1,5 +1,5 @@
-#ifndef MANTA_INPUTSERVER_HPP
-#define MANTA_INPUTSERVER_HPP
+#ifndef MANTA_INPUT_SERVER_HPP
+#define MANTA_INPUT_SERVER_HPP
 
 #include <string>
 #include <vector>

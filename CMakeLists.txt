@@ -31,6 +31,6 @@ set(GAME_DIR ${PROJECTS_DIR}/game)
 set(DEPENDS_DIR "${CMAKE_SOURCE_DIR}/dependencies")
 
 # Projects
-add_subdirectory(${PACKER_DIR})
 add_subdirectory(${GAME_DIR})
 add_subdirectory(${ENGINE_DIR})
+add_subdirectory(${PACKER_DIR})

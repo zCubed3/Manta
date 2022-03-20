@@ -11,6 +11,8 @@ namespace Manta {
         ImGuiContext(SDL_Window* window, SDL_GLContext context);
 
         void Process(SDL_Event* event);
+
+        ImGuiStyle *style;
     };
 }
 

@@ -24,7 +24,7 @@ set(SOURCES
         "${ENGINE_DIR}/src/data/engine_context.cpp"
 
         "${ENGINE_DIR}/src/input/axis.cpp"
-        "${ENGINE_DIR}/src/input/inputserver.cpp"
+        "${ENGINE_DIR}/src/input/input_server.cpp"
 
         "src/behaviors/freecam.cpp"
 

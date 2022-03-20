@@ -25,14 +25,16 @@ set(SOURCES
         "src/math/fmath.cpp"
 
         "src/assets/mesh.cpp"
+        "src/assets/texture.cpp"
         "src/assets/shader.cpp"
 
         "src/rendering/renderer.cpp"
         "src/rendering/viewport.cpp"
+        "src/rendering/render_target.cpp"
         "src/rendering/lighting.cpp"
 
         "src/input/axis.cpp"
-        "src/input/inputserver.cpp"
+        "src/input/input_server.cpp"
 
         "src/data/console/console.cpp"
         "src/data/console/celem.cpp"

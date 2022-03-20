@@ -11,11 +11,13 @@ namespace Manta {
         ImGui_ImplSDL2_InitForOpenGL(window, context);
         ImGui_ImplOpenGL3_Init("#version 150");
 
-        ImGuiStyle &style = ImGui::GetStyle();
-        ImGui::StyleColorsDark(&style);
+        style = &ImGui::GetStyle();
+        ImGui::StyleColorsDark(style);
 
         ImGuiIO &imguiIO = ImGui::GetIO();
         imguiIO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+        imguiIO.Fonts->AddFontFromFileTTF("content/engine/fonts/Roboto-Regular.ttf", 14);
     }
 
     void ImGuiContext::Process(SDL_Event *event) {

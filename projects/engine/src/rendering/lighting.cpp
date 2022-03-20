@@ -12,7 +12,7 @@
 // https://github.com/KevinComerford/zero_lab_renderer/
 
 // TODO: Don't rely entirely on OpenGL?
-namespace Manta {
+namespace Manta::Rendering {
     void Lighting::CreateBuffer() {
         glGenBuffers(1, &handle);
 

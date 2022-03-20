@@ -6,7 +6,7 @@
 #include <data/engine_context.hpp>
 
 #include <input/axis.hpp>
-#include <input/inputserver.hpp>
+#include <input/input_server.hpp>
 
 #include <iostream>
 

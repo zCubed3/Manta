@@ -1,6 +1,6 @@
 #include "axis.hpp"
 
-#include "inputserver.hpp"
+#include "input_server.hpp"
 
 namespace Manta::Input {
     // Does nothing by default but can be extended by derivatives!

@@ -1,17 +1,64 @@
 set(SOURCES
-    "${COMMON_DIR}/data/meshes/obj.cpp"
-    "${COMMON_DIR}/data/meshes/mbsm.cpp"
-    "${COMMON_DIR}/data/meshes/mmdl.cpp"
+        "${DEPENDS_DIR}/imgui/imgui.cpp"
+        "${DEPENDS_DIR}/imgui/imgui_draw.cpp"
+        "${DEPENDS_DIR}/imgui/imgui_demo.cpp"
+        "${DEPENDS_DIR}/imgui/imgui_tables.cpp"
+        "${DEPENDS_DIR}/imgui/imgui_widgets.cpp"
+        "${DEPENDS_DIR}/imgui/backends/imgui_impl_sdl.cpp"
+        "${DEPENDS_DIR}/imgui/backends/imgui_impl_opengl3.cpp"
 
-    "${DEPENDS_DIR}/MikkTSpace/mikktspace.c"
+        "${DEPENDS_DIR}/MikkTSpace/mikktspace.c"
 
-    "src/main.cpp"
+        "${COMMON_DIR}/data/meshes/obj.cpp"
+        "${COMMON_DIR}/data/meshes/mbsm.cpp"
+        "${COMMON_DIR}/data/meshes/mmdl.cpp"
+
+        "${ENGINE_DIR}/src/world/timing.cpp"
+        "${ENGINE_DIR}/src/world/world.cpp"
+        "${ENGINE_DIR}/src/world/actor.cpp"
+        "${ENGINE_DIR}/src/world/behavior.cpp"
+        "${ENGINE_DIR}/src/world/transform.cpp"
+
+        "${ENGINE_DIR}/src/world/behaviors/camera.cpp"
+        "${ENGINE_DIR}/src/world/behaviors/light.cpp"
+
+        "${ENGINE_DIR}/src/rendering/renderer.cpp"
+        "${ENGINE_DIR}/src/rendering/viewport.cpp"
+        "${ENGINE_DIR}/src/rendering/lighting.cpp"
+
+        "${ENGINE_DIR}/src/assets/shader.cpp"
+        "${ENGINE_DIR}/src/assets/mesh.cpp"
+
+        "${ENGINE_DIR}/src/ui/imguicontext.cpp"
+
+        "${ENGINE_DIR}/src/data/console/console.cpp"
+
+        "${ENGINE_DIR}/src/data/engine_context.cpp"
+
+        "${ENGINE_DIR}/src/input/axis.cpp"
+        "${ENGINE_DIR}/src/input/input_server.cpp"
+
+        "src/main.cpp"
 )
 
 set(INCLUDE_DIRS
-    "${DEPENDS_DIR}/MikkTSpace"
-    "${COMMON_DIR}"
+        "${ENGINE_DIR}/src"
+        "${DEPENDS_DIR}/glm"
+        "${DEPENDS_DIR}/imgui"
+        "${DEPENDS_DIR}/MikkTSpace"
+        "${COMMON_DIR}"
 )
+
+if (DEFINED WIN32)
+    set(LINK_DIRS "${DEPENDS_DIR}/openvr/lib/win64" "${DEPENDS_DIR}/vulkan/lib" "${DEPENDS_DIR}/SDL2/lib/x64" "${DEPENDS_DIR}/glew/lib/Release/x64" "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
+    set(LIBRARIES "SDL2" "SDL2main" "glew32" "opengl32")
+
+    set(INCLUDE_DIRS ${INCLUDE_DIRS} "${DEPENDS_DIR}/vulkan/include" "${DEPENDS_DIR}/SDL2/include" "${DEPENDS_DIR}/glew/include")
+else ()
+    set(LINK_DIRS "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
+    set(LIBRARIES "SDL2" "SDL2main" "GL" "GLEW")
+    set(INCLUDE_DIRS ${INCLUDE_DIRS})
+endif ()
 
 add_executable(MantaPacker ${GLOB_SOURCES} ${SOURCES})
 target_include_directories(MantaPacker PUBLIC ${INCLUDE_DIRS})

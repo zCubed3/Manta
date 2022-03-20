@@ -32,7 +32,7 @@ namespace Manta {
         viewport.z_near = z_near;
         viewport.z_far = z_far;
 
-        viewport.UpdateMatrices();
+        viewport.Update();
 
         return true;
     }

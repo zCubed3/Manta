@@ -1,152 +1,140 @@
-#include <data/meshes/obj.hpp>
-#include <data/meshes/mbsm.hpp>
-#include <data/meshes/mmdl.hpp>
-
-using namespace Manta::Data::Meshes;
-
 #include <iostream>
-#include <fstream>
 
-#include <math.h>
+#include <data/engine_context.hpp>
 
-#include <mikktspace.h>
+#include <world/timing.hpp>
+#include <world/world.hpp>
+#include <world/actor.hpp>
 
-#define GET_IDX() ((iFace * 3) + iVert)
+#include <world/behaviors/camera.hpp>
 
-static std::vector<WavefrontOBJ::OBJVector3> tangents;
-static std::vector<float> tangents_w;
+#include <rendering/viewport.hpp>
+#include <rendering/renderer.hpp>
+#include <rendering/lighting.hpp>
 
-int get_num_faces(const SMikkTSpaceContext* context) {
-    WavefrontOBJ* mesh = (WavefrontOBJ*)context->m_pUserData;
+#include <data/console/console.hpp>
 
-    auto len = mesh->unweld_indices.size() / 3;
-    return len;
-}
+#include <ui/imguicontext.hpp>
 
-int get_num_vertices_of_face(const SMikkTSpaceContext* context, const int iFace) {
-    return 3;
-}
+#include <input/input_server.hpp>
 
-void get_position(const SMikkTSpaceContext *context, float *outdata, const int iFace, const int iVert) {
-    WavefrontOBJ* mesh = (WavefrontOBJ*)context->m_pUserData;
+#include <GL/glew.h>
 
-    size_t idx = GET_IDX();
-
-    auto position = mesh->unweld_positions[mesh->unweld_indices[idx].v];
-    outdata[0] = position.x;
-    outdata[1] = position.y;
-    outdata[2] = position.z;
-}
-
-void get_normal(const SMikkTSpaceContext *context, float *outdata, const int iFace, const int iVert) {
-    WavefrontOBJ* mesh = (WavefrontOBJ*)context->m_pUserData;
-
-    size_t idx = GET_IDX();
-
-    auto normal = mesh->unweld_normals[mesh->unweld_indices[idx].n];
-    outdata[0] = normal.x;
-    outdata[1] = normal.y;
-    outdata[2] = normal.z;
-}
-
-void get_uv(const SMikkTSpaceContext *context, float *outdata, const int iFace, const int iVert) {
-    WavefrontOBJ* mesh = (WavefrontOBJ*)context->m_pUserData;
-
-    size_t idx = GET_IDX();
-
-    auto uv = mesh->unweld_uvs[mesh->unweld_indices[idx].u];
-    outdata[0] = uv.x;
-    outdata[1] = uv.y;
-}
-
-void set_tspace(const SMikkTSpaceContext *context, const float *tangent, const float fSign, const int iFace, const int iVert) {
-    WavefrontOBJ* mesh = (WavefrontOBJ*)context->m_pUserData;
-
-    size_t idx = GET_IDX();
-
-    WavefrontOBJ::OBJVector4 v4 = {tangent[0], tangent[1], tangent[2], fSign};
-    mesh->unweld_tangents[mesh->unweld_indices[idx].v] = v4;
-}
+using namespace Manta;
 
 int main(int argc, char** argv) {
-    // TODO: Make do more than this
-    if (argc < 3)
-        throw std::runtime_error("Please provide 2 arguments!");
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS);
 
-    auto file = std::ifstream(argv[1]);
-    auto obj = WavefrontOBJ::LoadFromStream(file, false);
+    SDL_Event sdl_event;
+    bool keep_running = true;
 
-    obj->unweld_tangents.resize(obj->unweld_positions.size());
+    // TODO: Renderer modularity?
+    auto renderer = new Rendering::Renderer();
+    renderer->Initialize();
 
-    SMikkTSpaceContext context {};
-    SMikkTSpaceInterface interface {};
+    auto imgui = new Manta::ImGuiContext(renderer->sdl_window, renderer->sdl_context);
 
-    interface.m_getNumFaces = get_num_faces;
-    interface.m_getNumVerticesOfFace = get_num_vertices_of_face;
-    interface.m_getPosition = get_position;
-    interface.m_getNormal = get_normal;
-    interface.m_getTexCoord = get_uv;
-    interface.m_setTSpaceBasic = set_tspace;
+    auto input = new Input::InputServer();
 
-    context.m_pInterface = &interface;
-    context.m_pUserData = obj;
+    auto engine = new EngineContext();
 
-    genTangSpaceDefault(&context);
+    engine->renderer = renderer;
+    engine->timing = new Timing();
+    engine->console = new Console::Console();
+    engine->imgui = imgui;
+    engine->input = input;
+    engine->lighting = new Rendering::Lighting();
 
-    obj->WeldVertices();
+    // The empty world is used for the blank scene!
+    auto empty_world = new World();
 
-    auto bsm = new MantaBSM();
-    auto mmdl = new MantaMDL();
+    // By default we have one giant scene camera pointed at 0, 0, 0
+    auto scene_camera_actor = new Actor("scene_camera");
+    auto scene_camera = scene_camera_actor->AddBehavior<CameraBehavior>();
 
-    mmdl->PushChannel(MantaMDL::ChannelType::VEC3, MantaMDL::ChannelHint::VERTEX);
-    mmdl->PushChannel(MantaMDL::ChannelType::VEC3, MantaMDL::ChannelHint::NORMAL);
-    mmdl->PushChannel(MantaMDL::ChannelType::VEC2, MantaMDL::ChannelHint::UV0);
-    mmdl->PushChannel(MantaMDL::ChannelType::VEC4, MantaMDL::ChannelHint::TANGENT);
-    mmdl->PushChannel(MantaMDL::ChannelType::UINT, MantaMDL::ChannelHint::INDEXER);
+    empty_world->AddActor(scene_camera_actor);
 
-    mmdl->name = obj->name;
+    //
+    // ImGui styling
+    //
+    imgui->style->WindowMenuButtonPosition = ImGuiDir_None;
 
-    for (auto vert : obj->weld_vertices) {
-        mmdl->PushData<MantaMDL::Vec3>(0, { vert.position[0], vert.position[1], vert.position[2] });
-        mmdl->PushData<MantaMDL::Vec3>(1, { vert.normal[0], vert.normal[1], vert.normal[2] });
-        mmdl->PushData<MantaMDL::Vec2>(2, { vert.uv[0], vert.uv[1] });
-        mmdl->PushData<MantaMDL::Vec4>(3, { vert.tangent[0], vert.tangent[1], vert.tangent[2], vert.tangent[3] });
+    bool first_run = true;
+    while (keep_running) {
+        // Event polling
+        bool resized = false;
+
+        while (SDL_PollEvent(&sdl_event) != 0) {
+            if (sdl_event.type == SDL_QUIT)
+                keep_running = false;
+
+            if (sdl_event.type == SDL_WINDOWEVENT) {
+                if (sdl_event.window.event == SDL_WINDOWEVENT_RESIZED)
+                    resized = true;
+            }
+
+            input->ProcessEvent(&sdl_event);
+            imgui->Process(&sdl_event);
+        }
+
+        if (first_run) {
+            resized = true;
+            first_run = false;
+        }
+
+        renderer->Update();
+        engine->timing->UpdateTime();
+
+        input->UpdateBinds();
+
+        // Empty world update
+        scene_camera->width = renderer->width;
+        scene_camera->height = renderer->height;
+
+        empty_world->Update(engine);
+
+        for (auto target_viewport : engine->active_viewports) {
+            engine->active_viewport = target_viewport;
+
+            if (!target_viewport)
+                continue;
+
+            glViewport(target_viewport->x, target_viewport->y,target_viewport->width, target_viewport->height);
+            glScissor(target_viewport->x, target_viewport->y,target_viewport->width, target_viewport->height);
+
+            glClearColor(target_viewport->clear_color.x, target_viewport->clear_color.y, target_viewport->clear_color.z, 1.0f);
+
+            int clear = 0;
+
+            if (target_viewport->clear)
+                clear |= GL_COLOR_BUFFER_BIT;
+
+            if (target_viewport->clear_depth)
+                clear |= GL_DEPTH_BUFFER_BIT;
+
+            glClear(clear);
+
+            //mesh->DrawNow(test->transform.local_to_world, test->transform.world_to_local_t, shader);
+        }
+
+        //
+        // Packer UI
+        //
+        glViewport(0, 0, renderer->width, renderer->height);
+        glScissor(0, 0,renderer->width, renderer->height);
+
+        renderer->BeginImGui();
+
+        ImGui::SetNextWindowPos(ImVec2(0, 0));
+        ImGui::SetNextWindowSize(ImVec2(renderer->width, renderer->height));
+
+        ImGui::Begin("Packer Operations");
+
+        ImGui::End();
+
+        renderer->EndImGui();
+
+
+        renderer->Present();
     }
-
-    for (auto idx : obj->weld_indices) {
-        mmdl->PushData<uint32_t>(4, idx);
-    }
-
-    mmdl->WriteToFile("test.mmdl");
-
-    for (auto idx : obj->weld_indices)
-        bsm->indices.emplace_back(idx);
-
-    for (auto vert : obj->weld_vertices) {
-        MantaBSM::BSMVertex bsm_vert {};
-
-        for (int p = 0; p < 3; p++)
-            bsm_vert.position[p] = vert.position[p];
-
-        for (int u = 0; u < 2; u++)
-            bsm_vert.uv[u] = vert.uv[u];
-
-        float yaw = atan2f(vert.normal[0], vert.normal[2]);
-        float pitch = asinf(vert.normal[1]);
-
-        bsm_vert.normal[0] = yaw;
-        bsm_vert.normal[1] = pitch;
-
-        yaw = atan2f(vert.tangent[0], vert.tangent[2]);
-        pitch = asinf(vert.tangent[1]);
-
-        bsm_vert.tangent[0] = yaw;
-        bsm_vert.tangent[1] = pitch;
-        bsm_vert.tangent[2] = vert.tangent[3];
-
-        bsm->vertices.emplace_back(bsm_vert);
-    }
-
-    bsm->name = obj->name;
-    bsm->WriteToFile(argv[2]);
 }
