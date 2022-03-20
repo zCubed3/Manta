@@ -66,7 +66,7 @@ namespace Manta {
             shader->SetMat4x4("MANTA_M_I", transform_i);
             shader->SetMat4x4("MANTA_M_IT", glm::transpose(transform_i));
 
-            shader->SetVec3("MANTA_CAM_POS", engine->active_viewport->position);
+            shader->SetVec3("MANTA_CAM_POS", engine->active_viewport->viewing_pos);
         }
 
         shader->SetFloat("MANTA_TIME", engine->timing->time);

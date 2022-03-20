@@ -43,6 +43,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 using namespace Manta;
+using namespace Manta::Rendering;
 using namespace Manta::Data::Meshes;
 
 typedef GameModule*(*module_init_fptr)();
@@ -150,9 +151,9 @@ int main(int argc, char** argv) {
         viewport_transform->euler = glm::vec3(engine->timing->sin_time.y * 20, 180 + engine->timing->cos_time.y * 20, 0);
         viewport_transform->UpdateMatrices();
 
-        viewport->position = viewport_transform->position;
+        viewport->viewing_pos = viewport_transform->position;
         viewport->view = viewport_transform->view;
-        viewport->Update();
+        viewport->UpdateViewport();
 
         for (auto target_viewport : engine->active_viewports) {
             engine->active_viewport = target_viewport;
@@ -164,9 +165,7 @@ int main(int argc, char** argv) {
                 renderer->SetRenderTarget(target_viewport->render_target);
             }
 
-            glViewport(target_viewport->x, target_viewport->y,target_viewport->width, target_viewport->height);
-            glScissor(target_viewport->x, target_viewport->y,target_viewport->width, target_viewport->height);
-
+            renderer->SetViewportRect(target_viewport->rect, Renderer::ViewportSetFlags::SetViewport | Renderer::ViewportSetFlags::SetScissor);
             glClearColor(target_viewport->clear_color.x, target_viewport->clear_color.y, target_viewport->clear_color.z, 1.0f);
 
             int clear = 0;

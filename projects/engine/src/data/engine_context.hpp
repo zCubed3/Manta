@@ -29,6 +29,7 @@ namespace Manta {
         //
         // Render data
         //
+        std::vector<Rendering::Viewport*> active_viewports;
         Rendering::Viewport* active_viewport;
         Rendering::Lighting* lighting;
         Rendering::Renderer* renderer;

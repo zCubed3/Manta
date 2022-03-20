@@ -14,8 +14,6 @@ namespace Manta {
 
     class World final {
     public:
-        std::vector<Rendering::Viewport*> viewports;
-
         void AddActor(Actor* actor);
         Actor* FindActor(const std::string& path);
 

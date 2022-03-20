@@ -127,48 +127,43 @@ int main(int argc, char** argv) {
         input->UpdateBinds();
 
         // Empty world update
-        scene_camera->width = renderer->width;
-        scene_camera->height = renderer->height;
+        scene_camera->rect.width = renderer->width;
+        scene_camera->rect.height = renderer->height;
 
         empty_world->Update(engine);
 
         for (auto world : mesh_view_worlds)
             world->Update(engine);
 
-        for (auto world : engine->worlds) {
-            for (auto target_viewport : world->viewports) {
-                engine->active_viewport = target_viewport;
+        //
+        // Draw the empty scene
+        //
+        engine->active_viewport = scene_camera;
+        renderer->SetViewportRect(scene_camera->rect);
 
-                if (!target_viewport)
-                    continue;
+        glClearColor(scene_camera->clear_color.x, scene_camera->clear_color.y,
+                     scene_camera->clear_color.z, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-                if (target_viewport->render_target) {
-                    renderer->SetRenderTarget(target_viewport->render_target);
-                }
+        renderer->DrawWorld(empty_world, engine);
 
-                glViewport(target_viewport->x, target_viewport->y, target_viewport->width, target_viewport->height);
-                glScissor(target_viewport->x, target_viewport->y, target_viewport->width, target_viewport->height);
+        //
+        // Draw the mesh viewer world
+        //
+        engine->active_viewport = mesh_proto_camera;
+        renderer->SetViewportRect(mesh_proto_camera->rect);
 
-                glClearColor(target_viewport->clear_color.x, target_viewport->clear_color.y,
-                             target_viewport->clear_color.z, 1.0f);
+        renderer->SetRenderTarget(mesh_proto_camera->render_target);
 
-                int clear = 0;
+        glClearColor(mesh_proto_camera->clear_color.x, mesh_proto_camera->clear_color.y,
+                     mesh_proto_camera->clear_color.z, 1.0f);
 
-                if (target_viewport->clear)
-                    clear |= GL_COLOR_BUFFER_BIT;
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-                if (target_viewport->clear_depth)
-                    clear |= GL_DEPTH_BUFFER_BIT;
+        renderer->DrawWorld(mesh_proto_world, engine);
 
-                glClear(clear);
+        renderer->SetRenderTarget(nullptr);
 
-                renderer->DrawWorld(world, engine);
-
-                if (target_viewport->render_target) {
-                    renderer->SetRenderTarget(nullptr);
-                }
-            }
-        }
 
         //
         // Packer UI
@@ -203,7 +198,7 @@ int main(int argc, char** argv) {
             if (ImGui::IsMouseDown(ImGuiMouseButton_Right))
                 was_dragging_right = true;
 
-            mesh_proto_camera->fov += input->mouse_scroll_y * 1.0f;
+            mesh_proto_camera->fov -= input->mouse_scroll_y * 1.0f;
 
             ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
         }
@@ -237,7 +232,9 @@ int main(int argc, char** argv) {
         }
 
         ImGui::SetCursorPos(cursor);
-        ImGui::Image((void *) (intptr_t) mesh_proto_camera->render_target->color_buffer->handle, ImVec2(mesh_proto_camera->width, mesh_proto_camera->height), ImVec2(0, 1), ImVec2(1, 0));
+
+        auto image_size = ImVec2(mesh_proto_camera->rect.width, mesh_proto_camera->rect.height);
+        ImGui::Image((void *) (intptr_t) mesh_proto_camera->render_target->color_buffer->handle, image_size, ImVec2(0, 1), ImVec2(1, 0));
 
         ImGui::End();
 

@@ -48,10 +48,10 @@ namespace Manta::Rendering {
         }
 
         glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
+        SetDepthTest(DepthTestFunc::Less);
 
         glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
+        SetCullMode(CullMode::Back);
 
         glEnable(GL_SCISSOR_TEST);
     }
@@ -90,6 +90,14 @@ namespace Manta::Rendering {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
+    void Renderer::SetViewportRect(ViewportRect rect, uint32_t options) {
+        if (options & ViewportSetFlags::SetViewport)
+            glViewport(rect.x, rect.y, rect.width, rect.height);
+
+        if (options & ViewportSetFlags::SetScissor)
+            glScissor(rect.x, rect.y, rect.width, rect.height);
+    }
+
     void Renderer::SetRenderTarget(RenderTarget *target) {
         if (target == nullptr) {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -110,6 +118,8 @@ namespace Manta::Rendering {
     }
 
     void Renderer::SetCullMode(Renderer::CullMode mode) {
+        culling_mode = mode;
+
         switch (mode) {
             default:
                 glCullFace(GL_NONE);
@@ -126,6 +136,8 @@ namespace Manta::Rendering {
     }
 
     void Renderer::SetDepthTest(DepthTestFunc func) {
+        depth_testing = func;
+
         switch (func) {
             default:
                 glDepthFunc(GL_ALWAYS);

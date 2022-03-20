@@ -3,13 +3,14 @@
 
 #include <SDL2/SDL.h>
 
+#include "viewport.hpp"
+
 namespace Manta {
     class World;
     class EngineContext;
 }
 
 namespace Manta::Rendering {
-    class Viewport;
     class Lighting;
     class RenderTarget;
 
@@ -28,6 +29,16 @@ namespace Manta::Rendering {
         void BeginImGui();
         void EndImGui();
 
+        //
+        // Higher level draw calls
+        //
+        enum ViewportSetFlags : uint32_t {
+            SetViewport = 1,
+            SetScissor = 2
+        };
+
+        void SetViewportRect(ViewportRect rect, uint32_t options = ViewportSetFlags::SetViewport);
+
         // Pass nullptr to draw to the default framebuffer!
         void SetRenderTarget(RenderTarget* target);
 
@@ -36,12 +47,14 @@ namespace Manta::Rendering {
             Off, Back, Front
         };
 
+        CullMode culling_mode = CullMode::Off;
         void SetCullMode(CullMode mode);
 
         enum class DepthTestFunc {
             Off, Less, Greater
         };
 
+        DepthTestFunc depth_testing = DepthTestFunc::Off;
         void SetDepthTest(DepthTestFunc func);
 
         void Present();

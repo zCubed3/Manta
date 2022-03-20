@@ -11,14 +11,14 @@
 
 namespace Manta {
     void CameraBehavior::OnDisable(World *world, Actor *owner, EngineContext* engine) {
-        auto iter = std::find(world->viewports.begin(), world->viewports.end(), &viewport);
+        auto iter = std::find(engine->active_viewports.begin(), engine->active_viewports.end(), this);
 
-        if (iter != world->viewports.end())
-            world->viewports.erase(iter);
+        if (iter != engine->active_viewports.end())
+            engine->active_viewports.erase(iter);
     }
 
     void CameraBehavior::OnEnable(World *world, Actor *owner, EngineContext* engine) {
-        world->viewports.emplace_back(&viewport);
+        engine->active_viewports.emplace_back(this);
     }
 
     bool CameraBehavior::Update(World *world, Actor *owner, EngineContext *engine) {
@@ -26,22 +26,16 @@ namespace Manta {
             return false;
 
         if (render_target) {
-            width = render_target->width;
-            height = render_target->height;
+            rect.width = render_target->width;
+            rect.height = render_target->height;
         }
 
         owner->transform.gen_view = true;
 
-        viewport.view = owner->transform.view;
-        viewport.position = owner->transform.position;
-        viewport.width = width;
-        viewport.height = height;
-        viewport.fov = fov;
-        viewport.z_near = z_near;
-        viewport.z_far = z_far;
-        viewport.render_target = render_target;
+        view = owner->transform.view;
+        viewing_pos = owner->transform.position;
 
-        viewport.Update();
+        UpdateViewport();
 
         return true;
     }

@@ -76,8 +76,8 @@ namespace Manta::Game {
 
     void GameGameModule::Update(EngineContext* engine) {
         camera->fov = 60;
-        camera->width = engine->renderer->width;
-        camera->height = engine->renderer->height;
+        camera->rect.width = engine->renderer->width;
+        camera->rect.height = engine->renderer->height;
 
         auto spin = glm::vec3(0, engine->timing->delta_time, 0) * 20.0f;
         //test_actor->transform.euler += spin;
