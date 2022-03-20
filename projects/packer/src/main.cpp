@@ -2,12 +2,17 @@
 
 #include <data/engine_context.hpp>
 
+#include <assets/texture.hpp>
+#include <assets/mesh.hpp>
+#include <assets/shader.hpp>
+
 #include <world/timing.hpp>
 #include <world/world.hpp>
 #include <world/actor.hpp>
 
 #include <world/behaviors/camera.hpp>
 
+#include <rendering/render_target.hpp>
 #include <rendering/viewport.hpp>
 #include <rendering/renderer.hpp>
 #include <rendering/lighting.hpp>
@@ -19,6 +24,8 @@
 #include <input/input_server.hpp>
 
 #include <GL/glew.h>
+
+#include <glm/gtc/quaternion.hpp>
 
 using namespace Manta;
 
@@ -44,6 +51,9 @@ int main(int argc, char** argv) {
     engine->imgui = imgui;
     engine->input = input;
     engine->lighting = new Rendering::Lighting();
+    engine->lighting->CreateBuffer();
+
+    Shader::CreateEngineShaders(engine);
 
     // The empty world is used for the blank scene!
     auto empty_world = new World();
@@ -54,10 +64,39 @@ int main(int argc, char** argv) {
 
     empty_world->AddActor(scene_camera_actor);
 
-    //
-    // ImGui styling
-    //
-    imgui->style->WindowMenuButtonPosition = ImGuiDir_None;
+    engine->worlds.emplace_back(empty_world);
+
+    // TODO: Replace me with an actual mesh viewer!
+    Mesh* mmdl_proto = Mesh::LoadFromFile("test.mmdl");
+
+    std::vector<World*> mesh_view_worlds;
+
+    auto mesh_proto_world = new World();
+
+    auto mesh_proto_actor = new Actor("dummy_actor");
+    mesh_proto_actor->meshes.emplace_back(mmdl_proto);
+    mesh_proto_world->AddActor(mesh_proto_actor);
+
+    auto mesh_proto_actor2 = new Actor("dummy_actor2");
+    mesh_proto_actor2->meshes.emplace_back(mmdl_proto);
+    mesh_proto_world->AddActor(mesh_proto_actor2);
+
+    auto mesh_proto_camera_actor = new Actor("viewer_camera");
+    mesh_proto_camera_actor->transform.position = glm::vec3(0, 0, 1);
+    mesh_proto_camera_actor->transform.euler = glm::vec3(0, 180, 0);
+
+    auto mesh_proto_camera = mesh_proto_camera_actor->AddBehavior<CameraBehavior>();
+    mesh_proto_world->AddActor(mesh_proto_camera_actor);
+
+    auto rt = new Rendering::RenderTarget(256, 256, Rendering::RenderTarget::DepthPrecision::High);
+    rt->Create();
+    mesh_proto_camera->render_target = rt;
+
+    engine->worlds.emplace_back(mesh_proto_world);
+
+    mesh_view_worlds.emplace_back(mesh_proto_world);
+    bool was_dragging_left = false, was_dragging_right = false;
+    glm::vec3 drag_offset = glm::vec3(0, 0, 0), globe_pos = glm::vec3(0, 0, 1);
 
     bool first_run = true;
     while (keep_running) {
@@ -93,28 +132,42 @@ int main(int argc, char** argv) {
 
         empty_world->Update(engine);
 
-        for (auto target_viewport : engine->active_viewports) {
-            engine->active_viewport = target_viewport;
+        for (auto world : mesh_view_worlds)
+            world->Update(engine);
 
-            if (!target_viewport)
-                continue;
+        for (auto world : engine->worlds) {
+            for (auto target_viewport : world->viewports) {
+                engine->active_viewport = target_viewport;
 
-            glViewport(target_viewport->x, target_viewport->y,target_viewport->width, target_viewport->height);
-            glScissor(target_viewport->x, target_viewport->y,target_viewport->width, target_viewport->height);
+                if (!target_viewport)
+                    continue;
 
-            glClearColor(target_viewport->clear_color.x, target_viewport->clear_color.y, target_viewport->clear_color.z, 1.0f);
+                if (target_viewport->render_target) {
+                    renderer->SetRenderTarget(target_viewport->render_target);
+                }
 
-            int clear = 0;
+                glViewport(target_viewport->x, target_viewport->y, target_viewport->width, target_viewport->height);
+                glScissor(target_viewport->x, target_viewport->y, target_viewport->width, target_viewport->height);
 
-            if (target_viewport->clear)
-                clear |= GL_COLOR_BUFFER_BIT;
+                glClearColor(target_viewport->clear_color.x, target_viewport->clear_color.y,
+                             target_viewport->clear_color.z, 1.0f);
 
-            if (target_viewport->clear_depth)
-                clear |= GL_DEPTH_BUFFER_BIT;
+                int clear = 0;
 
-            glClear(clear);
+                if (target_viewport->clear)
+                    clear |= GL_COLOR_BUFFER_BIT;
 
-            //mesh->DrawNow(test->transform.local_to_world, test->transform.world_to_local_t, shader);
+                if (target_viewport->clear_depth)
+                    clear |= GL_DEPTH_BUFFER_BIT;
+
+                glClear(clear);
+
+                renderer->DrawWorld(world, engine);
+
+                if (target_viewport->render_target) {
+                    renderer->SetRenderTarget(nullptr);
+                }
+            }
         }
 
         //
@@ -125,10 +178,66 @@ int main(int argc, char** argv) {
 
         renderer->BeginImGui();
 
-        ImGui::SetNextWindowPos(ImVec2(0, 0));
-        ImGui::SetNextWindowSize(ImVec2(renderer->width, renderer->height));
+        ImGui::ShowDemoWindow();
 
-        ImGui::Begin("Packer Operations");
+        ImGui::SetNextWindowPos(ImVec2(0, 0));
+        ImGui::SetNextWindowSize(ImVec2(renderer->width / 3, renderer->height));
+
+        ImGui::Begin("Content Folders", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+
+        ImGui::End();
+
+        // TODO: Make me into an actual mesh viewer!
+        ImGui::SetNextWindowSize(ImVec2(0, 0));
+
+        ImGui::Begin("Mesh Viewer Proto", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+
+        auto cursor = ImGui::GetCursorPos();
+        ImGui::InvisibleButton("mesh_viewer_box", ImVec2(256, 256));
+
+        if (ImGui::IsItemHovered())
+        {
+            if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+                was_dragging_left = true;
+
+            if (ImGui::IsMouseDown(ImGuiMouseButton_Right))
+                was_dragging_right = true;
+
+            mesh_proto_camera->fov += input->mouse_scroll_y * 1.0f;
+
+            ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+        }
+
+        if (was_dragging_left && !ImGui::IsMouseDown(ImGuiMouseButton_Left))
+            was_dragging_left = false;
+
+        if (was_dragging_right && !ImGui::IsMouseDown(ImGuiMouseButton_Right))
+            was_dragging_right = false;
+
+        if (was_dragging_left || was_dragging_right) {
+            glm::vec3 up = mesh_proto_camera_actor->transform.local_to_world * glm::vec4(0, 1, 0, 0);
+            glm::vec3 right = mesh_proto_camera_actor->transform.local_to_world * glm::vec4(1, 0, 0, 0);
+
+            if (was_dragging_left) {
+                globe_pos += up * input->mouse_delta_y * 0.01f;
+                globe_pos += right * input->mouse_delta_x * 0.01f;
+                globe_pos = glm::normalize(globe_pos);
+
+                auto look_quat = glm::quatLookAt(globe_pos, glm::vec3(0, 1, 0));
+                mesh_proto_camera_actor->transform.euler = glm::degrees(glm::eulerAngles(look_quat));
+            }
+
+            if (was_dragging_right) {
+                drag_offset += up * input->mouse_delta_y * 0.01f;
+                drag_offset += right * input->mouse_delta_x * 0.01f;
+            }
+
+            mesh_proto_actor2->transform.position = drag_offset;
+            mesh_proto_camera_actor->transform.position = drag_offset + globe_pos;
+        }
+
+        ImGui::SetCursorPos(cursor);
+        ImGui::Image((void *) (intptr_t) mesh_proto_camera->render_target->color_buffer->handle, ImVec2(mesh_proto_camera->width, mesh_proto_camera->height), ImVec2(0, 1), ImVec2(1, 0));
 
         ImGui::End();
 
@@ -136,6 +245,8 @@ int main(int argc, char** argv) {
 
 
         renderer->Present();
+
+        input->Reset();
     }
 
     return 0;

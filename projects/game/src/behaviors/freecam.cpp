@@ -11,8 +11,8 @@
 #include <iostream>
 
 namespace Manta::Game {
-    bool FreecamBehavior::Update(Actor *owner, EngineContext *engine) {
-        if (!Behavior::Update(owner, engine))
+    bool FreecamBehavior::Update(World* world, Actor *owner, EngineContext *engine) {
+        if (!Behavior::Update(world, owner, engine))
             return false;
 
         glm::vec3 forward = owner->transform.local_to_world * glm::vec4(0, 0, 1, 0);

@@ -8,6 +8,7 @@ namespace Manta {
     class Timing;
     class Shader;
     class ImGuiContext;
+    class World;
 
     namespace Console {
         class Console;
@@ -18,9 +19,9 @@ namespace Manta {
     }
 
     namespace Rendering {
-        class Viewport;
         class Lighting;
         class Renderer;
+        class Viewport;
     }
 
     class EngineContext {
@@ -28,9 +29,7 @@ namespace Manta {
         //
         // Render data
         //
-        std::vector<Rendering::Viewport*> active_viewports;
         Rendering::Viewport* active_viewport;
-
         Rendering::Lighting* lighting;
         Rendering::Renderer* renderer;
 
@@ -40,6 +39,8 @@ namespace Manta {
         Input::InputServer* input;
 
         ImGuiContext* imgui;
+
+        std::vector<World*> worlds;
 
         // TODO: Move stupid data like this elsewhere
         Shader* error_shader;

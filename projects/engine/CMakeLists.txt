@@ -27,6 +27,7 @@ set(SOURCES
         "src/assets/mesh.cpp"
         "src/assets/texture.cpp"
         "src/assets/shader.cpp"
+        "src/assets/material.cpp"
 
         "src/rendering/renderer.cpp"
         "src/rendering/viewport.cpp"

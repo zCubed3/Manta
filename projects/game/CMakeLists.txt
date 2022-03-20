@@ -22,10 +22,12 @@ set(SOURCES
 
         "${ENGINE_DIR}/src/rendering/renderer.cpp"
         "${ENGINE_DIR}/src/rendering/viewport.cpp"
+        "${ENGINE_DIR}/src/rendering/render_target.cpp"
         "${ENGINE_DIR}/src/rendering/lighting.cpp"
 
         "${ENGINE_DIR}/src/assets/shader.cpp"
         "${ENGINE_DIR}/src/assets/mesh.cpp"
+        "${ENGINE_DIR}/src/assets/texture.cpp"
 
         "${ENGINE_DIR}/src/data/console/console.cpp"
 

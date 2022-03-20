@@ -20,8 +20,8 @@ namespace Manta {
         LightType light_type = LightType::Sun;
         glm::vec3 color = glm::vec3(1, 1, 1);
 
-        void OnDisable(Actor *owner, EngineContext *engine) override;
-        void OnEnable(Actor *owner, EngineContext *engine) override;
+        void OnDisable(World *world, Actor *owner, EngineContext *engine) override;
+        void OnEnable(World *world, Actor *owner, EngineContext *engine) override;
 
         std::string get_TypeId() override;
     };

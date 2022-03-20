@@ -11,19 +11,19 @@ namespace Manta {
         this->name = name;
     }
 
-    void Actor::Update(EngineContext* engine) {
+    void Actor::Update(World* world, EngineContext* engine) {
         // TODO: Safety
         for (auto behavior : behaviors) {
             if (behavior->IsNew())
-                behavior->Start(this, engine);
+                behavior->Start(world, this, engine);
 
-            behavior->Update(this, engine);
+            behavior->Update(world, this, engine);
         }
 
         transform.UpdateMatrices();
     }
 
-    void Actor::Draw(EngineContext* engine) {
+    void Actor::Draw(World* world, EngineContext* engine) {
         int m = 0;
         for (const auto& mesh : meshes) {
             Shader* shader = engine->error_shader;

@@ -3,21 +3,21 @@
 #include "actor.hpp"
 
 namespace Manta {
-    void Behavior::Start(Actor *owner, EngineContext* engine) {
+    void Behavior::Start(World *world, Actor *owner, EngineContext* engine) {
         if (enabled)
-            OnEnable(owner, engine);
+            OnEnable(world, owner, engine);
         else
-            OnDisable(owner, engine);
+            OnDisable(world, owner, engine);
 
         is_new = false;
     }
 
-    bool Behavior::Update(Actor* owner, EngineContext* engine) {
+    bool Behavior::Update(World *world, Actor* owner, EngineContext* engine) {
         if (last_enabled != enabled) {
             if (enabled)
-                OnEnable(owner, engine);
+                OnEnable(world, owner, engine);
             else
-                OnDisable(owner, engine);
+                OnDisable(world, owner, engine);
         }
 
         this->owner = owner;
@@ -30,8 +30,8 @@ namespace Manta {
         return true;
     }
 
-    void Behavior::OnDisable(Actor *owner, EngineContext* engine) {}
-    void Behavior::OnEnable(Actor *owner, EngineContext* engine) {}
+    void Behavior::OnDisable(World *world, Actor *owner, EngineContext* engine) {}
+    void Behavior::OnEnable(World *world, Actor *owner, EngineContext* engine) {}
 
     bool Behavior::IsNew() {
         return is_new;

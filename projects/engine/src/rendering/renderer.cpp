@@ -29,10 +29,11 @@ namespace Manta::Rendering {
                 SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
         );
 
+        // TODO: Fix depth buffer issues on Windows!
+
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-        SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 32 );
 
         // TODO: MSAA config
         //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
@@ -67,7 +68,7 @@ namespace Manta::Rendering {
             if (actor == nullptr)
                 continue;
 
-            actor->Draw(engine);
+            actor->Draw(world, engine);
         }
     }
 
@@ -106,5 +107,37 @@ namespace Manta::Rendering {
 
     void Renderer::Present() {
         SDL_GL_SwapWindow(sdl_window);
+    }
+
+    void Renderer::SetCullMode(Renderer::CullMode mode) {
+        switch (mode) {
+            default:
+                glCullFace(GL_NONE);
+                break;
+
+            case CullMode::Front:
+                glCullFace(GL_FRONT);
+                break;
+
+            case CullMode::Back:
+                glCullFace(GL_BACK);
+                break;
+        }
+    }
+
+    void Renderer::SetDepthTest(DepthTestFunc func) {
+        switch (func) {
+            default:
+                glDepthFunc(GL_ALWAYS);
+                break;
+
+            case DepthTestFunc::Less:
+                glDepthFunc(GL_LESS);
+                break;
+
+            case DepthTestFunc::Greater:
+                glDepthFunc(GL_GREATER);
+                break;
+        }
     }
 }

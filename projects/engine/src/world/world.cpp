@@ -29,7 +29,7 @@ namespace Manta {
                 continue;
             }
 
-            actors[a]->Update(engine);
+            actors[a]->Update(this, engine);
         }
 
         size_t off = 0;

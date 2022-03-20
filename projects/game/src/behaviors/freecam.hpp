@@ -6,7 +6,7 @@
 namespace Manta::Game {
     class FreecamBehavior : public Behavior {
     public:
-        bool Update(Actor *owner, EngineContext *engine) override;
+        bool Update(World *world, Actor *owner, EngineContext *engine) override;
 
         std::string get_TypeId() override;
     };

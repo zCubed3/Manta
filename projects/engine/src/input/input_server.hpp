@@ -17,9 +17,11 @@ namespace Manta::Input {
         std::unordered_map<std::string, Axis*> bound_axes;
 
         float mouse_delta_x, mouse_delta_y;
+        float mouse_scroll_y;
 
         void ProcessEvent(SDL_Event* event);
         void UpdateBinds();
+        void Reset();
 
         void AddAxis(const std::string& name, Axis* axis);
     };

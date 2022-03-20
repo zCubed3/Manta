@@ -20,6 +20,10 @@ namespace Manta::Input {
 
             default:
                 break;
+
+            case SDL_MOUSEWHEEL:
+                mouse_scroll_y = event->wheel.y;
+                break;
         }
 
         for (auto& axis : bound_axes)
@@ -35,6 +39,10 @@ namespace Manta::Input {
 
         for (auto axis : bound_axes)
             axis.second->Update(this);
+    }
+
+    void InputServer::Reset() {
+        mouse_scroll_y = 0;
     }
 
     void InputServer::AddAxis(const std::string& name, Axis *axis) {

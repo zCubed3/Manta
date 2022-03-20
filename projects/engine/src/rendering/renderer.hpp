@@ -31,6 +31,19 @@ namespace Manta::Rendering {
         // Pass nullptr to draw to the default framebuffer!
         void SetRenderTarget(RenderTarget* target);
 
+        // Drawing properties
+        enum class CullMode {
+            Off, Back, Front
+        };
+
+        void SetCullMode(CullMode mode);
+
+        enum class DepthTestFunc {
+            Off, Less, Greater
+        };
+
+        void SetDepthTest(DepthTestFunc func);
+
         void Present();
 
         int width = 512, height = 512;

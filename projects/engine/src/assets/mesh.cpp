@@ -54,6 +54,9 @@ namespace Manta {
     }
 
     void Mesh::DrawNow(const glm::mat4& transform, const glm::mat4 &transform_i, Shader* shader, EngineContext* engine) {
+        if (shader == nullptr)
+            shader = engine->error_shader;
+
         uint32_t handle = shader->Use(engine);
 
         // TODO: Shader properties

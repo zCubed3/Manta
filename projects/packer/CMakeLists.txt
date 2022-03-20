@@ -24,10 +24,12 @@ set(SOURCES
 
         "${ENGINE_DIR}/src/rendering/renderer.cpp"
         "${ENGINE_DIR}/src/rendering/viewport.cpp"
+        "${ENGINE_DIR}/src/rendering/render_target.cpp"
         "${ENGINE_DIR}/src/rendering/lighting.cpp"
 
         "${ENGINE_DIR}/src/assets/shader.cpp"
         "${ENGINE_DIR}/src/assets/mesh.cpp"
+        "${ENGINE_DIR}/src/assets/texture.cpp"
 
         "${ENGINE_DIR}/src/ui/imguicontext.cpp"
 
@@ -38,8 +40,8 @@ set(SOURCES
         "${ENGINE_DIR}/src/input/axis.cpp"
         "${ENGINE_DIR}/src/input/input_server.cpp"
 
-        #"src/main.cpp"
-        "src/old_main.cpp"
+        "src/main.cpp"
+        #"src/old_main.cpp"
 )
 
 set(INCLUDE_DIRS

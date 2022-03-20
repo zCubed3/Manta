@@ -3,24 +3,32 @@
 #include <algorithm>
 
 #include <world/actor.hpp>
+#include <world/world.hpp>
+
+#include <rendering/render_target.hpp>
 
 #include <data/engine_context.hpp>
 
 namespace Manta {
-    void CameraBehavior::OnDisable(Actor *owner, EngineContext* engine) {
-        auto iter = std::find(engine->active_viewports.begin(), engine->active_viewports.end(), &viewport);
+    void CameraBehavior::OnDisable(World *world, Actor *owner, EngineContext* engine) {
+        auto iter = std::find(world->viewports.begin(), world->viewports.end(), &viewport);
 
-        if (iter != engine->active_viewports.end())
-            engine->active_viewports.erase(iter);
+        if (iter != world->viewports.end())
+            world->viewports.erase(iter);
     }
 
-    void CameraBehavior::OnEnable(Actor *owner, EngineContext* engine) {
-        engine->active_viewports.emplace_back(&viewport);
+    void CameraBehavior::OnEnable(World *world, Actor *owner, EngineContext* engine) {
+        world->viewports.emplace_back(&viewport);
     }
 
-    bool CameraBehavior::Update(Actor *owner, EngineContext *engine) {
-        if (!Behavior::Update(owner, engine))
+    bool CameraBehavior::Update(World *world, Actor *owner, EngineContext *engine) {
+        if (!Behavior::Update(world, owner, engine))
             return false;
+
+        if (render_target) {
+            width = render_target->width;
+            height = render_target->height;
+        }
 
         owner->transform.gen_view = true;
 
@@ -31,6 +39,7 @@ namespace Manta {
         viewport.fov = fov;
         viewport.z_near = z_near;
         viewport.z_far = z_far;
+        viewport.render_target = render_target;
 
         viewport.Update();
 

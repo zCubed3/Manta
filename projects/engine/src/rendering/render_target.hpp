@@ -10,7 +10,7 @@ namespace Manta {
 namespace Manta::Rendering {
     class RenderTarget {
     public:
-        enum DepthPrecision {
+        enum class DepthPrecision {
             None = 0, Low = 16, Medium = 24, High = 32
         };
 
