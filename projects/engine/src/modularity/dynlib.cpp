@@ -15,6 +15,10 @@ namespace Manta {
         lib->handle = dlopen(path.c_str(), RTLD_LAZY);
 #endif
 
+#ifdef WIN32
+        lib->module = LoadLibraryA(path.c_str());
+#endif
+
         return lib;
     }
 
@@ -30,11 +34,19 @@ namespace Manta {
 #ifdef __linux__
         return dlsym(handle, signature.c_str());
 #endif
+
+#ifdef WIN32
+        return GetProcAddress(module, signature.c_str());
+#endif
     }
 
     bool DynLib::IsValid() {
 #ifdef __linux__
         return handle != nullptr;
+#endif
+
+#ifdef WIN32
+        return module != nullptr;
 #endif
     }
 }

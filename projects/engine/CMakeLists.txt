@@ -65,7 +65,7 @@ if (DEFINED WIN32)
     set(LINK_DIRS "${DEPENDS_DIR}/openvr/lib/win64" "${DEPENDS_DIR}/vulkan/lib" "${DEPENDS_DIR}/SDL2/lib/x64" "${DEPENDS_DIR}/glew/lib/Release/x64" "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
     set(LIBRARIES "SDL2" "SDL2main" "glew32" "opengl32")
 
-    set(INCLUDE_DIRS ${INCLUDE_DIRS} "${DEPENDS_DIR}/vulkan/include" "${DEPENDS_DIR}/SDL2/include" "${DEPENDS_DIR}/glew/include")
+    set(INCLUDE_DIRS ${INCLUDE_DIRS} "${DEPENDS_DIR}/SDL2/include" "${DEPENDS_DIR}/glew/include")
 else ()
     set(LINK_DIRS "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
     set(LIBRARIES "SDL2" "SDL2main" "GL" "GLEW")

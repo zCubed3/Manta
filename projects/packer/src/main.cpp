@@ -137,4 +137,6 @@ int main(int argc, char** argv) {
 
         renderer->Present();
     }
+
+    return 0;
 }

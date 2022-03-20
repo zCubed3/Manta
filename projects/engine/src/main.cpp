@@ -58,7 +58,11 @@ int main(int argc, char** argv) {
     auto renderer = new Rendering::Renderer();
     renderer->Initialize();
 
+#ifdef WIN32
+    auto dlib_game = DynLib::Open("./game.dll");
+#else
     auto dlib_game = DynLib::Open("./lib/game.so");
+#endif
 
     auto module_init = dlib_game->GetFunction<module_init_fptr>("module_init");
     GameModule* game_module = module_init();
@@ -208,4 +212,6 @@ int main(int argc, char** argv) {
     // Clean up
     delete renderer;
     delete dlib_game;
+
+    return 0;
 }

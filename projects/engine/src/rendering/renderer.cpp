@@ -31,6 +31,8 @@ namespace Manta::Rendering {
 
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 32 );
 
         // TODO: MSAA config
         //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);

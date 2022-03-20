@@ -110,7 +110,7 @@ namespace Manta {
         return status;
     }
 
-    bool did_compile_program(uint program) {
+    bool did_compile_program(uint32_t program) {
         int status;
         glGetProgramiv(program, GL_LINK_STATUS, &status);
 

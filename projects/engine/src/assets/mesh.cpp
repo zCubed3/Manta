@@ -108,7 +108,7 @@ namespace Manta {
     }
 
     Mesh* Mesh::LoadFromFile(const std::string& path) {
-        std::ifstream file(path);
+        std::ifstream file(path, std::ifstream::binary);
 
         if (!file.is_open())
             throw std::runtime_error("File wasn't found / couldn't be read!");

@@ -5,6 +5,10 @@
 
 #include <defines.hpp>
 
+#ifdef WIN32
+#include <Windows.h>
+#endif
+
 // Wrapper for .so and .dll files!
 namespace Manta {
     class DynLib {
@@ -22,7 +26,11 @@ namespace Manta {
 
     protected:
 #ifdef __linux__
-      void* handle;
+        void* handle;
+#endif
+
+#ifdef WIN32
+        HMODULE module;
 #endif
     };
 }

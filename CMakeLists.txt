@@ -20,6 +20,7 @@ message("Build type = ${CMAKE_BUILD_TYPE}")
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     # set(CMAKE_VERBOSE_MAKEFILE ON) # Our shiny red button of debugging
     add_compile_definitions("_DEBUG" "DEBUG")
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 endif()
 
 # Common directories
