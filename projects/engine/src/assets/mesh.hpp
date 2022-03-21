@@ -18,6 +18,8 @@ namespace Manta {
     class Viewport;
     class EngineContext;
 
+    struct MeshBuffer;
+
     class Mesh {
     public:
         // We have 1 vertex type in the engine for now, later more will come with different data configs allowed inside them!
@@ -33,23 +35,20 @@ namespace Manta {
         std::string name = "Unnamed";
         std::vector<uint32_t> indices;
         std::vector<Vertex> vertices;
+        MeshBuffer* buffer;
 
-        void CreateBuffers();
-        void UpdateBuffers();
-
-        static Mesh* LoadFromFile(const std::string &path);
-
-        // Meshes can draw themselves, though it is preferred to use renderers!
-        void DrawNow(const glm::mat4& transform, Shader* shader, EngineContext* engine);
-        void DrawNow(const glm::mat4& transform, const glm::mat4& transform_i, Shader* shader, EngineContext* engine);
+        static Mesh* LoadFromFile(const std::string &path, EngineContext* engine);
 
     protected:
-        uint32_t vao;
-        uint32_t vbo, ibo;
-
         void ReadOBJ(std::istream& source);
         void ReadBSM(std::istream& source);
         void ReadMMDL(std::istream &source);
+    };
+
+    // TODO: Recreating if we add dynamic mesh generation?
+    struct MeshBuffer {
+        virtual void Create(Mesh* mesh, EngineContext* engine) = 0;
+        virtual void UpdateData(Mesh* mesh, EngineContext* engine) = 0;
     };
 }
 

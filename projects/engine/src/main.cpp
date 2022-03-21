@@ -48,10 +48,55 @@ using namespace Manta::Data::Meshes;
 
 typedef GameModule*(*module_init_fptr)();
 
+// TODO: Replace old rendering architecture
+#include <rendering/newrenderer.hpp>
+#include <rendering/gl4/gl4renderer.hpp>
+#include <rendering/vk/vkrenderer.hpp>
+
+using namespace Manta::Rendering::OpenGL4;
+using namespace Manta::Rendering::Vulkan;
+
 // TODO: Differentiate between shipping and editor if we ever make an editor
 int main(int argc, char** argv) {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS);
 
+    //NewRenderer* nrenderer = new GL4Renderer();
+    NewRenderer* nrenderer = new VkRenderer();
+
+    nrenderer->Initialize("Manta");
+
+    SDL_Event sdl_event;
+
+    bool keep_running = true;
+    bool resized = false;
+    bool first_run = true;
+
+    auto engine = new EngineContext();
+    engine->renderer2 = nrenderer;
+
+    Mesh* test_mesh = Mesh::LoadFromFile("test.mmdl", engine);
+
+    while (keep_running) {
+        while (SDL_PollEvent(&sdl_event) != 0) {
+            if (sdl_event.type == SDL_QUIT)
+                keep_running = false;
+
+            if (sdl_event.type == SDL_WINDOWEVENT) {
+                if (sdl_event.window.event == SDL_WINDOWEVENT_RESIZED)
+                    resized = true;
+            }
+        }
+
+        if (first_run) {
+            resized = true;
+            first_run = false;
+        }
+
+        nrenderer->Present();
+    }
+
+    return 0;
+    /*Old main loop
     SDL_Event sdl_event;
     bool keep_running = true;
 
@@ -213,4 +258,5 @@ int main(int argc, char** argv) {
     delete dlib_game;
 
     return 0;
+     */
 }

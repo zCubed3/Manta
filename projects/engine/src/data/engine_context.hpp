@@ -22,6 +22,7 @@ namespace Manta {
         class Lighting;
         class Renderer;
         class Viewport;
+        class NewRenderer;
     }
 
     class EngineContext {
@@ -33,6 +34,7 @@ namespace Manta {
         Rendering::Viewport* active_viewport;
         Rendering::Lighting* lighting;
         Rendering::Renderer* renderer;
+        Rendering::NewRenderer* renderer2;
 
         Timing* timing;
 

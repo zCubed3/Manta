@@ -32,7 +32,7 @@ namespace Manta {
                 shader = shaders[m];
             }
 
-            mesh->DrawNow(transform.local_to_world, transform.world_to_local, shader, engine);
+            //mesh->DrawNow(transform.local_to_world, transform.world_to_local, shader, engine);
             m += 1;
         }
     }

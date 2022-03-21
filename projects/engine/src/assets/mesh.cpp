@@ -24,93 +24,12 @@
 
 #include <math.h>
 
+#include <rendering/newrenderer.hpp>
+
 using namespace Manta::Data::Meshes;
 
 namespace Manta {
-    void Mesh::CreateBuffers() {
-        glGenVertexArrays(1, &vao);
-        glGenBuffers(1, &vbo);
-        glGenBuffers(1, &ibo);
-
-        UpdateBuffers();
-    }
-
-    void Mesh::UpdateBuffers() {
-        glBindVertexArray(vao);
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * indices.size(), indices.data(), GL_STATIC_DRAW);
-
-        glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    }
-
-    void Mesh::DrawNow(const glm::mat4 &transform, Shader *shader, EngineContext* engine) {
-        Mesh::DrawNow(transform, glm::inverse(transform), shader, engine);
-    }
-
-    void Mesh::DrawNow(const glm::mat4& transform, const glm::mat4 &transform_i, Shader* shader, EngineContext* engine) {
-        if (shader == nullptr)
-            shader = engine->error_shader;
-
-        uint32_t handle = shader->Use(engine);
-
-        // TODO: Shader properties
-        if (engine->active_viewport) {
-            shader->SetMat4x4("MANTA_MVP", engine->active_viewport->eye * transform);
-            shader->SetMat4x4("MANTA_M", transform);
-            shader->SetMat4x4("MANTA_M_I", transform_i);
-            shader->SetMat4x4("MANTA_M_IT", glm::transpose(transform_i));
-
-            shader->SetVec3("MANTA_CAM_POS", engine->active_viewport->viewing_pos);
-        }
-
-        shader->SetFloat("MANTA_TIME", engine->timing->time);
-        shader->SetVec4("MANTA_SINTIME", engine->timing->sin_time);
-        shader->SetVec4("MANTA_COSTIME", engine->timing->cos_time);
-        shader->SetVec4("MANTA_TANTIME", engine->timing->tan_time);
-
-        uint32_t lights_index = glGetUniformBlockIndex(handle, "MANTA_LIGHT_BUFFER");
-        glUniformBlockBinding(handle, lights_index, 4);
-
-        glBindBufferBase(GL_UNIFORM_BUFFER, 4, engine->lighting->handle);
-
-        //
-        //
-        //
-
-        glBindVertexArray(vao);
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glEnableVertexAttribArray(2);
-        glEnableVertexAttribArray(3);
-
-        int v_size = sizeof(Vertex);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, v_size, nullptr);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, v_size, (void *) (sizeof(float) * 3));
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, v_size, (void *) (sizeof(float) * 6));
-        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, v_size, (void *) (sizeof(float) * 8));
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
-
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glDisableVertexAttribArray(2);
-        glDisableVertexAttribArray(3);
-
-        glBindVertexArray(0);
-    }
-
-    Mesh* Mesh::LoadFromFile(const std::string& path) {
+    Mesh* Mesh::LoadFromFile(const std::string& path, EngineContext* engine) {
         std::ifstream file(path, std::ifstream::binary);
 
         if (!file.is_open())
@@ -165,7 +84,8 @@ namespace Manta {
         std::cout << "  Indice Count: " << mesh->indices.size() << std::endl;
 #endif
 
-        mesh->CreateBuffers();
+        mesh->buffer = engine->renderer2->CreateMeshBuffer();
+        mesh->buffer->Create(mesh, engine);
 
         return mesh;
     }

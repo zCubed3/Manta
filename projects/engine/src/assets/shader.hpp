@@ -34,6 +34,32 @@ namespace Manta {
 
         static void CreateEngineShaders(EngineContext* engine);
 
+        //
+        // Functions within this shader that describe how we handle it!
+        //
+
+        // TODO: Afaik Spir-V strips out custom pragmas, we need a way to describe shaders!
+        // TODO: Binary / Text shader container file!
+
+        // Depth testing functions, these are universally similar!
+        enum class DepthTestFunc {
+            Always, // No depth testing is done at all, this causes depth buffer artifacts!
+            Less, // Draws fragment if fragment is closer than the one behind it
+            Greater // Draws fragment if fragment is further than the one in front of it
+        };
+
+        // Face culling modes, between OpenGL and Vulkan, modes are flipped, don't panic though, we can fix that ourselves!
+        enum class CullMode {
+            Off, // Perform zero culling
+            Back, // Culls a given face that points away from the viewport
+            Front // Culls a given face that points toward the viewport
+        };
+
+        // Alpha blending functions
+        enum class AlphaBlendFunc {
+            // TODO: Add these
+        };
+
     protected:
         int version = 330;
         bool analyzed = false;

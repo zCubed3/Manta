@@ -6,6 +6,7 @@ set(SOURCES
         "${DEPENDS_DIR}/imgui/imgui_widgets.cpp"
         "${DEPENDS_DIR}/imgui/backends/imgui_impl_sdl.cpp"
         "${DEPENDS_DIR}/imgui/backends/imgui_impl_opengl3.cpp"
+        "${DEPENDS_DIR}/imgui/backends/imgui_impl_vulkan.cpp"
 
         "${DEPENDS_DIR}/MikkTSpace/mikktspace.c"
 
@@ -49,12 +50,21 @@ set(SOURCES
 
         "src/modularity/dynlib.cpp"
 
+        # New rendering system
+        "src/rendering/newrenderer.cpp"
+
+        "src/rendering/gl4/gl4renderer.cpp"
+
+        "src/rendering/vk/vkrenderer.cpp"
+        "src/rendering/vk/assets/vkmeshbuffer.cpp"
+
         "src/main.cpp"
 )
 
 set(INCLUDE_DIRS
     "${ENGINE_DIR}/src"
     "${DEPENDS_DIR}/glm"
+    "${DEPENDS_DIR}/vma/include"
     "${DEPENDS_DIR}/imgui"
     "${DEPENDS_DIR}/MikkTSpace"
     "${COMMON_DIR}"
@@ -69,7 +79,7 @@ if (DEFINED WIN32)
     set(INCLUDE_DIRS ${INCLUDE_DIRS} "${DEPENDS_DIR}/SDL2/include" "${DEPENDS_DIR}/glew/include")
 else ()
     set(LINK_DIRS "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
-    set(LIBRARIES "SDL2" "SDL2main" "GL" "GLEW")
+    set(LIBRARIES "vulkan" "SDL2" "SDL2main" "GL" "GLEW" VulkanMemoryAllocator)
     set(INCLUDE_DIRS ${INCLUDE_DIRS})
 endif ()
 
@@ -90,5 +100,5 @@ add_custom_target(copy-content ALL
 )
 
 add_dependencies(Manta copy-content)
-add_dependencies(Manta MantaGame)
+#add_dependencies(Manta MantaGame)
 
